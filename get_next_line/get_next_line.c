@@ -1,41 +1,81 @@
 #include "get_next_line.h"
+#include <stdio.h>
 
 char	*get_next_line(int fd)
 {
-	static char *dst;
-	char		*temp_read;
-	int			size;
+	static char		*buffer;
+	char			*dst;
+	char			*sdst;
+	char			*tdst;
+	int				newline;
 
-	if (!dst)
-		dst = malloc((BUFFER_SIZE + 1) * sizeof(char));
+	if (!buffer)
+		buffer = (char *)ft_calloc(BUFFER_SIZE + 1, sizeof(char));
+	if (!buffer)
+		return (NULL);
+	dst = (char *)malloc((BUFFER_SIZE + 1) * sizeof(char));
 	if (!dst)
 		return (NULL);
-	read(fd, &temp_read, BUFFER_SIZE);
-	if (!dst[0])
-		ft_strlcpy(dst, temp_read, BUFFER_SIZE);
-	else
+	ft_strcpy(dst, buffer);
+	newline = ft_strchr(dst, '\n');
+	if (newline != -1)
 	{
-		size = ft_strlen(dst);
-		ft_strlcpy(&dst[size], temp_read, )
+		ft_strcpy(buffer, &dst[newline + 1]);
+		dst[newline + 1] = 0;
+		return (dst);
 	}
-	c = 0;
-	pos->x = 0;
-	pos->y = 0;
-	while (c != '\n' && read(fd, &c, 1) > 0)
+//	printf("d:%s\n", buffer);
+//	printf("d:%s\n", dst);
+	while (newline == -1)
 	{
-		if (c != map->empty)
+		tdst = dst;
+//		printf("t:%s\ns:%s\n", tdst, sdst);
+
+		sdst = (char *)ft_calloc(BUFFER_SIZE + 1, sizeof(char));
+		if (!sdst)
+			return (NULL);
+		newline = read(fd, sdst, BUFFER_SIZE);
+//		printf("ddd:%d\n", dst[0]);
+//		printf("ddd:%d\n", sdst[0]);
+		dst = ft_strjoin(tdst, sdst);
+//		printf("dd:%s\n", dst);
+//		printf("dd:%s\n", sdst);
+		free(tdst);
+		newline = ft_strlen(dst);
+		printf("nl:%d\n", newline);
+		if (newline == BUFFER_SIZE)
+			newline = ft_strchr(dst, '\n');
+		else if (newline == 0)
 		{
-			if (c == map->obstacle)
-			{
-				(*elem)->next = ft_create_elem(pos->x, pos->y);
-				*elem = (*elem)->next;
-			}
-			else if (c != '\n')
-				map->is_valid = 0;
+			free(sdst);
+			return (NULL);
 		}
-		++pos->x;
+		free(sdst);
+//		printf("nl:%d\n", newline);
+//		printf("%s\n", dst);
+//		printf("is there a newline? %zu\n", ft_strlen(newline));
 	}
-	map->x = pos->x - 1;
-	++pos->y;
-	pos->x = 0;
+//	printf("%d", newline);
+	ft_strcpy(buffer, &dst[newline + 1]);
+//	printf("d:%d,%d\n", buffer[0], buffer[1]);
+	dst[newline + 1] = 0;
+//	printf("d:%d,%d\n", dst[0], dst[1]);
+//	printf("d:%s\n", dst);
+	return (dst);
+}
+
+#include <fcntl.h>
+
+int main()
+{
+	char *line;
+
+//	int fd = open("gnlTester/files/empty", O_RDONLY);
+	line = get_next_line(1000);
+	printf("%s\n", line);
+	while (line)
+	{
+		line = get_next_line(1000);
+		printf("%s\n", line);
+	}
 }
