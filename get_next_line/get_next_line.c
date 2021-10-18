@@ -41,16 +41,22 @@ char	*get_next_line(int fd)
 //		printf("dd:%s\n", dst);
 //		printf("dd:%s\n", sdst);
 		free(tdst);
-		newline = ft_strlen(dst);
-		printf("nl:%d\n", newline);
-		if (newline == BUFFER_SIZE)
-			newline = ft_strchr(dst, '\n');
-		else if (newline == 0)
-		{
-			free(sdst);
-			return (NULL);
-		}
 		free(sdst);
+//		printf("nl:%d\n", newline);
+		if (newline < 1)
+		{
+			if (buffer[0] == 0)
+			{
+				free(buffer);
+				return (NULL);
+			}
+			newline = ft_strchr(dst, 0);
+			buffer[0] = 0;
+			dst[newline + 1] = 0;
+			return (dst);
+		}
+		else
+			newline = ft_strchr(dst, '\n');
 //		printf("nl:%d\n", newline);
 //		printf("%s\n", dst);
 //		printf("is there a newline? %zu\n", ft_strlen(newline));
@@ -66,16 +72,16 @@ char	*get_next_line(int fd)
 
 #include <fcntl.h>
 
-int main()
+int main(int argc, char **argv)
 {
 	char *line;
-
-//	int fd = open("gnlTester/files/empty", O_RDONLY);
-	line = get_next_line(1000);
-	printf("%s\n", line);
+	argc = 1;
+	int fd = open(argv[1], O_RDONLY);
+	line = get_next_line(fd);
+	printf("%d | %s", argc++, line);
 	while (line)
 	{
-		line = get_next_line(1000);
-		printf("%s\n", line);
+		line = get_next_line(fd);
+		printf("%d | %d", argc++, line == NULL);
 	}
 }
