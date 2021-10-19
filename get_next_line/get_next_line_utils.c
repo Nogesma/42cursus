@@ -53,7 +53,7 @@ void	*ft_calloc(size_t count, size_t size)
 
 char	*ft_strjoin(char *s1, char *s2)
 {
-	int		s1l;
+	size_t 	s1l;
 	char	*str;
 
 	if (!s1 || !s2)

@@ -12,12 +12,20 @@ char	*get_next_line(int fd)
 	dst = (char *)ft_calloc(BUFFER_SIZE + 1, sizeof(char));
 	if (!dst)
 		return (NULL);
+	ft_strcpy(dst, buffer);
+	buffer[0] = 0;
 	newline = ft_strchr(dst, '\n');
 	if (newline != -1)
 	{
 		ft_strcpy(buffer, &dst[newline + 1]);
 		dst[newline + 1] = 0;
-		return (dst);
+		sdst = (char *)ft_calloc(newline + 1, sizeof(char));
+		if (!sdst)
+			return (NULL);
+		ft_strcpy(sdst, dst);
+		free(dst);
+		printf("a:%s\n", sdst);
+		return (sdst);
 	}
 	while (newline == -1)
 	{
@@ -25,26 +33,38 @@ char	*get_next_line(int fd)
 		sdst = (char *)ft_calloc(BUFFER_SIZE + 1, sizeof(char));
 		if (!sdst)
 			return (NULL);
-		newline = read(fd, sdst, BUFFER_SIZE);
+		newline = (int)read(fd, sdst, BUFFER_SIZE);
 		dst = ft_strjoin(tdst, sdst);
 		if (newline < 1)
 		{
+			buffer [0] = 0;
 			if (dst[0])
+			{
+				printf("b:%s\n", dst);
 				return (dst);
+			}
 			free(dst);
-			newline = BUFFER_SIZE + 1;
-			while (newline --> 0)
-				buffer[newline] = 0;
 			return (NULL);
 		}
 		else if (newline < BUFFER_SIZE)
-			newline = ft_strchr(dst, 0);
+		{
+			newline = ft_strchr(dst, '\n');
+			if (newline == -1)
+				newline = ft_strchr(dst, 0);
+		}
 		else
 			newline = ft_strchr(dst, '\n');
 	}
-	ft_strcpy(buffer, &dst[newline + 1]);
+	if (newline != (int)ft_strlen(dst))
+		ft_strcpy(buffer, &dst[newline + 1]);
 	dst[newline + 1] = 0;
-	return (dst);
+	sdst = (char *)ft_calloc(newline + 1, sizeof(char));
+	if (!sdst)
+		return (NULL);
+	ft_strcpy(sdst, dst);
+	free(dst);
+	printf("c:%s\n", sdst);
+	return (sdst);
 }
 
 #include <fcntl.h>
