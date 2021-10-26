@@ -3,3 +3,6 @@
 a.out
 *.o
 *.a
+fract-ol/fract-ol
+CMakeLists.txt
+cmake-build-debug

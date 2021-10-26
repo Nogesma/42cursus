@@ -1,16 +1,28 @@
 #include <stdlib.h>
 #include <stdio.h>
-#include <string.h>
+#include <math.h>
 #include <mlx.h>
 
 typedef struct data_s
 {
   void *mlx_ptr;
   void *mlx_win;
-  void *image;
-  void *buffer;
+  double zoom;
   int x;
   int y;
+  double panx;
+  double pany;
+  int *buffer;
+  char *image;
+  int pixel_bits;
+  int line_bytes;
+  int endian;
+  float dx;
+  float dy;
+  float xMin;
+  float xMax;
+  float yMin;
+  float yMax;
 } data_t;
 
 typedef struct rgb_s
@@ -30,7 +42,47 @@ int rgb_to_int(int r, int g, int b)
 	return (color);
 }
 
-int iterate(int x, int y, int maxiterations, data_t data, char *buffer, int endian, int line_bytes, int zoom)
+int iterate(int max_iter, float x0, float y0)
+{
+	float xtemp;
+	float x;
+	float y;
+	int iter;
+
+	x = 0;
+	y = 0;
+	iter = 0;
+	while (iter < max_iter && (x * x + y * y <= 4))
+	{
+		xtemp = x * x - y * y + x0;
+		y = 2 * x * y + y0;
+		// Next iteration
+		x = xtemp;
+		iter++;
+	}
+	return (iter);
+}
+
+int iterateEquation(int maxiterations, double Cr, double Ci)
+{
+	double Zr = 0;
+	double Zi = 0;
+	double Tr = 0;
+	double Ti = 0;
+	int iterations = 0;
+
+	while (iterations < maxiterations && (Tr + Ti <= 4))
+	{
+		Zi = 2 * Zr * Zi + Ci;
+		Zr = Tr - Ti + Cr;
+		Tr = Zr * Zr;
+		Ti = Zi * Zi;
+		iterations++;
+	}
+	return (iterations);
+}
+
+int set_pixel_value(data_t *data, int pixel, int iterations, int maxiterations)
 {
 	rgb palette[256] = {{.r = 24, .g = 16, .b = 0},
 						{.r = 27, .g = 16, .b = 0},
@@ -289,67 +341,171 @@ int iterate(int x, int y, int maxiterations, data_t data, char *buffer, int endi
 						{.r =216, .g =208, .b =192},
 						{.r =216, .g =208, .b =192}};
 
-	float x0;
-	float y0;
-	float offsetx = (float)-data.x / 2;
-	float offsety = (float)-data.y / 2;
-	float panx = -200;
-	float pany = 0;
-	x0 = (float)((float)x + offsetx + panx) / (float)zoom;
-	y0 = (float)((float)y + offsety + pany) / (float)zoom;
-	float xtemp;
-	float rx = 0;
-	float ry = 0;
-
-
-	int iterations = 0;
-	while (iterations < maxiterations && (rx * rx + ry * ry <= 4))
-	{
-		xtemp = rx * rx - ry * ry + x0;
-		ry = 2 * rx * ry + y0;
-
-		// Next iteration
-		rx = xtemp;
-		iterations++;
-	}
-
 	int color;
 	if (iterations == maxiterations)
-	{
 		color = 0;
-	} else
+	else
 	{
 		int index = (int)(((double)iterations / (double)(maxiterations - 1)) * 255);
 //		printf("%d %d\n", iterations, maxiterations - 1);
 		color = rgb_to_int(palette[index].r, palette[index].g, palette[index].b);
 	}
-	int pixel = (y * line_bytes) + (x * 4);
-	if (endian == 1)        // Most significant (Alpha) byte first
-	{
-		buffer[pixel + 0] = (char)(color >> 24);
-		buffer[pixel + 1] = (char)((color >> 16) & 0xFF);
-		buffer[pixel + 2] = (char)((color >> 8) & 0xFF);
-		buffer[pixel + 3] = (char)((color) & 0xFF);
-	}
-	else if (endian == 0)   // Least significant (Blue) byte first
-	{
-		buffer[pixel + 0] = (char)((color) & 0xFF);
-		buffer[pixel + 1] = (char)((color >> 8) & 0xFF);
-		buffer[pixel + 2] = (char)((color >> 16) & 0xFF);
-		buffer[pixel + 3] = (char)(color >> 24);
-	}
+	data->buffer[pixel] = (color);
 	return (0);
 }
+
+double *linspace(double start, double end, int size)
+{
+	double step;
+	int i;
+	double val;
+	double *dest;
+
+	dest = (double *)malloc(size * sizeof(double));
+	if (!dest)
+		return (NULL);
+	step = (end - start) / size;
+	i = -1;
+	val = start;
+	while (++i < size)
+	{
+		dest[i] = val;
+		val += step;
+	}
+	return (dest);
+}
+
+int	update_image(data_t *data)
+{
+	int	x;
+	int	y;
+	int	pixel;
+	float dx;
+	float dy;
+	int it;
+
+	dy = 0;
+//		bt = data.buffer;
+//		if (bt)
+//			free(bt);
+	y = -1;
+	pixel = 0;
+
+	while (++y < data->y)
+	{
+		x = -1;
+		dx = 0;
+		while (++x < data->x)
+		{
+			it = iterateEquation(100, dx + data->xMin,dy + data->yMin);
+//			printf("%d dx:%f dy:%f\n", it, dx, dy);
+			set_pixel_value(data, pixel, it, 100);
+			pixel++;
+			dx += data->dx;
+		}
+		dy += data->dy;
+//			mlx_pixel_put(data.mlx_ptr, data.mlx_win, x, y, rgb_to_int(230, 10, 124));
+	}
+	mlx_put_image_to_window(data->mlx_ptr, data->mlx_win, data->image, 0, 0);
+	//	mlx_destroy_image(data->mlx_ptr, data->image);
+	return (1);
+}
+
+int mandelbrot(data_t *data)
+{
+	data->xMin = -2.0;
+	data->xMax = 0.47;
+	data->yMin = -1.12;
+	data->yMax = 1.12;
+
+	data->dx = (data->xMax - data->xMin) / data->x;
+	data->dy = (data->yMax - data->yMin) / data->y;
+
+	update_image(data);
+	return (1);
+}
+
+int mouse_event(int button, int x, int y, data_t *data)
+{
+
+	// Whenever the event is triggered, print the value of button to console.
+	printf("bb::%d x:%d y:%d dx:%f dy:%f xmin:%f xmax:%f ymin:%f ymax:%f\n", button, x, y, data->dx, data->dy, data->xMin, data->xMax, data->yMin, data->yMax);
+	if (button == 4)
+	{
+		double xm = data->dx * x + data->xMin;
+		double ym = data->dy * y + data->yMin;
+
+		data->dx /= data->zoom;
+		data->dy /= data->zoom;
+
+		data->xMin= xm - x * data->dx;
+		data->xMax= xm + (data->x - x) * data->dx;
+
+		data->yMin= ym - y * data->dy;
+		data->yMax= ym + (data->y - y) * data->dy;
+		update_image(data);
+		printf("b::%d x:%d y:%d dx:%f dy:%f xmin:%f xmax:%f ymin:%f ymax:%f\n", button, x, y, data->dx, data->dy, data->xMin, data->xMax, data->yMin, data->yMax);
+
+		update_image(data);
+	}
+	else if (button == 5)
+	{
+		double xm = data->dx * data->zoom * x + data->xMin;
+		double ym = data->dy * data->zoom * y + data->yMin;
+
+		data->xMin= xm - (data->x - x) * data->dx;
+		data->xMax= xm + x * data->dx;
+
+		data->yMin= ym - y * data->dy;
+		data->yMax= ym + (data->y - y) * data->dy;
+
+		data->dx *= data->zoom;
+		data->dy *= data->zoom;
+
+
+		update_image(data);
+		printf("bb::%d x:%d y:%d dx:%f dy:%f xmin:%f xmax:%f ymin:%f ymax:%f\n", button, x, y, data->dx, data->dy, data->xMin, data->xMax, data->yMin, data->yMax);
+	}
+	return 1;
+}
+
+//int kbd_event(int button, data_t *data)
+//{
+//	// Whenever the event is triggered, print the value of button to console.
+//	printf("key:: %d px0:%f\n", button, data->panx);
+//	if (button == 65363)
+//	{
+//		data->panx += 5;
+//		update_image(data);
+//	}
+//	else if (button == 65361)
+//	{
+//		data->panx -= 5;
+//		update_image(data);
+//	}
+//	else if (button == 65362)
+//	{
+//		data->pany += 5;
+//		update_image(data);
+//	}
+//	else if (button == 65364)
+//	{
+//		data->pany -= 5;
+//		update_image(data);
+//	}
+//	return 1;
+//}
 
 int main(void)
 {
 	data_t data;
 
-	int x;
-	int y;
 	data.mlx_ptr = mlx_init();
-	data.x = 2560;
-	data.y = 1440;
+	data.x = 640;
+	data.y = 360;
+	data.zoom = 1.1;
+	data.panx = 0;
+	data.pany = 0;
 
 	if (!(data.mlx_ptr))
 		return (EXIT_FAILURE);
@@ -357,31 +513,13 @@ int main(void)
 	if (!(data.mlx_win))
 		return (EXIT_FAILURE);
 
-	int zoom = 398;
-	x = -1;
-	char *bt;
-	data.buffer = NULL;
-	while (++zoom < 400)
-	{
-		data.image = mlx_new_image(data.mlx_ptr, data.x, data.y);
-		int pixel_bits;
-		int line_bytes;
-		int endian;
-//		bt = data.buffer;
-		data.buffer = mlx_get_data_addr(data.image, &pixel_bits, &line_bytes, &endian);
-//		if (bt)
-//			free(bt);
-		printf("%d\n", zoom);
-		while (++x < data.x)
-		{
-			y = -1;
-			while (++y < data.y)
-//			mlx_pixel_put(data.mlx_ptr, data.mlx_win, x, y, rgb_to_int(230, 10, 124));
-				iterate(x, y, 200, data, data.buffer, endian, line_bytes, zoom);
-		}
-		mlx_put_image_to_window(data.mlx_ptr, data.mlx_win, data.image, 0, 0);
-		free(data.image);
-	}
+	data.image = mlx_new_image(data.mlx_ptr, data.x, data.y);
+	data.buffer = (int *)mlx_get_data_addr(data.image, &data.pixel_bits, &data.line_bytes, &data.endian);
+	data.line_bytes /= 4;
+
+	mandelbrot(&data);
+	mlx_mouse_hook(data.mlx_win, &mouse_event, &data);
+//	mlx_key_hook(data.mlx_win, &kbd_event, &data);
 	mlx_loop(data.mlx_ptr);
 	return (EXIT_SUCCESS);
 }

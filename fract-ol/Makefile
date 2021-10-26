@@ -11,7 +11,7 @@
 # **************************************************************************** #
 
 #CFLAGS = -Wall -Wextra -Werror
-IFLAGS = -lmlx -L/usr/lib -lXext -lX11 -lm -lbsd
+IFLAGS = -lmlx -L/usr/lib -lXext -lX11 -lm -lbsd -O3 -march=native
 CC     = gcc $(CFLAGS)
 OBJ    = main.o
 NAME   = fract-ol
