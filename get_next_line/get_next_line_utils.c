@@ -12,14 +12,20 @@
 
 #include "get_next_line.h"
 
-int	ft_strcpy(char *dest, const char *src)
+size_t	ft_strlcpy(char *dst, const char *src, size_t dstsize)
 {
-	int	i;
+	unsigned int	i;
 
-	i = -1;
-	while (src[++i])
-		dest[i] = src[i];
-	dest[i] = 0;
+	i = 0;
+	while (i + 1 < dstsize && src[i])
+	{
+		dst[i] = src[i];
+		i++;
+	}
+	if (dstsize != 0)
+		dst[i] = 0;
+	while (src[i])
+		i++;
 	return (i);
 }
 
@@ -35,40 +41,43 @@ size_t	ft_strlen(const char *s)
 
 void	*ft_calloc(size_t count, size_t size)
 {
-	size_t			s;
-	unsigned char	*m;
+	size_t	s;
+	void	*m;
 
 	s = count * size;
-	m = (unsigned char *)malloc(s);
+	m = malloc(s);
 	if (m == NULL)
 		return (NULL);
-	while (size-- > 0)
-		m[size] = 0;
-	return ((void *)m);
+	ft_bzero(m, s);
+	return (m);
 }
 
 char	*ft_strjoin(char *s1, char *s2)
 {
 	size_t	s1l;
+	size_t	s2l;
 	char	*str;
 
 	if (!s1 || !s2)
 		return (NULL);
 	s1l = ft_strlen(s1);
+	s2l = ft_strlen(s2);
 	str = (char *)ft_calloc(s1l + ft_strlen(s2) + 1, sizeof(char));
 	if (str == NULL)
 		return (NULL);
-	ft_strcpy(str, s1);
-	ft_strcpy(str + s1l, s2);
+	ft_strlcpy(str, s1, s1l + 1);
+	ft_strlcpy(str + s1l, s2, s2l + 1);
 	free(s1);
 	return (str);
 }
 
 void	ft_bzero(void *s, size_t n)
 {
-	size_t	i;
+	size_t			i;
+	unsigned char	*dst;
 
 	i = -1;
+	dst = (unsigned char *)s;
 	while (++i < n)
-		*(unsigned char *)&s[i] = 0;
+		dst[i] = 0;
 }

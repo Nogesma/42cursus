@@ -49,29 +49,36 @@ static char	*read_file(int fd, char *buffer)
 	return (dst);
 }
 
-static int	get_rest(char *dst, char *buffer)
+static void	get_rest(char *dst, char *buffer)
 {
 	int	i;
 
 	i = ft_strchr(dst, '\n');
 	if (i != -1)
-	{
-		ft_strcpy(buffer, &dst[i + 1]);
-		return (i);
-	}
-	ft_bzero(buffer, BUFFER_SIZE + 1);
-	return (ft_strchr(dst, 0));
+		ft_strlcpy(buffer, &dst[i + 1], BUFFER_SIZE + 1);
+	return ;
 }
 
-static char	*get_line(char *src, int size)
+static char	*get_line(char *src)
 {
 	char	*dst;
+	int		size;
 
+	size = ft_strchr(src, '\n') + 1;
+	if (size == 0)
+	{
+		size = ft_strlen(src);
+		if (size == 0)
+		{
+			free(src);
+			return (NULL);
+		}
+	}
 	dst = (char *)ft_calloc(size + 1, sizeof(char));
 	if (!dst)
 		return (NULL);
-	src[size + 1] = 0;
-	ft_strcpy(dst, src);
+	src[size] = 0;
+	ft_strlcpy(dst, src, size + 1);
 	free(src);
 	if (dst[0])
 		return (dst);
@@ -83,13 +90,12 @@ char	*get_next_line(int fd)
 {
 	static char		buffer[BUFFER_SIZE + 1];
 	char			*dst;
-	int				i;
 
 	if (read(fd, 0, 0) < 0)
 		return (NULL);
 	dst = read_file(fd, buffer);
-	i = get_rest(dst, buffer);
-	dst = get_line(dst, i);
+	get_rest(dst, buffer);
+	dst = get_line(dst);
 	return (dst);
 }
 
@@ -106,8 +112,10 @@ char	*get_next_line(int fd)
 //	printf("%d | %s", argc++, line);
 //	while (line)
 //	{
+//		free(line);
 //		line = get_next_line(fd);
 //		printf("%d | %s", argc++, line);
 //	}
+//	free(line);
 //	close(fd);
 //}

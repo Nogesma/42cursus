@@ -20,7 +20,7 @@
 # include <unistd.h>
 # include <stdlib.h>
 
-int		ft_strcpy(char *dest, const char *src);
+size_t	ft_strlcpy(char *dst, const char *src, size_t dstsize);
 
 size_t	ft_strlen(const char *s);
 
