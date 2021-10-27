@@ -11,16 +11,16 @@
 # **************************************************************************** #
 
 #CFLAGS = -Wall -Wextra -Werror
-IFLAGS = -lmlx -L/usr/lib -lXext -lX11 -lm -lbsd -O3 -march=native
+IFLAGS = -L./mlx -I./mlx -l mlx -framework OpenGL -framework Appkit -O3
 CC     = gcc $(CFLAGS)
 OBJ    = main.o
 NAME   = fract-ol
 
 .c.o:
-	$(CC) -c $< -o $@ $(IFLAGS)
+	$(CC) -openmp -c $< -o $@ $(IFLAGS)
 
 $(NAME): $(OBJ)
-	$(CC) -o $(NAME) $(OBJ) $(IFLAGS)
+	$(CC) -openmp -o $(NAME) $(OBJ) $(IFLAGS)
 
 all: $(NAME)
 
