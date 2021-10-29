@@ -20,13 +20,13 @@ char	*ft_strtrim(char const *s1, char const *set)
 	if (!s1 || !set)
 		return (NULL);
 	start = 0;
-	while (ft_strchr(set, s1[start]) != NULL)
+	while (ft_strchr(set, s1[start]))
 		start++;
 	len = start;
 	while (s1[len])
 		len++;
 	len--;
-	while (ft_strchr(set, s1[len]) != NULL)
+	while (ft_strchr(set, s1[len]))
 		len--;
 	return (ft_substr(s1, start, len - start + 1));
 }

@@ -19,14 +19,14 @@ char	*ft_substr(char const *s, unsigned int start, size_t len)
 
 	if (s == NULL)
 		return (NULL);
-	dest = (char *)ft_calloc((len + 1), sizeof(char));
+	if (start >= ft_strlen(s))
+		return (ft_calloc(1, 1));
+	i = ft_strlen(&s[start]);
+	if (len < i)
+		i = len;
+	dest = (char *)ft_calloc((i + 1), sizeof(char));
 	if (dest == NULL)
 		return (NULL);
-	if (start >= ft_strlen(s))
-		return (dest);
-	i = 0;
-	while (s[start] && i < len)
-		dest[i++] = s[start++];
-	dest[i] = 0;
+	ft_strlcpy(dest, &s[start], i + 1);
 	return (dest);
 }
