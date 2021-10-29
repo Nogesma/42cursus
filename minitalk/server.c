@@ -14,37 +14,51 @@
 #include <signal.h>
 #include <stdio.h>
 
-void	write_char(const char *s)
+char	*stradd(char *s1, char c)
 {
-	char	c;
-	int		i;
+	int		s1l;
+	char	*str;
 
-	i = 0;
-	c = 0;
-	while (s[i])
+	if (!s1)
 	{
-		c *= 2;
-		c += s[i] - '0';
-		++i;
+		str = (char *)malloc( 2 * sizeof(char));
+		if (!str)
+			return (NULL);
+		str[0] = c;
+		str[1] = 0;
+		return (str);
 	}
-	ft_putchar_fd((char)c, 1);
+	s1l = ft_strlen(s1);
+	str = (char *)malloc((s1l + 2) * sizeof(char));
+	if (!str)
+		return (NULL);
+	ft_strlcpy(str, s1, s1l + 1);
+	str[s1l] = c;
+	str[s1l + 1] = 0;
+	free(s1);
+	return (str);
 }
 
 void	print_signal(char c)
 {
-	static char	buffer[9];
-	int			i;
+	static char *str = 0;
+	static char	buffer = 0;
+	static int	i = 0;
 
-	i = 0;
-	while (buffer[i])
-		i++;
-	if (i != 7)
-		buffer[i] = c;
-	else
+	buffer = buffer << 1 | c;
+	i++;
+	if (i == 8)
 	{
-		buffer[i] = c;
-		write_char(buffer);
-		ft_bzero(buffer, 9);
+		if (buffer)
+			str = stradd(str, buffer);
+		else
+		{
+			ft_putstr_fd(str, 1);
+			free(str);
+			str = 0;
+		}
+		buffer = 0;
+		i = 0;
 	}
 }
 
@@ -52,11 +66,17 @@ void	handler(int sig, siginfo_t *info,
 	__attribute__((unused)) void *context)
 {
 	if (sig == SIGUSR1)
-		print_signal('0');
+		print_signal(0);
+	else if (sig ==SIGUSR2)
+		print_signal(1);
 	else
-		print_signal('1');
-	usleep(250);
-	kill(info->si_pid, SIGUSR1);
+		exit(1);
+//	usleep(250);
+	if (kill(info->si_pid, SIGUSR1) == -1)
+	{
+		ft_putstr_fd("Error sending sigusr1\n", 2);
+		exit(1);
+	}
 }
 
 int	main(void)
@@ -66,13 +86,13 @@ int	main(void)
 	ft_putstr_fd("PID: ", 1);
 	ft_putnbr_fd(getpid(), 1);
 	ft_putchar_fd('\n', 1);
+	sigfillset(&usraction.sa_mask);
+	sigdelset(&usraction.sa_mask, SIGINT);
+	sigdelset(&usraction.sa_mask, SIGQUIT);
 	usraction.sa_flags = SA_SIGINFO;
 	usraction.sa_sigaction = handler;
-	sigfillset(&usraction.sa_mask);
-	if (sigaction(SIGUSR1, &usraction, NULL) == -1)
-		ft_putstr_fd("Error, could not process SIGUSR1", 2);
-	if (sigaction(SIGUSR2, &usraction, NULL) == -1)
-		ft_putstr_fd("Error, could not process SIGUSR2", 2);
+	sigaction(SIGUSR1, &usraction, NULL);
+	sigaction(SIGUSR2, &usraction, NULL);
 	while (1)
 		pause();
 }

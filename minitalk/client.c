@@ -13,46 +13,59 @@
 #include <libft.h>
 #include <signal.h>
 
-void	send_str(char *s, pid_t pid)
+int	send_str(char *s, pid_t p)
 {
-	int	i;
-	int	j;
+	static char *str = 0;
+	static int	i = -1;
+	static int	j = -1;
+	static pid_t pid = 0;
 
-	i = -1;
-	while (s[++i])
+	if (s)
+		str = ft_strdup(s);
+	if (!str)
+		return (2);
+	if (!pid)
+		pid = p;
+	if (str[++i / 8])
 	{
-		j = 7;
-		while (j >= 0)
+		if (str[i / 8] & (0x80 >> (i % 8)))
 		{
-			if (s[i] & (1 << j))
-				kill(pid, SIGUSR2);
-			else
-				kill(pid, SIGUSR1);
-			pause();
-			j--;
+			if (kill(pid, SIGUSR2) == -1)
+				return (2);
 		}
+		else if (kill(pid, SIGUSR1) == -1)
+				return (2);
+		return (0);
 	}
+	if (++j < 8)
+	{
+		kill(pid, SIGUSR1);
+		return (0);
+	}
+	free(str);
+	return (1);
 }
 
-void	catch(__attribute__((unused)) int sig,
-	__attribute__((unused)) siginfo_t *info,
-	__attribute__((unused)) void *context)
+void	catch(__attribute__((unused)) int sig)
 {
+	int i;
+	i = send_str(0, 0);
+	if (i == 2 || i == 1)
+	{
+		exit(0);
+	}
 }
 
 int	main(int argc, char **argv)
 {
 	pid_t				pid;
-	struct sigaction	resume;
 
-	resume.sa_sigaction = catch;
-	resume.sa_flags = 0;
-	sigfillset(&resume.sa_mask);
-	if (sigaction(SIGUSR1, &resume, NULL) == -1)
-		ft_putstr_fd("Error, could not process SIGCONT", 2);
+	signal(SIGUSR1, catch);
 	if (argc == 3)
 	{
 		pid = ft_atoi(argv[1]);
 		send_str(argv[2], pid);
 	}
+	while (1)
+		pause();
 }

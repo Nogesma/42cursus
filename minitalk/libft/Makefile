@@ -6,11 +6,11 @@
 #    By: msegrans <msegrans@student.42lausan>       +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2021/10/12 12:07:41 by msegrans          #+#    #+#              #
-#    Updated: 2021/10/12 12:07:45 by msegrans         ###   ########.fr        #
+#    Updated: 2021/10/29 22:25:21 by msegrans         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
-CFLAGS = -Wall -Wextra -Werror
+CFLAGS = -Wall -Wextra -Werror -march=native -O0
 CC     = gcc $(CFLAGS)
 OBJ    = ft_atoi.o ft_bzero.o ft_calloc.o ft_isalnum.o ft_isalpha.o \
 	ft_isascii.o ft_isdigit.o ft_isprint.o ft_itoa.o ft_memchr.o ft_memcmp.o \
