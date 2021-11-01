@@ -10,7 +10,7 @@
 #                                                                              #
 # **************************************************************************** #
 
-CFLAGS  = -Wall -Wextra -Werror -O2 -march=native
+CFLAGS  = -Wall -Wextra -Werror
 CC      = gcc $(CFLAGS)
 LIB	    = libft/libft.a
 SERVER  = server

@@ -13,12 +13,31 @@
 #include <libft.h>
 #include <signal.h>
 
+int	send_null(pid_t pid)
+{
+	static int	j = -1;
+
+	if (++j < 8)
+	{
+		kill(pid, SIGUSR1);
+		return (0);
+	}
+	j = -1;
+	return (1);
+}
+
+int	send_signal(pid_t pid, int sig)
+{
+	if (kill(pid, sig) == -1)
+		return (2);
+	return (0);
+}
+
 int	send_str(char *s, pid_t p)
 {
-	static char *str = 0;
-	static int	i = -1;
-	static int	j = -1;
-	static pid_t pid = 0;
+	static char		*str = 0;
+	static int		i = -1;
+	static pid_t	pid = 0;
 
 	if (s)
 		str = ft_strdup(s);
@@ -29,30 +48,29 @@ int	send_str(char *s, pid_t p)
 	if (str[++i / 8])
 	{
 		if (str[i / 8] & (0x80 >> (i % 8)))
-		{
-			if (kill(pid, SIGUSR2) == -1)
-				return (2);
-		}
-		else if (kill(pid, SIGUSR1) == -1)
-				return (2);
-		return (0);
+			return (send_signal(pid, SIGUSR2));
+		return (send_signal(pid, SIGUSR1));
 	}
-	if (++j < 8)
+	if (send_null(pid))
 	{
-		kill(pid, SIGUSR1);
-		return (0);
+		free(str);
+		return (1);
 	}
-	free(str);
-	return (1);
+	return (0);
 }
 
 void	catch(__attribute__((unused)) int sig)
 {
-	int i;
+	int	i;
+
 	i = send_str(0, 0);
-	if (i == 2 || i == 1)
-	{
+	if (i == 1)
 		exit(0);
+	if (i == 2)
+	{
+		ft_putendl_fd("Error sending signal to server. "
+			"Are you sure it is running?", 2);
+		exit(1);
 	}
 }
 
@@ -60,12 +78,19 @@ int	main(int argc, char **argv)
 {
 	pid_t				pid;
 
-	signal(SIGUSR1, catch);
 	if (argc == 3)
 	{
+		signal(SIGUSR1, catch);
 		pid = ft_atoi(argv[1]);
+		if (pid <= 0)
+			return (1);
 		send_str(argv[2], pid);
+		while (1)
+			pause();
 	}
-	while (1)
-		pause();
+	else
+	{
+		ft_putendl_fd("usage: client [pid] [string]", 2);
+		return (1);
+	}
 }

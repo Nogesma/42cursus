@@ -21,7 +21,7 @@ char	*stradd(char *s1, char c)
 
 	if (!s1)
 	{
-		str = (char *)malloc( 2 * sizeof(char));
+		str = (char *)malloc(2 * sizeof(char));
 		if (!str)
 			return (NULL);
 		str[0] = c;
@@ -41,7 +41,7 @@ char	*stradd(char *s1, char c)
 
 void	print_signal(char c)
 {
-	static char *str = 0;
+	static char	*str = 0;
 	static char	buffer = 0;
 	static int	i = 0;
 
@@ -67,11 +67,10 @@ void	handler(int sig, siginfo_t *info,
 {
 	if (sig == SIGUSR1)
 		print_signal(0);
-	else if (sig ==SIGUSR2)
+	else if (sig == SIGUSR2)
 		print_signal(1);
 	else
 		exit(1);
-//	usleep(250);
 	if (kill(info->si_pid, SIGUSR1) == -1)
 	{
 		ft_putstr_fd("Error sending sigusr1\n", 2);
