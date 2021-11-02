@@ -25,14 +25,6 @@ typedef struct data_s
   double yMax;
 } data_t;
 
-typedef struct rgb_s
-{
-  int r;
-  int g;
-  int b;
-} rgb;
-
-
 int rgb_to_int(int r, int g, int b)
 {
 	int color = 0;
@@ -42,82 +34,72 @@ int rgb_to_int(int r, int g, int b)
 	return (color);
 }
 
-int iterate(int max_iter, float x0, float y0)
-{
-	float xtemp;
-	float x;
-	float y;
-	int iter;
-
-	x = 0;
-	y = 0;
-	iter = 0;
-	while (iter < max_iter && (x * x + y * y <= 4))
-	{
-		xtemp = x * x - y * y + x0;
-		y = 2 * x * y + y0;
-		// Next iteration
-		x = xtemp;
-		iter++;
-	}
-	return (iter);
-}
-
-int pickColor(int max_iterations, int iterations, double Tr, double Ti)
+int pickColor(int max_iterations, int iterations)
 {
 	int v;
 
-	float logBase = 1.0 / log(2.0);
-	float logHalfBase = log(0.5) * logBase;
-
-	if ( iterations == max_iterations ) // converged?
+	if ( iterations == max_iterations)
 		return (0);
-	v = 512 * (5 + iterations - logHalfBase - log(log(Tr + Ti)) * logBase) / iterations;
-	if ( v > 255 ) v = 255;
+	v = (int)((double)iterations / (double)max_iterations * (double)255);
 	return rgb_to_int(v, v, v);
 }
 
-int iterateEquation(int maxiterations, double Cr, double Ci)
+int iterate_mandelbrot(int maxiterations, double x0, double y0)
 {
-	double Zr = 0;
-	double Zi = 0;
-	double Tr = 0;
-	double Ti = 0;
-	int iterations = 0;
+	double xtemp;
+	double x;
+	double y;
+	int iterations;
 
-	while (iterations < maxiterations && (Tr + Ti <= 4))
+	x = 0;
+	y = 0;
+	iterations = 0;
+	while (iterations < maxiterations && (x * x + y * y <= 4))
 	{
-		Zi = 2 * Zr * Zi + Ci;
-		Zr = Tr - Ti + Cr;
-		Tr = Zr * Zr;
-		Ti = Zi * Zi;
+		xtemp = x * x - y * y + x0;
+		y = 2 * x * y + y0;
+		x = xtemp;
 		iterations++;
 	}
-	return pickColor(maxiterations, iterations, Tr, Ti);
+	return (pickColor(maxiterations, iterations));
 }
 
+int iterate_julia(int maxiterations, double x0, double y0)
+{
+	int iterations = 0;
+	double xtemp;
+
+	double cy = 0;
+	double cx = 0;
+	while (x0 * x0 + y0 * y0 < 4  &&  iterations < maxiterations)
+	{
+		xtemp = x0 * x0 - x0 * x0;
+		y0 = 2 * x0 * x0  + cy;
+		x0 = xtemp + cx;
+		iterations++;
+	}
+	return (pickColor(maxiterations, iterations));
+}
 int	update_image(data_t *data)
 {
 	int	x;
 	int	y;
 	int	pixel;
-	float dx;
-	float dy;
+	double dx;
+	double dy;
 	int colour;
 
 	dy = 0;
 	y = -1;
 	pixel = 0;
 
-	#pragma omp parallel
 	while (++y < data->y)
 	{
 		x = -1;
 		dx = 0;
-		#pragma omp parallel
 		while (++x < data->x)
 		{
-			colour = iterateEquation(500, dx + data->xMin,dy + data->yMin);
+			colour = iterate_mandelbrot(200, dx + data->xMin,dy + data->yMin);
 //			printf("%d dx:%f dy:%f\n", it, dx, dy);
 			data->buffer[pixel] = (colour);
 			pixel++;
@@ -130,6 +112,7 @@ int	update_image(data_t *data)
 	//	mlx_destroy_image(data->mlx_ptr, data->image);
 	return (1);
 }
+
 
 int mandelbrot(data_t *data)
 {
@@ -165,8 +148,6 @@ int mouse_event(int button, int x, int y, data_t *data)
 		data->yMax= ym + (data->y - y) * data->dy;
 		update_image(data);
 		printf("b::%d x:%d y:%d dx:%f dy:%f xmin:%f xmax:%f ymin:%f ymax:%f\n", button, x, y, data->dx, data->dy, data->xMin, data->xMax, data->yMin, data->yMax);
-
-		update_image(data);
 	}
 	else if (button == 5)
 	{
@@ -189,32 +170,43 @@ int mouse_event(int button, int x, int y, data_t *data)
 	return 1;
 }
 
-//int kbd_event(int button, data_t *data)
-//{
-//	// Whenever the event is triggered, print the value of button to console.
-//	printf("key:: %d px0:%f\n", button, data->panx);
-//	if (button == 65363)
-//	{
-//		data->panx += 5;
-//		update_image(data);
-//	}
-//	else if (button == 65361)
-//	{
-//		data->panx -= 5;
-//		update_image(data);
-//	}
-//	else if (button == 65362)
-//	{
-//		data->pany += 5;
-//		update_image(data);
-//	}
-//	else if (button == 65364)
-//	{
-//		data->pany -= 5;
-//		update_image(data);
-//	}
-//	return 1;
-//}
+int kbd_event(int button, data_t *data)
+{
+	double step;
+
+	printf("key:: %d px0:%f\n", button, data->panx);
+	if (button == 65363)
+	{
+		step = data->dx * 4;
+		data->xMin += step;
+		data->xMax += step;
+		update_image(data);
+	}
+	else if (button == 65361)
+	{
+		step = data->dx * 4;
+		data->xMin -= step;
+		data->xMax -= step;
+		update_image(data);
+	}
+	else if (button == 65364)
+	{
+		step = data->dy * 4;
+		data->yMin += step;
+		data->yMax += step;
+		update_image(data);
+	}
+	else if (button == 65362)
+	{
+		step = data->dy * 4;
+		data->yMin -= step;
+		data->yMax -= step;
+		update_image(data);
+	}
+	else if (button == 65307)
+		exit(0);
+	return 1;
+}
 
 int main(void)
 {
@@ -239,7 +231,7 @@ int main(void)
 
 	mandelbrot(&data);
 	mlx_mouse_hook(data.mlx_win, &mouse_event, &data);
-//	mlx_key_hook(data.mlx_win, &kbd_event, &data);
+	mlx_key_hook(data.mlx_win, &kbd_event, &data);
 	mlx_loop(data.mlx_ptr);
 	return (EXIT_SUCCESS);
 }
