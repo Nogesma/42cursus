@@ -11,7 +11,8 @@
 # **************************************************************************** #
 
 #CFLAGS = -Wall -Wextra -Werror
-IFLAGS = -lmlx -L/usr/lib -lXext -lX11 -lm -lbsd -O3 -march=native #-L./mlx -I./mlx -l mlx #-framework OpenGL -framework Appkit -O3
+IFLAGS_LINUX = -lmlx -lXext -lX11 -lm -lbsd #-L./mlx -I./mlx -l mlx #-framework OpenGL -framework Appkit -O3
+IFLAGS = -Lmlx -Imlx -lmlx -framework OpenGL -framework Appkit
 CC     = gcc $(CFLAGS)
 OBJ    = main.o
 NAME   = fract-ol

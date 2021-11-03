@@ -62,7 +62,7 @@ void	print_signal(char c)
 	}
 }
 
-void	handler(int sig, siginfo_t *info,
+void	handler(int sig, __attribute__((unused)) siginfo_t *info,
 	__attribute__((unused)) void *context)
 {
 	if (sig == SIGUSR1)
@@ -71,11 +71,11 @@ void	handler(int sig, siginfo_t *info,
 		print_signal(1);
 	else
 		exit(1);
-	if (kill(info->si_pid, SIGUSR1) == -1)
-	{
-		ft_putstr_fd("Error sending sigusr1\n", 2);
-		exit(1);
-	}
+//	if (kill(info->si_pid, SIGUSR1) == -1)
+//	{
+//		ft_putstr_fd("Error sending sigusr1\n", 2);
+//		exit(1);
+//	}
 }
 
 int	main(void)
@@ -85,9 +85,7 @@ int	main(void)
 	ft_putstr_fd("PID: ", 1);
 	ft_putnbr_fd(getpid(), 1);
 	ft_putchar_fd('\n', 1);
-	sigfillset(&usraction.sa_mask);
-	sigdelset(&usraction.sa_mask, SIGINT);
-	sigdelset(&usraction.sa_mask, SIGQUIT);
+	sigemptyset(&usraction.sa_mask);
 	usraction.sa_flags = SA_SIGINFO;
 	usraction.sa_sigaction = handler;
 	sigaction(SIGUSR1, &usraction, NULL);

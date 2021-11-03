@@ -14,7 +14,7 @@ CFLAGS  = -Wall -Wextra -Werror
 CC      = gcc $(CFLAGS)
 LIB	    = libft/libft.a
 SERVER  = server
-CLIENT  = client
+CLIENT  = c
 INCLUDE = libft
 
 .c.o:

@@ -3,20 +3,23 @@
 #include <math.h>
 #include <mlx.h>
 
-typedef struct data_s
+typedef struct mlx_s
 {
   void *mlx_ptr;
   void *mlx_win;
-  double zoom;
-  int x;
-  int y;
-  double panx;
-  double pany;
   int *buffer;
   char *image;
+  int height;
+  int width;
   int pixel_bits;
   int line_bytes;
   int endian;
+} mlx_t;
+
+typedef struct data_s
+{
+  double zoom;
+
   double dx;
   double dy;
   double xMin;
@@ -25,26 +28,62 @@ typedef struct data_s
   double yMax;
 } data_t;
 
-int rgb_to_int(int r, int g, int b)
+typedef struct colour_s
 {
-	int color = 0;
+  int r;
+  int g;
+  int b;
+} colour_t;
+
+typedef struct all_s
+{
+  mlx_t *mlx;
+  colour_t *start;
+  colour_t *end;
+  data_t *mandel;
+} all_t;
+
+unsigned int rgb_to_int(unsigned int r, unsigned int g, unsigned int b)
+{
+	unsigned int color = 0;
 	color |= b;
 	color |= g << 8;
 	color |= r << 16;
 	return (color);
 }
 
-int pickColor(int max_iterations, int iterations)
+unsigned int pickColor(int max_iterations, int iterations, colour_t *start, colour_t *end)
 {
-	int v;
+ 	int v;
+ 	int r;
+	int g;
+	int b;
 
 	if ( iterations == max_iterations)
 		return (0);
-	v = (int)((double)iterations / (double)max_iterations * (double)255);
-	return rgb_to_int(v, v, v);
+	v = (int)log((double)iterations / (double)max_iterations * 255);
+
+	r = (int)(((double)end->r - (double)start->r) * v / log(255));
+	g = (int)(((double)end->g - (double)start->g) * v / log(255));
+	b = (int)(((double)end->b - (double)start->b) * v / log(255));
+
+	if (end->r > start->r)
+		r += start->r;
+	else
+		r += end->r;
+	if (end->g > start->g)
+		g += start->g;
+	else
+		g += end->g;
+	if (end->b > start->b)
+		b += start->b;
+	else
+		b += end->b;
+
+	return rgb_to_int(r, g, b);
 }
 
-int iterate_mandelbrot(int maxiterations, double x0, double y0)
+unsigned int iterate_mandelbrot(int maxiterations, double x0, double y0, all_t *a)
 {
 	double xtemp;
 	double x;
@@ -61,26 +100,27 @@ int iterate_mandelbrot(int maxiterations, double x0, double y0)
 		x = xtemp;
 		iterations++;
 	}
-	return (pickColor(maxiterations, iterations));
+	return (pickColor(maxiterations, iterations, a->start, a->end));
 }
 
-int iterate_julia(int maxiterations, double x0, double y0)
-{
-	int iterations = 0;
-	double xtemp;
+//int iterate_julia(int maxiterations, double x0, double y0)
+//{
+//	int iterations = 0;
+//	double xtemp;
+//
+//	double cy = 0;
+//	double cx = 0;
+//	while (x0 * x0 + y0 * y0 < 4  &&  iterations < maxiterations)
+//	{
+//		xtemp = x0 * x0 - x0 * x0;
+//		y0 = 2 * x0 * x0  + cy;
+//		x0 = xtemp + cx;
+//		iterations++;
+//	}
+//	return (pickColor(maxiterations, iterations));
+//}
 
-	double cy = 0;
-	double cx = 0;
-	while (x0 * x0 + y0 * y0 < 4  &&  iterations < maxiterations)
-	{
-		xtemp = x0 * x0 - x0 * x0;
-		y0 = 2 * x0 * x0  + cy;
-		x0 = xtemp + cx;
-		iterations++;
-	}
-	return (pickColor(maxiterations, iterations));
-}
-int	update_image(data_t *data)
+int	update_image(all_t *a)
 {
 	int	x;
 	int	y;
@@ -93,145 +133,156 @@ int	update_image(data_t *data)
 	y = -1;
 	pixel = 0;
 
-	while (++y < data->y)
+//	int iterations = 2 * (a->mandel->xMax - a->mandel->xMin);
+//	printf("iterations: %d\n", iterations);
+	while (++y < a->mlx->height)
 	{
 		x = -1;
 		dx = 0;
-		while (++x < data->x)
+		while (++x < a->mlx->width)
 		{
-			colour = iterate_mandelbrot(200, dx + data->xMin,dy + data->yMin);
+			colour = (int)iterate_mandelbrot(500, dx + a->mandel->xMin,dy + a->mandel->yMin, a);
 //			printf("%d dx:%f dy:%f\n", it, dx, dy);
-			data->buffer[pixel] = (colour);
-			pixel++;
-			dx += data->dx;
+			a->mlx->buffer[pixel++] = colour;
+			dx += a->mandel->dx;
 		}
-		dy += data->dy;
-//			mlx_pixel_put(data.mlx_ptr, data.mlx_win, x, y, rgb_to_int(230, 10, 124));
+		dy += a->mandel->dy;
 	}
-	mlx_put_image_to_window(data->mlx_ptr, data->mlx_win, data->image, 0, 0);
-	//	mlx_destroy_image(data->mlx_ptr, data->image);
+	mlx_put_image_to_window(a->mlx->mlx_ptr, a->mlx->mlx_win, a->mlx->image, 0, 0);
 	return (1);
 }
 
 
-int mandelbrot(data_t *data)
+int mandelbrot(all_t *a)
 {
-	data->xMin = -2.0;
-	data->xMax = 0.47;
-	data->yMin = -1.12;
-	data->yMax = 1.12;
+	a->mandel->xMin = -2.0;
+	a->mandel->xMax = 0.47;
+	a->mandel->yMin = -1.12;
+	a->mandel->yMax = 1.12;
 
-	data->dx = (data->xMax - data->xMin) / data->x;
-	data->dy = (data->yMax - data->yMin) / data->y;
+	a->mandel->dx = (a->mandel->xMax - a->mandel->xMin) / a->mlx->width;
+	a->mandel->dy = (a->mandel->yMax - a->mandel->yMin) / a->mlx->height;
 
-	update_image(data);
+	update_image(a);
 	return (1);
 }
 
-int mouse_event(int button, int x, int y, data_t *data)
+int mouse_event(int button, int x, int y, all_t *a)
 {
-
+	double xm;
+	double ym;
 	// Whenever the event is triggered, print the value of button to console.
-	printf("bb::%d x:%d y:%d dx:%f dy:%f xmin:%f xmax:%f ymin:%f ymax:%f\n", button, x, y, data->dx, data->dy, data->xMin, data->xMax, data->yMin, data->yMax);
+//	printf("bb::%d x:%d y:%d dx:%f dy:%f xmin:%f xmax:%f ymin:%f ymax:%f\n", button, x, y, data->dx, data->dy, data->xMin, data->xMax, data->yMin, data->yMax);
 	if (button == 4)
 	{
-		double xm = data->dx * x + data->xMin;
-		double ym = data->dy * y + data->yMin;
+		xm = a->mandel->dx * x + a->mandel->xMin;
+		ym = a->mandel->dy * y + a->mandel->yMin;
 
-		data->dx /= data->zoom;
-		data->dy /= data->zoom;
+		a->mandel->dx /= a->mandel->zoom;
+		a->mandel->dy /= a->mandel->zoom;
 
-		data->xMin= xm - x * data->dx;
-		data->xMax= xm + (data->x - x) * data->dx;
+		a->mandel->xMin= xm - x * a->mandel->dx;
+		a->mandel->xMax= xm + (a->mlx->width - x) * a->mandel->dx;
 
-		data->yMin= ym - y * data->dy;
-		data->yMax= ym + (data->y - y) * data->dy;
-		update_image(data);
-		printf("b::%d x:%d y:%d dx:%f dy:%f xmin:%f xmax:%f ymin:%f ymax:%f\n", button, x, y, data->dx, data->dy, data->xMin, data->xMax, data->yMin, data->yMax);
+		a->mandel->yMin= ym - y * a->mandel->dy;
+		a->mandel->yMax= ym + (a->mlx->height - y) * a->mandel->dy;
+		//		printf("b::%d x:%d y:%d dx:%f dy:%f xmin:%f xmax:%f ymin:%f ymax:%f\n", button, x, y, data->dx, data->dy, data->xMin, data->xMax, data->yMin, data->yMax);
 	}
 	else if (button == 5)
 	{
-		double xm = data->dx * data->zoom * x + data->xMin;
-		double ym = data->dy * data->zoom * y + data->yMin;
+		xm = a->mandel->dx * x + a->mandel->xMin;
+		ym = a->mandel->dy * y + a->mandel->yMin;
 
-		data->xMin= xm - (data->x - x) * data->dx;
-		data->xMax= xm + x * data->dx;
+		a->mandel->dx *= a->mandel->zoom;
+		a->mandel->dy *= a->mandel->zoom;
 
-		data->yMin= ym - y * data->dy;
-		data->yMax= ym + (data->y - y) * data->dy;
+		a->mandel->xMin= xm - x * a->mandel->dx;
+		a->mandel->xMax= xm + (a->mlx->width - x) * a->mandel->dx;
 
-		data->dx *= data->zoom;
-		data->dy *= data->zoom;
+		a->mandel->yMin= ym - y * a->mandel->dy;
+		a->mandel->yMax= ym + (a->mlx->height - y) * a->mandel->dy;
 
-
-		update_image(data);
-		printf("bb::%d x:%d y:%d dx:%f dy:%f xmin:%f xmax:%f ymin:%f ymax:%f\n", button, x, y, data->dx, data->dy, data->xMin, data->xMax, data->yMin, data->yMax);
+//		printf("bb::%d x:%d y:%d dx:%f dy:%f xmin:%f xmax:%f ymin:%f ymax:%f\n", button, x, y, data->dx, data->dy, data->xMin, data->xMax, data->yMin, data->yMax);
 	}
-	return 1;
+	update_image(a);
+	return (1);
 }
 
-int kbd_event(int button, data_t *data)
+int kbd_event(int button, all_t *a)
 {
 	double step;
 
-	printf("key:: %d px0:%f\n", button, data->panx);
-	if (button == 65363)
+	printf("key:: %d\n", button);
+	if (button == 124)
 	{
-		step = data->dx * 4;
-		data->xMin += step;
-		data->xMax += step;
-		update_image(data);
+		step = a->mandel->dx * 4;
+		a->mandel->xMin += step;
+		a->mandel->xMax += step;
 	}
-	else if (button == 65361)
+	else if (button == 123)
 	{
-		step = data->dx * 4;
-		data->xMin -= step;
-		data->xMax -= step;
-		update_image(data);
+		step = a->mandel->dx * 4;
+		a->mandel->xMin -= step;
+		a->mandel->xMax -= step;
 	}
-	else if (button == 65364)
+	else if (button == 125)
 	{
-		step = data->dy * 4;
-		data->yMin += step;
-		data->yMax += step;
-		update_image(data);
+		step = a->mandel->dy * 4;
+		a->mandel->yMin += step;
+		a->mandel->yMax += step;
 	}
-	else if (button == 65362)
+	else if (button == 126)
 	{
-		step = data->dy * 4;
-		data->yMin -= step;
-		data->yMax -= step;
-		update_image(data);
+		step = a->mandel->dy * 4;
+		a->mandel->yMin -= step;
+		a->mandel->yMax -= step;
 	}
-	else if (button == 65307)
+	else if (button == 53)
+	{
+		mlx_destroy_image(a->mlx->mlx_ptr, a->mlx->image);
 		exit(0);
-	return 1;
+	}
+	update_image(a);
+	return (1);
 }
 
 int main(void)
 {
-	data_t data;
+	all_t all;
+	mlx_t mlx;
+	data_t *mand = (data_t *)malloc(sizeof(data_t));
 
-	data.mlx_ptr = mlx_init();
-	data.x = 988;
-	data.y = 896;
-	data.zoom = 1.1;
-	data.panx = 0;
-	data.pany = 0;
+	all.mlx = &mlx;
+	all.mandel = mand;
+	mlx.mlx_ptr = mlx_init();
+	mlx.height = 896;
+	mlx.width = 988;
 
-	if (!(data.mlx_ptr))
+	colour_t *start = (colour_t *)malloc(sizeof(colour_t));
+	colour_t *end = (colour_t *)malloc(sizeof(colour_t));
+	start->r = 206;
+	start->g = 41;
+	start->b = 0;
+	all.start = start;
+	end->r = 175;
+	end->g = 206;
+	end->b = 0;
+	all.end = end;
+	mand->zoom = 1.1;
+
+	if (!(mlx.mlx_ptr))
 		return (EXIT_FAILURE);
-	data.mlx_win = mlx_new_window(data.mlx_ptr, data.x, data.y, "Hello world");
-	if (!(data.mlx_win))
+	mlx.mlx_win = mlx_new_window(mlx.mlx_ptr, mlx.width, mlx.height, "Hello world");
+	if (!(mlx.mlx_win))
 		return (EXIT_FAILURE);
 
-	data.image = mlx_new_image(data.mlx_ptr, data.x, data.y);
-	data.buffer = (int *)mlx_get_data_addr(data.image, &data.pixel_bits, &data.line_bytes, &data.endian);
-	data.line_bytes /= 4;
+	mlx.image = mlx_new_image(mlx.mlx_ptr, mlx.width, mlx.height);
+	mlx.buffer = (int *)mlx_get_data_addr(mlx.image, &mlx.pixel_bits, &mlx.line_bytes, &mlx.endian);
+	mlx.line_bytes /= 4;
 
-	mandelbrot(&data);
-	mlx_mouse_hook(data.mlx_win, &mouse_event, &data);
-	mlx_key_hook(data.mlx_win, &kbd_event, &data);
-	mlx_loop(data.mlx_ptr);
+	mandelbrot(&all);
+	mlx_mouse_hook(mlx.mlx_win, &mouse_event, &all);
+	mlx_key_hook(mlx.mlx_win, &kbd_event, &all);
+	mlx_loop(mlx.mlx_ptr);
 	return (EXIT_SUCCESS);
 }
