@@ -13,12 +13,15 @@
 CFLAGS  = -Wall -Wextra -Werror
 CC      = gcc $(CFLAGS)
 LIB	    = libft/libft.a
+NAME    =
 SERVER  = server
 CLIENT  = client
 INCLUDE = libft
 
 .c.o:
 	$(CC) -c $< -o $@ -I$(INCLUDE)
+
+$(NAME): all
 
 all: $(CLIENT) $(SERVER)
 

@@ -6,7 +6,7 @@
 /*   By: marvin <msegrans@student.42lausanne.c      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/10/29 01:27:22 by marvin            #+#    #+#             */
-/*   Updated: 2021/10/29 01:27:25 by marvin           ###   ########.fr       */
+/*   Updated: 2021/11/04 19:09:01 by msegrans         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,34 +14,8 @@
 #include <signal.h>
 #include <stdio.h>
 
-char	*stradd(char *s1, char c)
+int	print_signal(char c)
 {
-	int		s1l;
-	char	*str;
-
-	if (!s1)
-	{
-		str = (char *)malloc(2 * sizeof(char));
-		if (!str)
-			return (NULL);
-		str[0] = c;
-		str[1] = 0;
-		return (str);
-	}
-	s1l = ft_strlen(s1);
-	str = (char *)malloc((s1l + 2) * sizeof(char));
-	if (!str)
-		return (NULL);
-	ft_strlcpy(str, s1, s1l + 1);
-	str[s1l] = c;
-	str[s1l + 1] = 0;
-	free(s1);
-	return (str);
-}
-
-void	print_signal(char c)
-{
-	static char	*str = 0;
 	static char	buffer = 0;
 	static int	i = 0;
 
@@ -49,33 +23,35 @@ void	print_signal(char c)
 	i++;
 	if (i == 8)
 	{
-		if (buffer)
-			str = stradd(str, buffer);
-		else
-		{
-			ft_putstr_fd(str, 1);
-			free(str);
-			str = 0;
-		}
-		buffer = 0;
 		i = 0;
+		if (buffer)
+			ft_putchar_fd(buffer, 1);
+		else
+			return (1);
+		buffer = 0;
 	}
+	return (0);
 }
 
 void	handler(int sig, __attribute__((unused)) siginfo_t *info,
 	__attribute__((unused)) void *context)
 {
-	ft_putnbr_fd(sig == SIGUSR2, 2);
-	ft_putstr_fd("PID: ", 1);
-	ft_putnbr_fd(info->si_pid, 1);
-	ft_putchar_fd('\n', 1);
+	static int	pid = 0;
+
+	if (!pid)
+		pid = info->si_pid;
 	if (sig == SIGUSR1)
-		print_signal(0);
+	{
+		if (print_signal(0))
+		{
+			kill(pid, SIGUSR1);
+			pid = 0;
+			return ;
+		}
+	}
 	else if (sig == SIGUSR2)
 		print_signal(1);
-	else
-		exit(1);
-	if (kill(info->si_pid, SIGUSR1) == -1)
+	if (kill(pid, SIGUSR1) == -1)
 	{
 		ft_putstr_fd("Error sending sigusr1\n", 2);
 		exit(1);

@@ -12,13 +12,11 @@
 
 #include <libft.h>
 #include <signal.h>
-#include <stdio.h>
 
 int	send_null(pid_t pid)
 {
 	static int	j = -1;
 
-	ft_putnbr_fd(0, 2);
 	if (++j < 8)
 	{
 		kill(pid, SIGUSR1);
@@ -49,7 +47,6 @@ int	send_str(char *s, pid_t p)
 		pid = p;
 	if (str[++i / 8])
 	{
-		ft_putnbr_fd((str[i / 8] & (0x80 >> (i % 8))) > 0, 2);
 		if (str[i / 8] & (0x80 >> (i % 8)))
 			return (send_signal(pid, SIGUSR2));
 		return (send_signal(pid, SIGUSR1));
@@ -81,9 +78,6 @@ int	main(int argc, char **argv)
 {
 	pid_t				pid;
 
-	ft_putstr_fd("PID: ", 1);
-	ft_putnbr_fd(getpid(), 1);
-	ft_putchar_fd('\n', 1);
 	if (argc == 3)
 	{
 		signal(SIGUSR1, catch);
