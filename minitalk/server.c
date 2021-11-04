@@ -65,17 +65,21 @@ void	print_signal(char c)
 void	handler(int sig, __attribute__((unused)) siginfo_t *info,
 	__attribute__((unused)) void *context)
 {
+	ft_putnbr_fd(sig == SIGUSR2, 2);
+	ft_putstr_fd("PID: ", 1);
+	ft_putnbr_fd(info->si_pid, 1);
+	ft_putchar_fd('\n', 1);
 	if (sig == SIGUSR1)
 		print_signal(0);
 	else if (sig == SIGUSR2)
 		print_signal(1);
 	else
 		exit(1);
-//	if (kill(info->si_pid, SIGUSR1) == -1)
-//	{
-//		ft_putstr_fd("Error sending sigusr1\n", 2);
-//		exit(1);
-//	}
+	if (kill(info->si_pid, SIGUSR1) == -1)
+	{
+		ft_putstr_fd("Error sending sigusr1\n", 2);
+		exit(1);
+	}
 }
 
 int	main(void)
