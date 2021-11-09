@@ -16,25 +16,20 @@
 
 int main(int argc, char **argv)
 {
-	int *arr;
+	t_list **head_a;
+	t_list **head_b;
 	int i;
 	int length;
 
 	if (argc < 2)
 		return (1);
-	arr = (int *)malloc((argc - 1) * sizeof(int));
 	length = argc - 1;
-	i = -1;
-	while (++i < length)
-		arr[i] = ft_atoi(argv[i + 1]);
-	i = -1;
-//	ft_printf("Size of array: %d\n", length);
-//	while (++i < length)
-//		ft_printf("%d: %d\n", i, arr[i]);
-	quicksort(arr, 0, length - 1);
-	i = -1;
-//	ft_printf("Sorted array:\n");
-//	while (++i < length)
-//		ft_printf("%d: %d\n", i, arr[i]);
-
+	i = length;
+	head_a = (t_list **)malloc(sizeof(t_list *));
+	head_b = (t_list **)malloc(sizeof(t_list *));
+	(*head_a) = 0;
+	(*head_b) = 0;
+	while (i-- > 0)
+		ft_lstadd_front(head_a,ft_lstnew(ft_atoi(argv[i + 1])));
+	quicksort(head_a, head_b, length - 1, 0);
 }

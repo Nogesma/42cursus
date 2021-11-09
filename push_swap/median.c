@@ -1,39 +1,32 @@
 #include "bubble_sort.h"
 #include <stdlib.h>
+#include <libft.h>
 
-static int *clone_list(const int *src, int n)
+static int *clone_list(t_list *src, int n)
 {
 	int *dest;
 	int i;
 
 	dest = (int *)malloc((n) * sizeof(int));
 	i = -1;
-	while (++i < n)
-		dest[i] = src[i];
+	while (++i < n && src)
+	{
+		dest[i] = src->content;
+		src = src->next;
+	}
 	return (dest);
 }
 
-static int get_index(const int *list, int n, int median)
-{
-	int i;
-
-	i = -1;
-	while (++i < n)
-		if (list[i] == median)
-			return (i);
-	return (-1);
-}
-
-int get_median_index(int *list, int n)
+int get_median_value(t_list *lst, int n)
 {
 	int *sort;
 	int i;
 
-	if (n < 3)
-		return (0);
-	sort = clone_list(list, n);
+	if (n < 3 && lst)
+		return (lst->content);
+	sort = clone_list(lst, n);
 	bubble_sort(sort, n);
-	i = get_index(list, n, sort[n / 2]);
+	i = sort[n / 2];
 	free(sort);
 	return (i);
 }
