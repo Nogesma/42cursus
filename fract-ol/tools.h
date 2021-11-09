@@ -1,20 +1,21 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   events.h                                           :+:      :+:    :+:   */
+/*   tools.h                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: msegrans <msegrans@student.42lausan>       +#+  +:+       +#+        */
+/*   By: msegrans <msegrans@student.42lausanne      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2021/11/04 19:01:47 by msegrans          #+#    #+#             */
-/*   Updated: 2021/11/04 19:01:49 by msegrans         ###   ########.fr       */
+/*   Created: 2021/11/08 03:26:50 by msegrans          #+#    #+#             */
+/*   Updated: 2021/11/08 03:26:52 by msegrans         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef EVENTS_H
-# define EVENTS_H
+#ifndef TOOLS_H
+# define TOOLS_H
 
-int	mouse_event(int button, int x, int y, t_all *a);
+# include "types.h"
+# include <math.h>
 
-int	kbd_event(int button, t_all *a);
+unsigned int	pick_color(int max_iterations, int iterations, t_colour *c);
 
-#endif //EVENTS_H
+#endif //TOOLS_H

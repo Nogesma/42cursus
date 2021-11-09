@@ -10,7 +10,9 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-void	mouse_event(int button, int x, int y, all_t *a)
+#include "main.h"
+
+int	mouse_event(int button, int x, int y, all_t *a)
 {
 	double	xm;
 	double	ym;
@@ -32,44 +34,46 @@ void	mouse_event(int button, int x, int y, all_t *a)
 	a->fractal->yMin = ym - y * a->fractal->dy;
 	a->fractal->yMax = ym + (a->mlx->height - y) * a->fractal->dy;
 	update_image(a);
+	return (1);
 }
 
-void	subtract(double *a, double b)
+static void	subtract(double *a, double b)
 {
 	*a -= b;
 }
 
-void	add(double *a, double b)
+static void	add(double *a, double b)
 {
 	*a += b;
 }
 
-void	apply_step(double *min, double *max, double step,
-				void *f(double*, double))
+static void	apply_step(double *min, double *max, double step,
+				void f(double*, double))
 {
 	f(min, step);
 	f(max, step);
 }
 
-void	kbd_event(int button, all_t *a)
+int	kbd_event(int button, all_t *a)
 {
 	double	stepx;
 	double	stepy;
 
-	stepx = a->fractal->dx * 4;
-	stepy = a->fractal->dy * 4;
-	if (button == 124)
-		apply_step(a->fractal->xMin, a->fractal->xMax, stepx, add);
-	else if (button == 123)
-		apply_step(a->fractal->xMin, a->fractal->xMax, stepx, subtract);
-	else if (button == 125)
-		apply_step(a->fractal->yMin, a->fractal->yMax, stepy, add);
-	else if (button == 126)
-		apply_step(a->fractal->yMin, a->fractal->yMax, stepy, subtract);
-	else if (button == 53)
+	stepx = a->fractal->dx * 8;
+	stepy = a->fractal->dy * 8;
+	if (button == 65363) // 124
+		apply_step(&(a->fractal->xMin), &(a->fractal->xMax), stepx, add);
+	else if (button == 65361) // 123
+		apply_step(&(a->fractal->xMin), &(a->fractal->xMax), stepx, subtract);
+	else if (button == 65364) //125
+		apply_step(&(a->fractal->yMin), &(a->fractal->yMax), stepy, add);
+	else if (button == 65362) // 126
+		apply_step(&(a->fractal->yMin), &(a->fractal->yMax), stepy, subtract);
+	else if (button == 65307) // 53
 	{
 		mlx_destroy_image(a->mlx->mlx_ptr, a->mlx->image);
 		exit(0);
 	}
 	update_image(a);
+	return (1);
 }

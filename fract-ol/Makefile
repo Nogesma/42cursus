@@ -10,11 +10,11 @@
 #                                                                              #
 # **************************************************************************** #
 
-CFLAGS = -Wall -Wextra -Werror
+CFLAGS = -Wall -Wextra -Werror -march=native -O3 -fopenmp
 IFLAGS_LINUX = -lmlx -lXext -lX11 -lm -lbsd #-L./mlx -I./mlx -l mlx #-framework OpenGL -framework Appkit -O3
 IFLAGS = -Lmlx -lmlx -framework OpenGL -framework Appkit
 CC     = gcc $(CFLAGS)
-OBJ    = main.o
+OBJ    = main.o events.o tools.o
 NAME   = fractol
 LIB    = libft/libft.a
 INCLUDE = -Ilibft -Imlx
@@ -23,7 +23,7 @@ INCLUDE = -Ilibft -Imlx
 	$(CC) -c $< -o $@ $(INCLUDE)
 
 $(NAME): $(OBJ) $(LIB)
-	$(CC) -o $(NAME) $(OBJ) $(LIB) $(IFLAGS) $(INCLUDE)
+	$(CC) -o $(NAME) $(OBJ) $(LIB) $(IFLAGS_LINUX) $(INCLUDE)
 
 all: $(NAME)
 

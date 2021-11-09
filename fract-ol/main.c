@@ -1,108 +1,41 @@
-#include <stdlib.h>
-#include <stdio.h>
-#include <math.h>
-#include <mlx.h>
-#include "libft/libft.h"
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   main.c                                             :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: msegrans <msegrans@student.42lausanne      +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2021/11/08 03:38:40 by msegrans          #+#    #+#             */
+/*   Updated: 2021/11/08 03:38:41 by msegrans         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
 
-typedef struct mlx_s
+#include "main.h"
+
+unsigned int	iterate_mandelbrot(int maxiterations, double x0, double y0,
+									t_all *a)
 {
-  void *mlx_ptr;
-  void *mlx_win;
-  int *buffer;
-  char *image;
-  int height;
-  int width;
-  int pixel_bits;
-  int line_bytes;
-  int endian;
-} mlx_t;
-
-typedef struct fract_s
-{
-  double zoom;
-  double dx;
-  double dy;
-  double xMin;
-  double xMax;
-  double yMin;
-  double yMax;
-} fract_t;
-
-typedef struct colour_s
-{
-  int sr;
-  int sg;
-  int sb;
-  int er;
-  int eg;
-  int eb;
-} colour_t;
-
-typedef struct all_s
-{
-  mlx_t *mlx;
-  colour_t *colour;
-  fract_t *fractal;
-} all_t;
-
-unsigned int rgb_to_int(unsigned int r, unsigned int g, unsigned int b)
-{
-	unsigned int color = 0;
-	color |= b;
-	color |= g << 8;
-	color |= r << 16;
-	return (color);
-}
-
-unsigned int pickColor(int max_iterations, int iterations, colour_t *c)
-{
- 	int v;
- 	int r;
-	int g;
-	int b;
-
-	if ( iterations == max_iterations)
-		return (0);
-	v = (int)log((double)iterations / (double)max_iterations * 255);
-
-	r = (int)(((double)c->er - (double)c->sr) * v / log(255));
-	g = (int)(((double)c->eg - (double)c->sg) * v / log(255));
-	b = (int)(((double)c->eb - (double)c->sb) * v / log(255));
-
-	if (c->er > c->sr)
-		r += c->sr;
-	else
-		r += c->er;
-	if (c->eg > c->sg)
-		g += c->sg;
-	else
-		g += c->eg;
-	if (c->eb > c->sb)
-		b += c->sb;
-	else
-		b += c->eb;
-
-	return rgb_to_int(r, g, b);
-}
-
-unsigned int iterate_mandelbrot(int maxiterations, double x0, double y0, all_t *a)
-{
-	double xtemp;
-	double x;
-	double y;
-	int iterations;
+//	double	xtemp;
+	double	x;
+	double	y;
+	double	x2;
+	double	y2;
+	int		iterations;
 
 	x = 0;
 	y = 0;
+	x2 = 0;
+	y2 = 0;
 	iterations = 0;
-	while (iterations < maxiterations && (x * x + y * y <= 4))
+	while (iterations < maxiterations && (x2 + y2 <= 4))
 	{
-		xtemp = x * x - y * y + x0;
-		y = 2 * x * y + y0;
-		x = xtemp;
+		y = (x + x) * y + y0;
+		x = x2 - y2 + x0;
+		x2 = x * x;
+		y2 = y * y;
 		iterations++;
 	}
-	return (pickColor(maxiterations, iterations, a->colour));
+	return (pick_color(maxiterations, iterations, a->colour));
 }
 
 //int iterate_julia(int maxiterations, double x0, double y0)
@@ -122,142 +55,111 @@ unsigned int iterate_mandelbrot(int maxiterations, double x0, double y0, all_t *
 //	return (pickColor(maxiterations, iterations));
 //}
 
-int	update_image(all_t *a)
+int	update_image(t_all *a)
 {
 	int	x;
 	int	y;
-	int	pixel;
-	double dx;
-	double dy;
-	int colour;
+	int iter;
 
-	dy = 0;
-	y = -1;
-	pixel = 0;
+	iter = (int)(223.0 / sqrt(4.0 * fabs(a->fractal->y_min - a->fractal->y_max)));
+	iter = 30;
+	ft_putnbr_fd(iter, 1);
+	ft_putendl_fd("", 1);
+	#pragma omp parallel for private(x)
 
-//	int iterations = 2 * (a->mandel->xMax - a->mandel->xMin);
-//	printf("iterations: %d\n", iterations);
-	while (++y < a->mlx->height)
-	{
-		x = -1;
-		dx = 0;
-		while (++x < a->mlx->width)
-		{
-			colour = (int)iterate_mandelbrot(500, dx + a->fractal->xMin,dy + a->fractal->yMin, a);
-//			printf("%d dx:%f dy:%f\n", it, dx, dy);
-			a->mlx->buffer[pixel++] = colour;
-			dx += a->fractal->dx;
-		}
-		dy += a->fractal->dy;
-	}
-	mlx_put_image_to_window(a->mlx->mlx_ptr, a->mlx->mlx_win, a->mlx->image, 0, 0);
+	for (y = 0; y < a->mlx->height; y++)
+		for (x = 0; x < a->mlx->width; x++)
+			a->mlx->buffer[y * a->mlx->width + x]
+				= (int)iterate_mandelbrot(iter,
+					(a->fractal->dx * x) + a->fractal->x_min,
+					(a->fractal->dy * y) + a->fractal->y_min, a);
+	mlx_put_image_to_window(a->mlx->mlx_ptr, a->mlx->mlx_win,
+		a->mlx->image, 0, 0);
 	return (1);
 }
 
-
-int mandelbrot(all_t *a)
+int	mandelbrot(t_all *a)
 {
-	a->fractal->xMin = -2.0;
-	a->fractal->xMax = 0.47;
-	a->fractal->yMin = -1.12;
-	a->fractal->yMax = 1.12;
-
-	a->fractal->dx = (a->fractal->xMax - a->fractal->xMin) / a->mlx->width;
-	a->fractal->dy = (a->fractal->yMax - a->fractal->yMin) / a->mlx->height;
-
+	a->fractal->x_min = -2.0;
+	a->fractal->x_max = 0.47;
+	a->fractal->y_min = -1.12;
+	a->fractal->y_max = 1.12;
+	a->fractal->dx = (a->fractal->x_max - a->fractal->x_min) / a->mlx->width;
+	a->fractal->dy = (a->fractal->y_max - a->fractal->y_min) / a->mlx->height;
 	update_image(a);
 	return (1);
 }
 
-int julia(all_t *a)
+int	julia(t_all *a)
 {
-	a->fractal->xMin = -2.0;
-	a->fractal->xMax = 0.47;
-	a->fractal->yMin = -1.12;
-	a->fractal->yMax = 1.12;
-
-	a->fractal->dx = (a->fractal->xMax - a->fractal->xMin) / a->mlx->width;
-	a->fractal->dy = (a->fractal->yMax - a->fractal->yMin) / a->mlx->height;
-
+	a->fractal->x_min = -2.0;
+	a->fractal->x_max = 0.47;
+	a->fractal->y_min = -1.12;
+	a->fractal->y_max = 1.12;
+	a->fractal->dx = (a->fractal->x_max - a->fractal->x_min) / a->mlx->width;
+	a->fractal->dy = (a->fractal->y_max - a->fractal->y_min) / a->mlx->height;
 	update_image(a);
 	return (1);
 }
 
-void init_fractal(mlx_t *mlx, int i)
+void	init_fractal(t_mlx *mlx, int i)
 {
 	(void)i;
 	mlx->height = 896;
 	mlx->width = 988;
 }
 
-all_t *get_all()
+t_all	*get_all(void)
 {
-	all_t *all;
-	mlx_t *mlx;
-	colour_t *colour;
-	fract_t *fractal;
+	t_all	*all;
 
-	all = (all_t *)malloc(sizeof(all_t));
+	all = (t_all *)malloc(sizeof(t_all));
 	if (!all)
 		return (NULL);
-	mlx = (mlx_t *)malloc(sizeof(mlx_t));
-	if (!mlx)
-		return (NULL);
-	colour = (colour_t *)malloc(sizeof(colour_t));
-	if (!colour)
-	{
-		free(all);
-		return (NULL);
-	}
-	fractal = (fract_t *)malloc(sizeof(fract_t));
-	if (!fractal)
-	{
-		free(all);
-		free(colour);
-		return (NULL);
-	}
-	all->mlx = mlx;
-	all->fractal = fractal;
-	all->colour = colour;
+	all->mlx = (t_mlx *)malloc(sizeof(t_mlx));
+	all->colour = (t_colour *)malloc(sizeof(t_colour));
+	all->fractal = (t_fract *)malloc(sizeof(t_fract));
 	return (all);
 }
 
-int init(int i)
+void	init_colour(t_colour *colour)
 {
-	all_t *all;
-
-	all = get_all();
-	all->mlx->mlx_ptr = mlx_init();
-	init_fractal(all->mlx, i);
-	all->colour->sr = 206;
-	all->colour->sg = 41;
-	all->colour->sb = 0;
-	all->colour->er = 175;
-	all->colour->eg = 206;
-	all->colour->eb = 0;
-	all->fractal->zoom = 1.1;
-	if (!(all->mlx->mlx_ptr))
-		return (EXIT_FAILURE);
-	all->mlx->mlx_win = mlx_new_window(all->mlx->mlx_ptr, all->mlx->width, all->mlx->height, "Hello world");
-	if (!(all->mlx->mlx_win))
-		return (EXIT_FAILURE);
-	all->mlx->image = mlx_new_image(all->mlx->mlx_ptr, all->mlx->width, all->mlx->height);
-	all->mlx->buffer = (int *)mlx_get_data_addr(all->mlx->image, &all->mlx->pixel_bits, &all->mlx->line_bytes, &all->mlx->endian);
-	all->mlx->line_bytes /= 4;
-	if (i == 1)
-		mandelbrot(all);
-	else
-		julia(all);
-	mlx_mouse_hook(all->mlx->mlx_win, &mouse_event, &all);
-	mlx_key_hook(all->mlx->mlx_win, &kbd_event, &all);
-	mlx_loop(all->mlx->mlx_ptr);
-	return (EXIT_SUCCESS);
+	colour->sr = 206;
+	colour->sg = 41;
+	colour->sb = 0;
+	colour->er = 175;
+	colour->eg = 206;
+	colour->eb = 0;
 }
 
-
-int main(int argc, char **argv)
+t_all	*init(int i)
 {
-	int	i;
+	t_all	*all;
+
+	all = get_all();
+	if (!all)
+		return (NULL);
+	all->mlx->mlx_ptr = mlx_init();
+	init_fractal(all->mlx, i);
+	init_colour(all->colour);
+	all->fractal->zoom = 1.1;
+	if (!(all->mlx->mlx_ptr))
+		return (NULL);
+	all->mlx->mlx_win = mlx_new_window(all->mlx->mlx_ptr,
+			all->mlx->width, all->mlx->height, "Hello world");
+	if (!(all->mlx->mlx_win))
+		return (NULL);
+	all->mlx->image = mlx_new_image(all->mlx->mlx_ptr,
+			all->mlx->width, all->mlx->height);
+	all->mlx->buffer = (int *)mlx_get_data_addr(all->mlx->image,
+			&all->mlx->pixel_bits, &all->mlx->line_bytes, &all->mlx->endian);
+	all->mlx->line_bytes /= 4;
+	return (all);
+}
+
+int	main(int argc, char **argv)
+{
+	t_all	*all;
 
 	if (argc != 2)
 	{
@@ -266,12 +168,20 @@ int main(int argc, char **argv)
 	}
 	else
 	{
-		i = 0;
 		if (ft_strncmp(argv[1], "julia", 5) == 0)
-			i = 2;
+		{
+			all = init(1);
+			julia(all);
+		}
 		else if (ft_strncmp(argv[1], "mandelbrot", 10) == 0)
-			i = 1;
-		if (i != 0)
-			init(i);
+		{
+			all = init(2);
+			mandelbrot(all);
+		}
+		else
+			return (1);
+		mlx_mouse_hook(all->mlx->mlx_win, &mouse_event, all);
+		mlx_key_hook(all->mlx->mlx_win, &kbd_event, all);
+		mlx_loop(all->mlx->mlx_ptr);
 	}
 }
