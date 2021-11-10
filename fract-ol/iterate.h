@@ -1,24 +1,23 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   tools.h                                            :+:      :+:    :+:   */
+/*   iterate.h                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: msegrans <msegrans@student.42lausanne      +#+  +:+       +#+        */
+/*   By: msegrans <msegrans@student.42lausan>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2021/11/08 03:26:50 by msegrans          #+#    #+#             */
-/*   Updated: 2021/11/08 03:26:52 by msegrans         ###   ########.fr       */
+/*   Created: 2021/11/10 15:28:05 by msegrans          #+#    #+#             */
+/*   Updated: 2021/11/10 15:28:07 by msegrans         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef TOOLS_H
-# define TOOLS_H
+#ifndef ITERATE_H
+# define ITERATE_H
 
 # include "types.h"
-# include "libft.h"
-# include <math.h>
+# include "tools.h"
 
-unsigned int	pick_color(int max_iterations, int iterations, t_colour *c);
+unsigned int	iterate_mandelbrot(int maxiter, double x0, double y0, t_all *a);
 
-double			ft_atod(char *s);
+unsigned int	iterate_julia(int maxiter, double zx, double zy, t_all *a);
 
-#endif //TOOLS_H
+#endif //ITERATE_H

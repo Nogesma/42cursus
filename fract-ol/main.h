@@ -23,6 +23,9 @@
 # include "tools.h"
 # include "events.h"
 # include "types.h"
+# include "iterate.h"
+# include "init.h"
+# include "fractal.h"
 
 int	update_image(t_all *a);
 

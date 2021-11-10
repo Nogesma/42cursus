@@ -13,17 +13,17 @@
 CFLAGS = -Wall -Wextra -Werror -march=native -O3 -fopenmp
 IFLAGS_LINUX = -lmlx -lXext -lX11 -lm -lbsd #-L./mlx -I./mlx -l mlx #-framework OpenGL -framework Appkit -O3
 IFLAGS = -Lmlx -lmlx -framework OpenGL -framework Appkit
-CC     = gcc $(CFLAGS)
-OBJ    = main.o events.o tools.o
+CC     = /Users/msegrans/.brew/opt/llvm/bin/clang $(CFLAGS)
+OBJ    = main.o events.o tools.o iterate.o init.o fractal.o
 NAME   = fractol
 LIB    = libft/libft.a
-INCLUDE = -Ilibft -Imlx
+INCLUDE = -Ilibft -Imlx -I/Users/msegrans/.brew/Cellar/libomp/13.0.0
 
 .c.o:
 	$(CC) -c $< -o $@ $(INCLUDE)
 
 $(NAME): $(OBJ) $(LIB)
-	$(CC) -o $(NAME) $(OBJ) $(LIB) $(IFLAGS_LINUX) $(INCLUDE)
+	$(CC) -o $(NAME) $(OBJ) -L/Users/msegrans/.brew/Cellar/libomp/13.0.0/lib/ $(LIB) $(IFLAGS) $(INCLUDE)
 
 all: $(NAME)
 

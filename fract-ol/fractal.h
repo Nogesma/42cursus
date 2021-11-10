@@ -1,24 +1,23 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   tools.h                                            :+:      :+:    :+:   */
+/*   fractal.h                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: msegrans <msegrans@student.42lausanne      +#+  +:+       +#+        */
+/*   By: msegrans <msegrans@student.42lausan>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2021/11/08 03:26:50 by msegrans          #+#    #+#             */
-/*   Updated: 2021/11/08 03:26:52 by msegrans         ###   ########.fr       */
+/*   Created: 2021/11/10 15:41:22 by msegrans          #+#    #+#             */
+/*   Updated: 2021/11/10 15:41:23 by msegrans         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef TOOLS_H
-# define TOOLS_H
+#ifndef FRACTAL_H
+# define FRACTAL_H
 
 # include "types.h"
-# include "libft.h"
-# include <math.h>
+# include "main.h"
 
-unsigned int	pick_color(int max_iterations, int iterations, t_colour *c);
+int	mandelbrot(t_all *a);
 
-double			ft_atod(char *s);
+int	julia(t_all *a);
 
-#endif //TOOLS_H
+#endif //FRACTAL_H

@@ -35,16 +35,16 @@ typedef struct fract
 	double	x_max;
 	double	y_min;
 	double	y_max;
+	double	cx;
+	double	cy;
+	char	t;
 }	t_fract;
 
 typedef struct colour
 {
-	int	sr;
-	int	sg;
-	int	sb;
-	int	er;
-	int	eg;
-	int	eb;
+	unsigned char	a;
+	unsigned char	b;
+	unsigned char	c;
 }	t_colour;
 
 typedef struct all

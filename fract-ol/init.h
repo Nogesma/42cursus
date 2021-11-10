@@ -1,24 +1,21 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   tools.h                                            :+:      :+:    :+:   */
+/*   init.h                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: msegrans <msegrans@student.42lausanne      +#+  +:+       +#+        */
+/*   By: msegrans <msegrans@student.42lausan>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2021/11/08 03:26:50 by msegrans          #+#    #+#             */
-/*   Updated: 2021/11/08 03:26:52 by msegrans         ###   ########.fr       */
+/*   Created: 2021/11/10 15:27:56 by msegrans          #+#    #+#             */
+/*   Updated: 2021/11/10 15:27:58 by msegrans         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef TOOLS_H
-# define TOOLS_H
+#ifndef INIT_H
+# define INIT_H
 
 # include "types.h"
-# include "libft.h"
-# include <math.h>
+# include "main.h"
 
-unsigned int	pick_color(int max_iterations, int iterations, t_colour *c);
+t_all	*init(int i, double cx, double cy);
 
-double			ft_atod(char *s);
-
-#endif //TOOLS_H
+#endif //INIT_H
