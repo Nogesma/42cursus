@@ -14,6 +14,15 @@
 #include "libft/libft.h"
 #include "quicksort.h"
 
+static void print_stack(t_list *lst)
+{
+	while (lst)
+	{
+		ft_printf("%d\n", lst->content);
+		lst = lst->next;
+	}
+}
+
 int main(int argc, char **argv)
 {
 	t_list **head_a;
@@ -31,5 +40,9 @@ int main(int argc, char **argv)
 	(*head_b) = 0;
 	while (i-- > 0)
 		ft_lstadd_front(head_a,ft_lstnew(ft_atoi(argv[i + 1])));
-	quicksort(head_a, head_b, length - 1, 0);
+	quicksort_a(head_a, head_b, length);
+	ft_printf("Head a...\n");
+	print_stack(*head_a);
+	ft_printf("Head b...\n");
+	print_stack(*head_b);
 }
