@@ -10,14 +10,14 @@
 #                                                                              #
 # **************************************************************************** #
 
-#CFLAGS = -Wall -Wextra -Werror
+CFLAGS = -Wall -Wextra -Werror
 IFLAGS_LINUX = -Llibft -lmlx -lXext -lX11 -lm -lbsd
 IFLAGS = -lmlx -lft -Llibft -Lmlx -framework OpenGL -framework Appkit
 CC     = gcc $(CFLAGS)
 OBJ    = main.o events.o tools.o iterate.o init.o fractal.o
 NAME   = fractol
-LIB    = libft
-MLX    = mlx
+LIB    = libft/libft.a
+MLX    = mlx/libmlx.a
 INCLUDE = -Ilibft -Imlx
 
 .c.o:
@@ -45,4 +45,4 @@ fclean: clean
 
 re: fclean all
 
-.PHONY: all clean fclean re $(MLX) $(LIB)
+.PHONY: all clean fclean re
