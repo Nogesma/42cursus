@@ -60,6 +60,7 @@ t_all	*init(int i, double cx, double cy)
 	all->fractal->cx = cx;
 	all->fractal->cy = cy;
 	all->fractal->t = i;
+	all->mlx->is_pressed = 0;
 	if (!(all->mlx->mlx_ptr))
 		return (NULL);
 	all->mlx->mlx_win = mlx_new_window(all->mlx->mlx_ptr,

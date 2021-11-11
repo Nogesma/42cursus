@@ -13,8 +13,10 @@
 #ifndef INIT_H
 # define INIT_H
 
+# include <mlx.h>
+# include <stdlib.h>
+
 # include "types.h"
-# include "main.h"
 
 t_all	*init(int i, double cx, double cy);
 

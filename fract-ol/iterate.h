@@ -14,10 +14,9 @@
 # define ITERATE_H
 
 # include "types.h"
-# include "tools.h"
 
-unsigned int	iterate_mandelbrot(int maxiter, double x0, double y0, t_all *a);
+int	iterate_mandelbrot(int maxiter, double x0, double y0, t_all *a);
 
-unsigned int	iterate_julia(int maxiter, double zx, double zy, t_all *a);
+int	iterate_julia(int maxiter, double zx, double zy, t_all *a);
 
 #endif //ITERATE_H

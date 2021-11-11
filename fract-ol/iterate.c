@@ -12,7 +12,12 @@
 
 #include "iterate.h"
 
-unsigned int	iterate_mandelbrot(int maxiter, double x0, double y0, t_all *a)
+int	pick_color(int iterations, t_colour *c)
+{
+	return ((iterations << c->a) + (iterations << c->b) + iterations * c->c);
+}
+
+int	iterate_mandelbrot(int maxiter, double x0, double y0, t_all *a)
 {
 	double	x;
 	double	y;
@@ -24,30 +29,30 @@ unsigned int	iterate_mandelbrot(int maxiter, double x0, double y0, t_all *a)
 	y = 0;
 	x2 = 0;
 	y2 = 0;
-	iterations = 0;
-	while (iterations < maxiter && (x2 + y2 <= 4))
+	iterations = maxiter;
+	while (iterations > 0 && (x2 + y2 <= 4))
 	{
 		y = (x + x) * y + y0;
 		x = x2 - y2 + x0;
 		x2 = x * x;
 		y2 = y * y;
-		iterations++;
+		iterations--;
 	}
-	return (pick_color(maxiter, iterations, a->colour));
+	return (pick_color(iterations, a->colour));
 }
 
-unsigned int	iterate_julia(int maxiter, double zx, double zy, t_all *a)
+int	iterate_julia(int maxiter, double zx, double zy, t_all *a)
 {
 	int		iterations;
 	double	xtemp;
 
-	iterations = 0;
-	while (iterations < maxiter && zx * zx + zy * zy < 4)
+	iterations = maxiter;
+	while (iterations > 0 && zx * zx + zy * zy < 4)
 	{
 		xtemp = zx * zx - zy * zy;
 		zy = 2 * zx * zy + a->fractal->cy;
 		zx = xtemp + a->fractal->cx;
-		iterations++;
+		iterations--;
 	}
-	return (pick_color(maxiter, iterations, a->colour));
+	return (pick_color(iterations, a->colour));
 }

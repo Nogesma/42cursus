@@ -13,12 +13,22 @@
 #ifndef TOOLS_H
 # define TOOLS_H
 
-# include "types.h"
-# include "libft.h"
+# include <libft.h>
 # include <math.h>
+# include <mlx.h>
 
-unsigned int	pick_color(int max_iterations, int iterations, t_colour *c);
+# include "types.h"
+# include "iterate.h"
 
-double			ft_atod(char *s);
+double	ft_atod(char *s);
+
+int		update_image(t_all *a);
+
+void	apply_step(double *min, double *max, double step,
+			void f(double*, double));
+
+void	subtract(double *a, double b);
+
+void	add(double *a, double b);
 
 #endif //TOOLS_H

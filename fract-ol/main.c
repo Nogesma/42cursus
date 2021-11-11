@@ -12,28 +12,19 @@
 
 #include "main.h"
 
-int	update_image(t_all *a)
+int	error(void)
 {
-	int	x;
-	int	y;
-	int	iter;
-	int *func;
-
-
-	iter = (int)(200 / sqrt(2.0 * fabs(a->fractal->y_min - a->fractal->y_max)));
-	#pragma omp parallel for private(x)
-	for (y = 0; y < a->mlx->height; y++)
-		for (x = 0; x < a->mlx->width; x++)
-		{
-			a->mlx->buffer[y * a->mlx->width + x]
-				= func[a->fractal->t](iter,
-					(a->fractal->dx * x) + a->fractal->x_min,
-					(a->fractal->dy * y) + a->fractal->y_min, a);
-		}
-	mlx_put_image_to_window(a->mlx->mlx_ptr, a->mlx->mlx_win,
-		a->mlx->image, 0, 0);
-
+	ft_putendl_fd("usage: fractol [mandelbrot/julia] {-1.0/1.0} {-1.0/1.0}", 1);
 	return (1);
+}
+
+void	start_hooks(t_all *all)
+{
+	mlx_mouse_hook(all->mlx->mlx_win, &mouse_event, all);
+	mlx_hook(all->mlx->mlx_win, 6, 1L << 8, &click_and_drag, all);
+	mlx_hook(all->mlx->mlx_win, 5, 1L << 3, &release, all);
+	mlx_key_hook(all->mlx->mlx_win, &kbd_event, all);
+	mlx_loop(all->mlx->mlx_ptr);
 }
 
 int	main(int argc, char **argv)
@@ -56,11 +47,8 @@ int	main(int argc, char **argv)
 			mandelbrot(all);
 		}
 		else
-			return (1);
-		mlx_mouse_hook(all->mlx->mlx_win, &mouse_event, all);
-		mlx_key_hook(all->mlx->mlx_win, &kbd_event, all);
-		mlx_loop(all->mlx->mlx_ptr);
+			return (error());
+		start_hooks(all);
 	}
-	ft_putendl_fd("usage: fractol [mandelbrot/julia] {-1.0/1.0} {-1.0/1.0}", 1);
-	return (1);
+	return (error());
 }

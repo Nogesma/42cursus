@@ -13,20 +13,14 @@
 #ifndef MAIN_H
 # define MAIN_H
 
-# include <unistd.h>
-# include <omp.h>
-# include <stdlib.h>
 # include <math.h>
 # include <mlx.h>
+# include <libft.h>
 
-# include "libft/libft.h"
-# include "tools.h"
-# include "events.h"
 # include "types.h"
-# include "iterate.h"
+# include "tools.h"
 # include "init.h"
 # include "fractal.h"
-
-int	update_image(t_all *a);
+# include "events.h"
 
 #endif //MAIN_H

@@ -14,7 +14,7 @@
 # define FRACTAL_H
 
 # include "types.h"
-# include "main.h"
+# include "tools.h"
 
 int	mandelbrot(t_all *a);
 

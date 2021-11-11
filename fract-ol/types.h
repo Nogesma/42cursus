@@ -24,6 +24,7 @@ typedef struct mlx
 	int		pixel_bits;
 	int		line_bytes;
 	int		endian;
+	int		is_pressed;
 }	t_mlx;
 
 typedef struct fract
@@ -37,7 +38,7 @@ typedef struct fract
 	double	y_max;
 	double	cx;
 	double	cy;
-	char	t;
+	int		t;
 }	t_fract;
 
 typedef struct colour

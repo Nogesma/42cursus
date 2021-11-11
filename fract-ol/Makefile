@@ -10,28 +10,33 @@
 #                                                                              #
 # **************************************************************************** #
 
-CFLAGS = -Wall -Wextra -Werror -march=native -O3 -fopenmp
-IFLAGS_LINUX = -lmlx -lXext -lX11 -lm -lbsd #-L./mlx -I./mlx -l mlx #-framework OpenGL -framework Appkit -O3
-IFLAGS = -Lmlx -lmlx -framework OpenGL -framework Appkit
-CC     = /Users/msegrans/.brew/opt/llvm/bin/clang $(CFLAGS)
+#CFLAGS = -Wall -Wextra -Werror
+IFLAGS_LINUX = -Llibft -lmlx -lXext -lX11 -lm -lbsd
+IFLAGS = -lmlx -lft -Llibft -Lmlx -framework OpenGL -framework Appkit
+CC     = gcc $(CFLAGS)
 OBJ    = main.o events.o tools.o iterate.o init.o fractal.o
 NAME   = fractol
-LIB    = libft/libft.a
-INCLUDE = -Ilibft -Imlx -I/Users/msegrans/.brew/Cellar/libomp/13.0.0
+LIB    = libft
+MLX    = mlx
+INCLUDE = -Ilibft -Imlx
 
 .c.o:
 	$(CC) -c $< -o $@ $(INCLUDE)
 
-$(NAME): $(OBJ) $(LIB)
-	$(CC) -o $(NAME) $(OBJ) -L/Users/msegrans/.brew/Cellar/libomp/13.0.0/lib/ $(LIB) $(IFLAGS) $(INCLUDE)
+$(NAME): $(MLX) $(LIB) $(OBJ)
+	$(CC) -o $(NAME) $(OBJ) $(INCLUDE) $(IFLAGS)
 
 all: $(NAME)
 
 $(LIB):
-	$(MAKE) -C libft bonus
+	$(MAKE) -C libft
+
+$(MLX):
+	$(MAKE) -C mlx
 
 clean:
-	$(RM) $(NAME)
+	$(RM) $(OBJ)
+	$(MAKE) -C mlx clean
 	$(MAKE) -C libft clean
 
 fclean: clean
@@ -40,4 +45,4 @@ fclean: clean
 
 re: fclean all
 
-.PHONY: all clean fclean re
+.PHONY: all clean fclean re $(MLX) $(LIB)
