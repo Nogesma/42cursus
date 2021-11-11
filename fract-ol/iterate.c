@@ -50,7 +50,7 @@ int	iterate_julia(int maxiter, double zx, double zy, t_all *a)
 	while (iterations > 0 && zx * zx + zy * zy < 4)
 	{
 		xtemp = zx * zx - zy * zy;
-		zy = 2 * zx * zy + a->fractal->cy;
+		zy = (zx + zx) * zy + a->fractal->cy;
 		zx = xtemp + a->fractal->cx;
 		iterations--;
 	}

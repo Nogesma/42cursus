@@ -23,7 +23,8 @@ int	click_and_drag(int x, int y, t_all *a)
 	return (1);
 }
 
-int	release(int button, __attribute__ ((unused)) int x, __attribute__ ((unused)) int y, t_all *all)
+int	release(int button, __attribute__ ((unused)) int x,
+		__attribute__ ((unused)) int y, t_all *all)
 {
 	if (button == 1)
 		all->mlx->is_pressed = 0;
@@ -73,8 +74,10 @@ int	kbd_event(int button, t_all *a)
 		apply_step(&(a->fractal->y_min), &(a->fractal->y_max), stepy, add);
 	else if (button == 126)
 		apply_step(&(a->fractal->y_min), &(a->fractal->y_max), stepy, subtract);
-	else if (button == 15)
+	else if (button == 15 && a->fractal->t)
 		julia(a);
+	else if (button == 15)
+		mandelbrot(a);
 	else if (button == 53)
 	{
 		mlx_destroy_image(a->mlx->mlx_ptr, a->mlx->image);
