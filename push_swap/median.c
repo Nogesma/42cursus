@@ -1,6 +1,6 @@
 #include "bubble_sort.h"
 #include <stdlib.h>
-#include <libft.h>
+#include "median.h"
 
 static int *clone_list(t_list *src, int n)
 {
@@ -29,4 +29,13 @@ int get_median_value(t_list *lst, int n)
 	i = sort[n / 2];
 	free(sort);
 	return (i);
+}
+
+int *get_sorted(t_list *lst, int n)
+{
+	int *sort;
+
+	sort = clone_list(lst, n);
+	bubble_sort(sort, n);
+	return (sort);
 }

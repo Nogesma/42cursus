@@ -5,6 +5,6 @@
 #ifndef QUICKSORT_H
 # define QUICKSORT_H
 
-void	quicksort_a(t_list **head_a, t_list **head_b, int n);
+int sort(t_list **head_a, t_list **head_b, int n);
 
 #endif //QUICKSORT_H

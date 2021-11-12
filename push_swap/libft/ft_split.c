@@ -82,6 +82,7 @@ static char	**new_str(char **dest, const char *str, char c)
 		}
 		i++;
 	}
+//	dest[j] = NULL;
 	return (dest);
 }
 
