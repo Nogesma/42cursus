@@ -6,3 +6,5 @@ a.out
 fract-ol/fract-ol
 CMakeLists.txt
 cmake-build-debug
+checker
+push_swap
