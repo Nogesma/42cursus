@@ -32,7 +32,7 @@ $(LIB):
 	$(MAKE) -C libft printf
 
 clean:
-	$(RM) $(NAME)
+	$(RM) $(OBJ)
 	$(MAKE) -C libft clean
 
 fclean: clean

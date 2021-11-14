@@ -1,8 +1,0 @@
-.DS_Store
-.idea
-a.out
-*.o
-*.a
-test
-CMakeLists.txt
-cmake-build-debug

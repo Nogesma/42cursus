@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   bubble_sort.c                                      :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: msegrans <msegrans@student.42lausan>       +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2021/11/14 17:14:37 by msegrans          #+#    #+#             */
+/*   Updated: 2021/11/14 17:14:42 by msegrans         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "libft.h"
 
 void	ft_swap(int *a, int *b)
@@ -9,9 +21,9 @@ void	ft_swap(int *a, int *b)
 	*b = c;
 }
 
-static int is_sorted(const int *list, int list_size)
+static int	is_sorted(const int *list, int list_size)
 {
-	int i;
+	int	i;
 
 	i = -1;
 	while (++i < list_size - 1)
