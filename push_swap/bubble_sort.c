@@ -10,7 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "libft.h"
+#include "bubble_sort.h"
 
 void	ft_swap(int *a, int *b)
 {
@@ -43,4 +43,28 @@ void	bubble_sort(int *list, int list_size)
 			if (list[j] > list[j + 1])
 				ft_swap(&list[j], &list[j + 1]);
 	}
+}
+
+static int	*clone_list(t_list *src, int n)
+{
+	int	*dest;
+	int	i;
+
+	dest = (int *)malloc((n) * sizeof(int));
+	i = -1;
+	while (++i < n && src)
+	{
+		dest[i] = src->content;
+		src = src->next;
+	}
+	return (dest);
+}
+
+int	*get_sorted(t_list *lst, int n)
+{
+	int	*sort;
+
+	sort = clone_list(lst, n);
+	bubble_sort(sort, n);
+	return (sort);
 }

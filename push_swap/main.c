@@ -11,16 +11,7 @@
 /* ************************************************************************** */
 
 #include <libft.h>
-#include "quicksort.h"
-
-static void	print_stack(t_list *lst)
-{
-	while (lst)
-	{
-		ft_printf("%d\n", lst->content);
-		lst = lst->next;
-	}
-}
+#include "sort.h"
 
 int	create_list(t_list **head, int argc, char **argv)
 {
@@ -44,6 +35,7 @@ int	create_list(t_list **head, int argc, char **argv)
 		while (i-- > 0)
 			ft_lstadd_front(head, ft_lstnew(ft_atoi(argv[i + 1])));
 	}
+	return (length);
 }
 
 int	main(int argc, char **argv)

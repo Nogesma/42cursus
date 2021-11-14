@@ -21,4 +21,8 @@ void	rotate_reverse_stack(t_list **stack);
 
 void	push_stack(t_list **head_a, t_list **head_b);
 
+void	swap_stack(t_list **head_a);
+
+void	rollback(t_list **head, int n);
+
 #endif //STACK_H

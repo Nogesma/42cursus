@@ -10,11 +10,11 @@
 #                                                                              #
 # **************************************************************************** #
 
-#CFLAGS = -Wall -Wextra -Werror
+CFLAGS = -Wall -Wextra -Werror
 IFLAGS_LINUX = -lmlx -lXext -lX11 -lm -lbsd #-L./mlx -I./mlx -l mlx #-framework OpenGL -framework Appkit -O3
 IFLAGS = -Lmlx -lmlx -framework OpenGL -framework Appkit
 CC     = gcc $(CFLAGS)
-OBJ    = main.o bubble_sort.o median.o quicksort.o
+OBJ    = main.o bubble_sort.o sort.o sort5.o math.o stack.o sort_big.o utils.o
 NAME   = push_swap
 LIB    = libft/libft.a
 INCLUDE = -Ilibft

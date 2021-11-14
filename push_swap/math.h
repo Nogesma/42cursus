@@ -1,20 +1,26 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   bubble_sort.h                                      :+:      :+:    :+:   */
+/*   math.h                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: msegrans <msegrans@student.42lausan>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2021/11/14 17:15:25 by msegrans          #+#    #+#             */
-/*   Updated: 2021/11/14 17:15:29 by msegrans         ###   ########.fr       */
+/*   Created: 2021/11/14 18:41:21 by msegrans          #+#    #+#             */
+/*   Updated: 2021/11/14 18:41:23 by msegrans         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef BUBBLE_SORT_H
-# define BUBBLE_SORT_H
+#ifndef MATH_H
+# define MATH_H
 
 # include <libft.h>
 
-int	*get_sorted(t_list *lst, int n);
+int	ft_sqrt(int nb);
 
-#endif //BUBBLE_SORT_H
+int	lstmin(t_list *lst);
+
+int	lstmax(t_list *lst);
+
+int	min(int a, int b);
+
+#endif //MATH_H

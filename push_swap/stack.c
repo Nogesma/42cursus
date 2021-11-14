@@ -48,3 +48,22 @@ void	push_stack(t_list **head_a, t_list **head_b)
 		*head_b = temp;
 	}
 }
+
+void	swap_stack(t_list **head_a)
+{
+	t_list	*temp;
+
+	temp = (*head_a)->next;
+	(*head_a)->next = temp->next;
+	temp->next = *head_a;
+	*head_a = temp;
+}
+
+void	rollback(t_list **head, int n)
+{
+	int	i;
+
+	i = -1;
+	while (++i < n)
+		rotate_reverse_stack(head);
+}

@@ -1,20 +1,24 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   bubble_sort.h                                      :+:      :+:    :+:   */
+/*   sort5.h                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: msegrans <msegrans@student.42lausan>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2021/11/14 17:15:25 by msegrans          #+#    #+#             */
-/*   Updated: 2021/11/14 17:15:29 by msegrans         ###   ########.fr       */
+/*   Created: 2021/11/14 19:19:42 by msegrans          #+#    #+#             */
+/*   Updated: 2021/11/14 19:19:44 by msegrans         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef BUBBLE_SORT_H
-# define BUBBLE_SORT_H
+#ifndef SORT5_H
+# define SORT5_H
 
 # include <libft.h>
+# include "stack.h"
+# include "math.h"
+# include "bubble_sort.h"
+# include "utils.h"
 
-int	*get_sorted(t_list *lst, int n);
+void	sort5(t_list **head_a, t_list **head_b);
 
-#endif //BUBBLE_SORT_H
+#endif //SORT5_H
