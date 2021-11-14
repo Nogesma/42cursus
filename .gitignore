@@ -7,4 +7,4 @@ fract-ol/fract-ol
 CMakeLists.txt
 cmake-build-debug
 checker
-push_swap
+push_swap/push_swap

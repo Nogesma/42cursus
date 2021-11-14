@@ -1,10 +1,10 @@
-//
-// Created by Mano Segransan on 11/9/21.
-//
-
 #ifndef QUICKSORT_H
 # define QUICKSORT_H
 
-int sort(t_list **head_a, t_list **head_b, int n);
+#include "stack.h"
+#include "median.h"
+#include <libft.h>
+
+void	sort(t_list **head_a, int n);
 
 #endif //QUICKSORT_H
