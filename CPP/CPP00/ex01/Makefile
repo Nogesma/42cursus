@@ -12,14 +12,15 @@
 
 CFLAGS = -Wall -Wextra -Werror
 CC     = c++ $(CFLAGS)
-OBJ    = megaphone.o
-NAME   = megaphone
+OBJ    = phonebook.o
+NAME   = phonebook
+LIB = -ledit
 
 .cpp.o:
 	$(CC) -c $< -o $@
 
 $(NAME): $(OBJ)
-	$(CC) -o $(NAME) $(OBJ)
+	$(CC) -o $(NAME) $(OBJ) $(LIB)
 
 all: $(NAME)
 
