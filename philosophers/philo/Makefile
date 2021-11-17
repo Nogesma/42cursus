@@ -14,13 +14,13 @@
 CC     = gcc $(CFLAGS)
 OBJ    = utils.o philosophers.o
 NAME   = philo
-LIBS =
+LIBS = -pthread
 
 .c.o:
 	$(CC) -c $< -o $@
 
-$(NAME): $(OBJ) $(LIB)
-	$(CC) -o $(NAME) $(OBJ)
+$(NAME): $(OBJ)
+	$(CC) -o $(NAME) $(OBJ) $(LIBS)
 
 all: $(NAME)
 

@@ -34,6 +34,7 @@ typedef struct params
 typedef struct philosophers
 {
   struct timeval last_meal;
+  int number_of_meals;
   params_t *params;
   int n;
   pthread_t thread_id;
@@ -57,48 +58,18 @@ void do_action(philosophers_t *p, char *s, int n)
 	usleep(n * 1000);
 }
 
-void print_look(int a, int b, pthread_mutex_t *m)
-{
-	pthread_mutex_lock(m);
-	printf("%d looking at fork %d\n", a, b);
-	pthread_mutex_unlock(m);
-}
-
 void take_forks(philosophers_t *p)
 {
-	if (p->n % 2)
-	{
-		print_look(p->n, p->n, &(p->params->print_mutex));
-		pthread_mutex_lock(&(p->params->mutex[p->n]));
-		do_action(p, "has taken a fork", 0);
-		print_look(p->n, (p->n + 1) % p->params->number_of_philosophers, &(p->params->print_mutex));
-		pthread_mutex_lock(&(p->params->mutex[(p->n + 1) % p->params->number_of_philosophers]));
-		do_action(p, "has taken a fork", 0);
-	}
-	else
-	{
-
-		print_look(p->n, (p->n + 1) % p->params->number_of_philosophers, &(p->params->print_mutex));
-		pthread_mutex_lock(&(p->params->mutex[(p->n + 1) % p->params->number_of_philosophers]));
-		do_action(p, "has taken a fork", 0);
-		if (p->params->number_of_philosophers <= 1)
-		{
-			pthread_mutex_unlock(&(p->params->mutex[(p->n + 1) % p->params->number_of_philosophers]));
-			return ;
-		}
-		print_look(p->n, p->n, &(p->params->print_mutex));
-		pthread_mutex_lock(&(p->params->mutex[p->n]));
-		do_action(p, "has taken a fork", 0);
-	}
+	pthread_mutex_lock(&(p->params->mutex[p->n]));
+	do_action(p, "has taken a fork", 0);
+	pthread_mutex_lock(&(p->params->mutex[(p->n + 1) % p->params->number_of_philosophers]));
+	do_action(p, "has taken a fork", 0);
 }
 
 void release_forks(philosophers_t *p)
 {
 	pthread_mutex_unlock(&(p->params->mutex[p->n]));
-	if (p->n + 1 == p->params->number_of_philosophers)
-		pthread_mutex_unlock(&(p->params->mutex[0]));
-	else
-		pthread_mutex_unlock(&(p->params->mutex[p->n + 1]));
+	pthread_mutex_unlock(&(p->params->mutex[(p->n + 1) % p->params->number_of_philosophers]));
 }
 
 void *eat_think_sleep_die(void *ptr)
@@ -106,19 +77,21 @@ void *eat_think_sleep_die(void *ptr)
 	philosophers_t *philo;
 
 	philo = (philosophers_t *)ptr;
-//	printf("Hello from thread: %d at pid %d\n", philo->n, getpid());
 	if (philo->n % 2)
-		usleep((philo->params->time_to_sleep + philo->params->time_to_eat) / 2);
+		usleep(philo->params->time_to_eat);
+	if (philo->params->number_of_philosophers % 2 && philo->n == philo->params->number_of_philosophers)
+		usleep(philo->params->time_to_eat);
 	while (1)
 	{
 		if (philo->params->ded)
 			return (NULL);
 		take_forks(philo);
 		if (philo->params->number_of_philosophers <= 1)
-			return (NULL);
+			philo->params->ded = 1;
 		do_action(philo, "is eating", philo->params->time_to_eat);
 		pthread_mutex_lock(&(philo->params->time_mutex[philo->n]));
 		gettimeofday(&philo->last_meal, NULL);
+		philo->number_of_meals++;
 		pthread_mutex_unlock(&(philo->params->time_mutex[philo->n]));
 		release_forks(philo);
 		do_action(philo, "is sleeping", philo->params->time_to_sleep);
@@ -145,6 +118,7 @@ void	init_philo(philosophers_t *p, params_t *params, int i)
 {
 	p->params = params;
 	p->n = i;
+	p->number_of_meals = 0;
 	p->last_meal.tv_usec = params->start_time.tv_usec;
 	p->last_meal.tv_sec = params->start_time.tv_sec;
 }
@@ -155,7 +129,6 @@ philosophers_t	*create_philosophers(params_t *args)
 	philosophers_t *philosophers;
 
 	philosophers = malloc(sizeof(philosophers_t) * args->number_of_philosophers);
-
 	i = -1;
 	while (++i < args->number_of_philosophers)
 	{
@@ -171,26 +144,52 @@ int is_dead(philosophers_t *p)
 	long now;
 	long time_to_die;
 
-
-
 	pthread_mutex_lock(&(p->params->time_mutex[p->n]));
 	gettimeofday(&t, NULL);
 	now = t.tv_sec * 1000 + t.tv_usec / 1000;
 	time_to_die = p->last_meal.tv_sec * 1000 + p->last_meal.tv_usec / 1000 + p->params->time_to_die;
 	pthread_mutex_unlock(&(p->params->time_mutex[p->n]));
-//	printf("%ld %ld %ld\n", now, time_to_die, now - time_to_die);
 	if (time_to_die < now)
 		return (1);
 	return (0);
 }
 
-void wait_thread_exit(philosophers_t *p)
+void wait_thread_exit(philosophers_t *p, params_t *params)
 {
 	int i;
 
 	i = -1;
-	while (++i < p->params->number_of_philosophers)
+	while (++i < params->number_of_philosophers)
+	{
 		pthread_join(p[i].thread_id, NULL);
+		pthread_mutex_destroy(&(params->mutex[i]));
+		pthread_mutex_destroy(&(params->time_mutex[i]));
+	}
+	pthread_mutex_destroy(&(params->print_mutex));
+	free(params->mutex);
+	free(params->time_mutex);
+	free(p);
+}
+
+int check_eat(philosophers_t *p)
+{
+	int i;
+
+	if (p->params->number_of_times_each_philosopher_must_eat == -1)
+		return (0);
+
+	i = -1;
+	while (++i < p->params->number_of_philosophers)
+	{
+		pthread_mutex_lock(&(p->params->time_mutex[p->n]));
+		if (p->number_of_meals == p->params->number_of_times_each_philosopher_must_eat)
+		{
+			pthread_mutex_unlock(&(p->params->time_mutex[p->n]));
+			return (1);
+		}
+		pthread_mutex_unlock(&(p->params->time_mutex[p->n]));
+	}
+	return (0);
 }
 
 int main(int ac, char **av)
@@ -213,7 +212,6 @@ int main(int ac, char **av)
 	gettimeofday(&(params.start_time), NULL);
 	create_mutex(&params);
 	philosophers = create_philosophers(&params);
-
 	while (1)
 	{
 		ac = -1;
@@ -223,7 +221,14 @@ int main(int ac, char **av)
 			{
 				do_action(&philosophers[ac], "died", 0);
 				params.ded = 1;
-				wait_thread_exit(philosophers);
+				wait_thread_exit(philosophers, &params);
+				return (0);
+			}
+			if (check_eat(&(philosophers[ac])))
+			{
+				do_action(&philosophers[ac], "finished", 0);
+				params.ded = 1;
+				wait_thread_exit(philosophers, &params);
 				return (0);
 			}
 		}
