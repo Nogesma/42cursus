@@ -54,7 +54,7 @@ void do_action(philosophers_t *p, char *s, int n)
 	if (p->params->ded)
 		return ;
 	gettimeofday(&t, NULL);
-	print_timestamp(t, p->n, s, &(p->params->print_mutex));
+	print_timestamp(t, p->n + 1, s, &(p->params->print_mutex));
 	usleep(n * 1000);
 }
 
@@ -78,9 +78,9 @@ void *eat_think_sleep_die(void *ptr)
 
 	philo = (philosophers_t *)ptr;
 	if (philo->n % 2)
-		usleep(philo->params->time_to_eat);
-	if (philo->params->number_of_philosophers % 2 && philo->n == philo->params->number_of_philosophers)
-		usleep(philo->params->time_to_eat);
+		usleep(philo->params->time_to_eat * 1000);
+	if ((philo->params->number_of_philosophers % 2) && (philo->n + 1 == philo->params->number_of_philosophers))
+		usleep(philo->params->time_to_eat * 1000);
 	while (1)
 	{
 		if (philo->params->ded)
@@ -88,11 +88,11 @@ void *eat_think_sleep_die(void *ptr)
 		take_forks(philo);
 		if (philo->params->number_of_philosophers <= 1)
 			philo->params->ded = 1;
-		do_action(philo, "is eating", philo->params->time_to_eat);
 		pthread_mutex_lock(&(philo->params->time_mutex[philo->n]));
 		gettimeofday(&philo->last_meal, NULL);
 		philo->number_of_meals++;
 		pthread_mutex_unlock(&(philo->params->time_mutex[philo->n]));
+		do_action(philo, "is eating", philo->params->time_to_eat);
 		release_forks(philo);
 		do_action(philo, "is sleeping", philo->params->time_to_sleep);
 		do_action(philo, "is thinking", 0);
@@ -192,6 +192,21 @@ int check_eat(philosophers_t *p)
 	return (0);
 }
 
+int check_params(params_t *p)
+{
+	if (p->number_of_philosophers < 0)
+		return (1);
+	if (p->time_to_die < 0)
+		return (1);
+	if (p->time_to_eat < 0)
+		return (1);
+	if (p->time_to_sleep < 0)
+		return (1);
+	if (p->number_of_times_each_philosopher_must_eat < -1)
+		return (1);
+	return (0);
+}
+
 int main(int ac, char **av)
 {
 	params_t params;
@@ -207,7 +222,10 @@ int main(int ac, char **av)
 		params.number_of_times_each_philosopher_must_eat = ft_atoi(av[5]);
 	else
 		params.number_of_times_each_philosopher_must_eat = -1;
-
+	if (check_params(&params))
+		return (1);
+//	if (params.number_of_philosophers <= 1)
+//		return (1);
 	params.ded = 0;
 	gettimeofday(&(params.start_time), NULL);
 	create_mutex(&params);
