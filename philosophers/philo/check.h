@@ -1,28 +1,26 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   philosophers.h                                     :+:      :+:    :+:   */
+/*   check.h                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: msegrans <msegrans@student.42lausan>       +#+  +:+       +#+        */
+/*   By: msegrans <msegrans@student.42lausanne      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2021/11/17 10:40:12 by msegrans          #+#    #+#             */
-/*   Updated: 2021/11/17 10:40:16 by msegrans         ###   ########.fr       */
+/*   Created: 2021/11/19 01:17:57 by msegrans          #+#    #+#             */
+/*   Updated: 2021/11/19 01:17:58 by msegrans         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef PHILOSOPHERS_H
-# define PHILOSOPHERS_H
+#ifndef CHECK_H
+# define CHECK_H
 
 # include <pthread.h>
-# include <stdio.h>
-# include <unistd.h>
-# include <stdlib.h>
 # include <sys/time.h>
 
-# include "utils.h"
-# include "mutex.h"
-# include "init.h"
 # include "types.h"
-# include "check.h"
+# include "mutex.h"
 
-#endif //PHILOSOPHERS_H
+int		check_params(t_params *p);
+
+void	check_end(t_params *params, t_philosophers *philosophers);
+
+#endif //CHECK_H

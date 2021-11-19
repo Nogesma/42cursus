@@ -10,9 +10,9 @@
 #                                                                              #
 # **************************************************************************** #
 
-#CFLAGS = -Wall -Wextra -Werror
+CFLAGS = -Wall -Wextra -Werror
 CC     = gcc $(CFLAGS)
-OBJ    = utils.o philosophers.o
+OBJ    = utils.o philosophers.o init.o mutex.o check.o
 NAME   = philo
 LIBS = -pthread
 

@@ -1,28 +1,31 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   philosophers.h                                     :+:      :+:    :+:   */
+/*   mutex.h                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: msegrans <msegrans@student.42lausan>       +#+  +:+       +#+        */
+/*   By: msegrans <msegrans@student.42lausanne      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2021/11/17 10:40:12 by msegrans          #+#    #+#             */
-/*   Updated: 2021/11/17 10:40:16 by msegrans         ###   ########.fr       */
+/*   Created: 2021/11/19 01:13:42 by msegrans          #+#    #+#             */
+/*   Updated: 2021/11/19 01:13:43 by msegrans         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef PHILOSOPHERS_H
-# define PHILOSOPHERS_H
+#ifndef MUTEX_H
+# define MUTEX_H
 
-# include <pthread.h>
-# include <stdio.h>
-# include <unistd.h>
-# include <stdlib.h>
 # include <sys/time.h>
+# include <pthread.h>
+# include <unistd.h>
+# include <stdio.h>
 
-# include "utils.h"
-# include "mutex.h"
-# include "init.h"
 # include "types.h"
-# include "check.h"
 
-#endif //PHILOSOPHERS_H
+void	last_action(t_philosophers *p, char *s);
+
+void	do_action(t_philosophers *p, char *s, int n);
+
+void	take_forks(t_philosophers *p);
+
+void	release_forks(t_philosophers *p);
+
+#endif //MUTEX_H
