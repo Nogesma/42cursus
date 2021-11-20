@@ -32,22 +32,21 @@ int	check_dead(t_philosophers *p)
 int	check_eat(t_philosophers *p)
 {
 	int	i;
+	int	j;
 
 	if (p->params->number_of_times_each_philosopher_must_eat == -1)
 		return (0);
 	i = -1;
+	j = 0;
 	while (++i < p->params->number_of_philosophers)
 	{
-		pthread_mutex_lock(&(p->params->time_mutex[p->n]));
-		if (p->number_of_meals
-			== p->params->number_of_times_each_philosopher_must_eat)
-		{
-			pthread_mutex_unlock(&(p->params->time_mutex[p->n]));
-			return (1);
-		}
-		pthread_mutex_unlock(&(p->params->time_mutex[p->n]));
+		pthread_mutex_lock(&(p->params->time_mutex[i]));
+		if (p[i].number_of_meals
+			>= p->params->number_of_times_each_philosopher_must_eat)
+			j++;
+		pthread_mutex_unlock(&(p->params->time_mutex[i]));
 	}
-	return (0);
+	return (j == p->params->number_of_philosophers);
 }
 
 int	check_params(t_params *p)
@@ -67,17 +66,29 @@ int	check_params(t_params *p)
 
 void	check_end(t_params *params, t_philosophers *philosophers)
 {
-	int	i;
+	int				i;
+	struct timeval	t;
 
 	while (1)
 	{
+		if (check_eat(philosophers))
+		{
+			params->ded = 1;
+			return ;
+		}
 		i = -1;
 		while (++i < params->number_of_philosophers)
 		{
 			if (check_dead(&(philosophers[i])))
-				return (last_action(&philosophers[i], "died"));
-			if (check_eat(&(philosophers[i])))
-				return (last_action(&philosophers[i], "finished"));
+			{
+				params->ded = 1;
+				gettimeofday(&t, NULL);
+				pthread_mutex_lock(&(params->print_mutex));
+				printf("%lu %d died\n",
+					time_to_ms(t) - time_to_ms(params->start_time), i + 1);
+				pthread_mutex_unlock(&(params->print_mutex));
+				return ;
+			}
 		}
 		usleep(5000);
 	}

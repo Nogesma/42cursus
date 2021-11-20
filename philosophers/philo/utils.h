@@ -13,6 +13,10 @@
 #ifndef UTILS_H
 # define UTILS_H
 
-int	ft_atoi(const char *str);
+# include <sys/time.h>
+
+int		ft_atoi(const char *str);
+
+long	time_to_ms(struct timeval t);
 
 #endif //UTILS_H

@@ -19,6 +19,7 @@
 # include <stdio.h>
 
 # include "types.h"
+# include "utils.h"
 
 void	last_action(t_philosophers *p, char *s);
 

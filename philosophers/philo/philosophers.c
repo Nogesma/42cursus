@@ -46,8 +46,6 @@ int	main(int ac, char **av)
 		params.number_of_times_each_philosopher_must_eat = -1;
 	if (check_params(&params))
 		return (1);
-	if (params.number_of_philosophers <= 1)
-		return (1);
 	params.ded = 0;
 	gettimeofday(&(params.start_time), NULL);
 	create_mutex(&params);

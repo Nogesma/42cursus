@@ -10,6 +10,8 @@
 /*                                                                            */
 /* ************************************************************************** */
 
+#include "utils.h"
+
 int	ft_atoi(const char *str)
 {
 	int	result;
@@ -36,4 +38,9 @@ int	ft_atoi(const char *str)
 		++i;
 	}
 	return (result * is_negative);
+}
+
+long	time_to_ms(struct timeval t)
+{
+	return (t.tv_sec * 1000 + t.tv_usec / 1000);
 }
