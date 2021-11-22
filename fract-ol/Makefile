@@ -6,12 +6,12 @@
 #    By: msegrans <msegrans@student.42lausan>       +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2021/10/12 12:07:41 by msegrans          #+#    #+#              #
-#    Updated: 2021/10/12 12:07:45 by msegrans         ###   ########.fr        #
+#    Updated: 2021/11/22 22:24:58 by msegrans         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 CFLAGS = -Wall -Wextra -Werror
-IFLAGS_LINUX = -Llibft -lmlx -lXext -lX11 -lm -lbsd
+IFLAGS_LINUX = -Llibft -lft -lmlx -lXext -lX11 -lm -lbsd
 IFLAGS = -lmlx -lft -Llibft -Lmlx -framework OpenGL -framework Appkit
 CC     = gcc $(CFLAGS)
 OBJ    = main.o events.o tools.o iterate.o init.o fractal.o
@@ -24,7 +24,7 @@ INCLUDE = -Ilibft -Imlx
 	$(CC) -c $< -o $@ $(INCLUDE)
 
 $(NAME): $(MLX) $(LIB) $(OBJ)
-	$(CC) -o $(NAME) $(OBJ) $(INCLUDE) $(IFLAGS)
+	$(CC) -o $(NAME) $(OBJ) $(INCLUDE) $(IFLAGS_LINUX)
 
 all: $(NAME)
 
