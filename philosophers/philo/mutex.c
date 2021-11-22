@@ -12,17 +12,6 @@
 
 #include "mutex.h"
 
-void	last_action(t_philosophers *p, char *s)
-{
-	struct timeval	t;
-
-	p->params->ded = 1;
-	gettimeofday(&t, NULL);
-	pthread_mutex_lock(&(p->params->print_mutex));
-	printf("%lu %d %s\n", t.tv_sec * 1000 + t.tv_usec / 1000, p->n + 1, s);
-	pthread_mutex_unlock(&(p->params->print_mutex));
-}
-
 void	do_action(t_philosophers *p, char *s, int n)
 {
 	struct timeval	t;
@@ -31,7 +20,8 @@ void	do_action(t_philosophers *p, char *s, int n)
 		return ;
 	gettimeofday(&t, NULL);
 	pthread_mutex_lock(&(p->params->print_mutex));
-	printf("%lu %d %s\n", t.tv_sec * 1000 + t.tv_usec / 1000, p->n + 1, s);
+	printf("%ld %d %s\n",
+		time_to_ms(t) - time_to_ms(p->params->start_time), p->n + 1, s);
 	pthread_mutex_unlock(&(p->params->print_mutex));
 	usleep(n * 1000);
 }
@@ -40,6 +30,8 @@ void	take_forks(t_philosophers *p)
 {
 	pthread_mutex_lock(&(p->params->mutex[p->n]));
 	do_action(p, "has taken a fork", 0);
+	if (p->n < 2)
+		return ;
 	pthread_mutex_lock(&(p->params->mutex[(p->n + 1)
 			% p->params->number_of_philosophers]));
 	do_action(p, "has taken a fork", 0);

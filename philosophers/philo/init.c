@@ -18,17 +18,17 @@ void	*eat_think_sleep_die(void *ptr)
 
 	philo = (t_philosophers *)ptr;
 	if (philo->n % 2)
-		usleep(philo->params->time_to_eat * 1000);
+		usleep(philo->params->time_to_eat * 900);
 	if ((philo->params->number_of_philosophers % 2)
 		&& (philo->n + 1 == philo->params->number_of_philosophers))
-		usleep(philo->params->time_to_eat * 1000);
+		usleep(philo->params->time_to_eat * 900);
 	while (1)
 	{
 		if (philo->params->ded)
 			return (NULL);
 		take_forks(philo);
 		if (philo->params->number_of_philosophers <= 1)
-			philo->params->ded = 1;
+			return (NULL);
 		pthread_mutex_lock(&(philo->params->time_mutex[philo->n]));
 		gettimeofday(&philo->last_meal, NULL);
 		philo->number_of_meals++;
