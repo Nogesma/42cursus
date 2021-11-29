@@ -15,14 +15,17 @@ CC     = gcc $(CFLAGS)
 OBJ    = minishell.o
 NAME   = minishell
 LIB    = libft/libft.a
-INCLUDE = -Ilibft
+INCLUDE = -Ilibft -I $(HOME)/.brew/Cellar/readline/8.1.1/include
+ifneq ($(UNAME), Linux)
+    LIBS_MAC = -L $(HOME)/.brew/Cellar/readline/8.1.1/lib -lreadline
+endif
 LIBS = -Llibft -lft -ledit
 
 .c.o:
 	$(CC) -c $< -o $@ $(INCLUDE)
 
 $(NAME): $(OBJ) $(LIB)
-	$(CC) -o $(NAME) $(OBJ) $(INCLUDE) $(LIBS)
+	$(CC) -o $(NAME) $(OBJ) $(INCLUDE) $(LIBS) $(LIBS_MAC)
 
 all: $(NAME)
 
