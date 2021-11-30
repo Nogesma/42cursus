@@ -5,7 +5,7 @@
 #include <sys/stat.h>
 #include <sys/errno.h>
 
-void exec_binary(char *path, char **args, char **env)
+void	exec_binary(char *path, char **args, char **env)
 {
 	pid_t child;
 	int status;
@@ -16,9 +16,8 @@ void exec_binary(char *path, char **args, char **env)
 	if (child == 0 && execve(path, args, env) == -1)
 	{
 		perror(path);
-		return ;
+		exit(1);
 	}
-//	printf("normal errno: %d, %s", errno, strerror(errno));
 	if (child > 0)
 		wait(&status);
 }
@@ -48,6 +47,31 @@ void free_list(char **lst)
 	free(lst);
 }
 
+char *ft_strjoin_path(char *s1, char *s2)
+{
+	size_t 	s1l;
+	size_t	s2l;
+	char	*str;
+
+	if (!s1 || !s2)
+		return (NULL);
+	s1l = ft_strlen(s1);
+	s2l = ft_strlen(s2);
+	str = (char *)ft_calloc(s1l + s2l + 2, sizeof(char));
+	if (str == NULL)
+		return (NULL);
+	ft_strlcpy(str, s1, s1l + 1);
+	str[s1l] = '/';
+	ft_strlcpy(str + s1l + 1, s2, s2l + 1);
+	return (str);
+}
+
+char *free_path_search(char *s, DIR *dir)
+{
+	free(dir);
+	return (s);
+}
+
 char *search_path(char *path, char *exec)
 {
 	DIR *dir;
@@ -55,6 +79,7 @@ char *search_path(char *path, char *exec)
 	struct stat statbuf;
 	size_t len;
 	char *exec_path;
+	char *temp;
 
 	len = ft_strlen(exec);
 	dir = opendir(path);
@@ -65,35 +90,21 @@ char *search_path(char *path, char *exec)
 	{
 		if (dp->d_type == DT_DIR && ft_strncmp(".", dp->d_name, 1))
 		{
-//			ft_printf("DIR--> path: %s\nname: %s\n", path, dp->d_name);
-			// TODO: create function to join paths with / between
-
-			/** Careful, memory leak in strjoin below **/
-			exec_path = ft_strjoin(path, "/");
-			exec_path = ft_strjoin(exec_path, dp->d_name);
-			path = exec_path;
-//			ft_printf("DIR--> path: %s\n", path);
-//			ft_printf("%p\n", &dp);
-			exec_path = search_path(path, exec);
+			temp = ft_strjoin_path(path, dp->d_name);
+			exec_path = search_path(temp, exec);
+			free(temp);
 			if (exec_path)
-				return (exec_path);
+				return (free_path_search(exec_path, dir));
 		}
 		else if (dp->d_namlen == len && !ft_strncmp(exec, dp->d_name, len))
 		{
-//			ft_printf("FILENAME--> path: %s\nname: %s\n", path, dp->d_name);
-			// TODO: create function to join paths with / between
-
-			/** Careful, memory leak in strjoin below **/
-			exec_path = ft_strjoin(path, "/");
-			exec_path = ft_strjoin(exec_path, exec);
+			exec_path = ft_strjoin_path(path, exec);
 			if (stat(exec_path, &statbuf) == 0 && statbuf.st_mode & S_IXUSR)
-				return (exec_path);
+				return (free_path_search(exec_path, dir));
 		}
-//		else
-//			ft_printf("FILE--> path: %s\nname: %s\n", path, dp->d_name);
 		dp = readdir(dir);
 	}
-	return (NULL);
+	return (free_path_search(NULL, dir));
 }
 
 char *get_exec_path(char *exec, char *PATH)
@@ -107,8 +118,7 @@ char *get_exec_path(char *exec, char *PATH)
 	exec_path = NULL;
 	while (paths[++i] && exec_path == NULL)
 		exec_path = search_path(paths[i], exec);
-//	ft_printf("i: %d ", i);
-//	ft_printf("PATH: %s\nexec_path: %s\nexec: %s.\n", paths[i], exec_path, exec);
+	free_list(paths);
 	return (exec_path);
 }
 
@@ -129,19 +139,25 @@ void search_exec(char *line, char **env)
 {
 	char **args;
 	char *PATH;
-	char *exec;
+	char *command;
 
-	PATH = get_env(env, "PATH");
-	args = ft_split(line, ' ');
 	if (is_built_in(line))
 		return ;
+	PATH = get_env(env, "PATH");
+	args = ft_split(line, ' ');
+	command = args[0];
 	if (!(line[0] == '.' || line[0] == '/'))
+		args[0] = get_exec_path(args[0], PATH);
+	if (args[0])
+		exec_binary(args[0], args, env);
+	else
 	{
-		exec = get_exec_path(args[0], PATH);
-		if (exec)
-			args[0] = exec;
+		ft_putstr_fd("minish: ", 2);
+		ft_putstr_fd(command, 2);
+		ft_putstr_fd(": command not found\n", 2);
 	}
-	exec_binary(args[0], args, env);
+	if (!args[0])
+		free(command);
 	free_list(args);
 }
 
