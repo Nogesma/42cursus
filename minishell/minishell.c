@@ -13,13 +13,10 @@ void exec_binary(char *path, char **args, char **env)
 	child = fork();
 	if (child == -1)
 		return ;
-	if (child == 0)
+	if (child == 0 && execve(path, args, env) == -1)
 	{
-		if (execve(path, args, env) == -1)
-		{
-//			printf("errno: %d, %s", errno, strerror(errno));
-			return ;
-		}
+		perror(path);
+		return ;
 	}
 //	printf("normal errno: %d, %s", errno, strerror(errno));
 	if (child > 0)
@@ -132,17 +129,19 @@ void search_exec(char *line, char **env)
 {
 	char **args;
 	char *PATH;
+	char *exec;
 
 	PATH = get_env(env, "PATH");
 	args = ft_split(line, ' ');
 	if (is_built_in(line))
 		return ;
 	if (!(line[0] == '.' || line[0] == '/'))
-		args[0] = get_exec_path(args[0], PATH);
-	if (args[0])
 	{
-		exec_binary(args[0], args, env);
+		exec = get_exec_path(args[0], PATH);
+		if (exec)
+			args[0] = exec;
 	}
+	exec_binary(args[0], args, env);
 	free_list(args);
 }
 
