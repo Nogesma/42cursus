@@ -67,6 +67,8 @@ Account::~Account( void )
 	Account::_displayTimestamp();
 	std::cout << "index:" << this->_accountIndex << ';';
 	std::cout << "amount:" << this->_amount << ';';
+	_totalAmount -= _amount;
+	_nbAccounts--;
 	std::cout << "closed" << std::endl;
 	return ;
 }
@@ -105,7 +107,6 @@ bool	Account::makeWithdrawal( int withdrawal )
 	return (0);
 }
 
-//int		Account::checkAmount( void ) const;
 void	Account::displayStatus( void ) const
 {
 	Account::_displayTimestamp();
