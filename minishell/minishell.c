@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   minishell.c                                        :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: msegrans <msegrans@student.42lausan>       +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2021/12/01 13:06:12 by msegrans          #+#    #+#             */
+/*   Updated: 2021/12/01 13:06:14 by msegrans         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "minishell.h"
 #include <libft.h>
 #include <signal.h>
@@ -7,8 +19,8 @@
 
 void	exec_binary(char *path, char **args, char **env)
 {
-	pid_t child;
-	int status;
+	pid_t	child;
+	int		status;
 
 	child = fork();
 	if (child == -1)
@@ -29,7 +41,7 @@ int	is_built_in(const char *line)
 	return (0);
 }
 
-void print_list(char **lst)
+void	print_list(char **lst)
 {
 	for (int i = 0; lst[i]; i++)
 	{
@@ -37,19 +49,19 @@ void print_list(char **lst)
 	}
 }
 
-void free_list(char **lst)
+void	free_list(char **lst)
 {
 	int	i;
 
 	i = -1;
-	while(lst[++i])
+	while (lst[++i])
 		free(lst[i]);
 	free(lst);
 }
 
-char *ft_strjoin_path(char *s1, char *s2)
+char	*ft_strjoin_path(char *s1, char *s2)
 {
-	size_t 	s1l;
+	size_t	s1l;
 	size_t	s2l;
 	char	*str;
 
@@ -66,20 +78,20 @@ char *ft_strjoin_path(char *s1, char *s2)
 	return (str);
 }
 
-char *free_path_search(char *s, DIR *dir)
+char	*free_path_search(char *s, DIR *dir)
 {
 	free(dir);
 	return (s);
 }
 
-char *search_path(char *path, char *exec)
+char	*search_path(char *path, char *exec)
 {
-	DIR *dir;
-	struct dirent *dp;
-	struct stat statbuf;
-	size_t len;
-	char *exec_path;
-	char *temp;
+	DIR				*dir;
+	struct dirent	*dp;
+	struct stat		statbuf;
+	size_t			len;
+	char			*exec_path;
+	char			*temp;
 
 	len = ft_strlen(exec);
 	dir = opendir(path);
@@ -107,11 +119,11 @@ char *search_path(char *path, char *exec)
 	return (free_path_search(NULL, dir));
 }
 
-char *get_exec_path(char *exec, char *PATH)
+char	*get_exec_path(char *exec, char *PATH)
 {
-	char **paths;
-	int i;
-	char *exec_path;
+	char	**paths;
+	int		i;
+	char	*exec_path;
 
 	paths = ft_split(&PATH[5], ':');
 	i = -1;
@@ -122,10 +134,10 @@ char *get_exec_path(char *exec, char *PATH)
 	return (exec_path);
 }
 
-char *get_env(char **env, char *name)
+char	*get_env(char **env, char *name)
 {
-	int i;
-	size_t len;
+	int		i;
+	size_t	len;
 
 	len = ft_strlen(name);
 	i = -1;
@@ -135,19 +147,19 @@ char *get_env(char **env, char *name)
 	return (NULL);
 }
 
-void search_exec(char *line, char **env)
+void	search_exec(char *line, char **env)
 {
-	char **args;
-	char *PATH;
-	char *command;
+	char	**args;
+	char	*path;
+	char	*command;
 
 	if (is_built_in(line))
 		return ;
-	PATH = get_env(env, "PATH");
+	path = get_env(env, "PATH");
 	args = ft_split(line, ' ');
 	command = args[0];
 	if (!(line[0] == '.' || line[0] == '/'))
-		args[0] = get_exec_path(args[0], PATH);
+		args[0] = get_exec_path(args[0], path);
 	if (args[0])
 		exec_binary(args[0], args, env);
 	else
@@ -161,8 +173,7 @@ void search_exec(char *line, char **env)
 	free_list(args);
 }
 
-
-void sigint(__attribute__ ((unused)) int sig)
+void	sigint(__attribute__ ((unused)) int sig)
 {
 	write(1, "\n", 1);
 	rl_on_new_line();
@@ -170,12 +181,10 @@ void sigint(__attribute__ ((unused)) int sig)
 	rl_forced_update_display();
 }
 
-int	main(__attribute__ ((unused)) int ac, __attribute__ ((unused)) char **av, char **env)
+int	main(__attribute__ ((unused)) int ac, __attribute__ ((unused)) char **av,
+		char **env)
 {
-	char *line;
-
-	(void)ac;
-	(void)av;
+	char	*line;
 
 	signal(SIGINT, sigint);
 	line = readline("minish$ ");
