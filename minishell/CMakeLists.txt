@@ -13,6 +13,7 @@ link_directories(libft)
 link_directories(~/.brew/Cellar/readline/8.1.1/lib)
 
 add_executable(minishell
-        minishell.c)
+        minishell.c
+        utils.c)
 
 TARGET_LINK_LIBRARIES(minishell readline)

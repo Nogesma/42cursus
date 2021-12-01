@@ -12,20 +12,21 @@
 
 CFLAGS = -Wall -Wextra -Werror
 CC     = gcc $(CFLAGS)
-OBJ    = minishell.o
+OBJ    = minishell.o utils.o
 NAME   = minishell
 LIB    = libft/libft.a
 INCLUDE = -Ilibft -I $(HOME)/.brew/Cellar/readline/8.1.1/include
-ifneq ($(UNAME), Linux)
-    LIBS_MAC = -L $(HOME)/.brew/Cellar/readline/8.1.1/lib -lreadline
-endif
 LIBS = -Llibft -lft -ledit
+
+ifneq ($(UNAME), Linux)
+    LIBS := $(LIBS) -L $(HOME)/.brew/Cellar/readline/8.1.1/lib -lreadline
+endif
 
 .c.o:
 	$(CC) -c $< -o $@ $(INCLUDE)
 
 $(NAME): $(OBJ) $(LIB)
-	$(CC) -o $(NAME) $(OBJ) $(INCLUDE) $(LIBS) $(LIBS_MAC)
+	$(CC) -o $(NAME) $(OBJ) $(INCLUDE) $(LIBS)
 
 all: $(NAME)
 
