@@ -29,22 +29,24 @@ void	exec_binary(char *path, char **args, char **env)
 		wait(&status);
 }
 
-void pwd()
+int	pwd()
 {
 	char *cwd;
 
 	cwd = getcwd(NULL, 0);
 	ft_printf("%s\n", cwd);
 	free(cwd);
+	return (1);
 }
 
-void cd(const char *path)
+int	cd(const char *path)
 {
 	if (chdir(path) == -1)
 	{
 		ft_putstr_fd("minish: cd: ", 2);
 		perror(path);
 	}
+	return (1);
 }
 
 void	print_list(char **lst)
@@ -55,9 +57,10 @@ void	print_list(char **lst)
 	}
 }
 
-void env(char **env)
+int	env(char **env)
 {
 	print_list(env);
+	return (1);
 }
 
 // TODO: check if line exec build int shell command, and exec built in
@@ -67,20 +70,11 @@ void env(char **env)
 int	is_built_in(const char *line, char **e)
 {
 	if (!ft_strncmp("pwd", line, 3))
-	{
-		pwd();
-		return (1);
-	}
+		return (pwd());
 	if (!ft_strncmp("cd", line, 2))
-	{
-		cd(&line[3]);
-		return (1);
-	}
+		return (cd(&line[3]));
 	if (!ft_strncmp("env", line, 3))
-	{
-		env(e);
-		return (1);
-	}
+		return (env(e));
 	if (!ft_strncmp("exit", line, 4))
 		exit(0);
 	return (0);
