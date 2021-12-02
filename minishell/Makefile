@@ -16,10 +16,12 @@ OBJ    = minishell.o utils.o
 NAME   = minishell
 LIB    = libft/libft.a
 INCLUDE = -Ilibft -I $(HOME)/.brew/Cellar/readline/8.1.1/include
-LIBS = -Llibft -lft -ledit
+LIBS = -Llibft -lft
 
 ifneq ($(UNAME), Linux)
     LIBS := $(LIBS) -L $(HOME)/.brew/Cellar/readline/8.1.1/lib -lreadline
+else
+    LIBS := $(LIBS) -ledit
 endif
 
 .c.o:

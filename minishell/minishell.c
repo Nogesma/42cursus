@@ -131,7 +131,7 @@ void	sigint(__attribute__ ((unused)) int sig)
 	write(1, "\n", 1);
 	rl_on_new_line();
 	rl_replace_line("", 0);
-	rl_forced_update_display();
+	rl_redisplay();
 }
 
 int	main(__attribute__ ((unused)) int ac, __attribute__ ((unused)) char **av,
