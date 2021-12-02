@@ -29,19 +29,61 @@ void	exec_binary(char *path, char **args, char **env)
 		wait(&status);
 }
 
-// TODO: check if line exec build int shell command, and exec built in
-int	is_built_in(const char *line)
+void pwd()
 {
-	(void)line;
-	return (0);
+	char *cwd;
+
+	cwd = getcwd(NULL, 0);
+	ft_printf("%s\n", cwd);
+	free(cwd);
+}
+
+void cd(const char *path)
+{
+	if (chdir(path) == -1)
+	{
+		ft_putstr_fd("minish: cd: ", 2);
+		perror(path);
+	}
 }
 
 void	print_list(char **lst)
 {
 	for (int i = 0; lst[i]; i++)
 	{
-		printf("%s\n", lst[i]);
+		ft_printf("%s\n", lst[i]);
 	}
+}
+
+void env(char **env)
+{
+	print_list(env);
+}
+
+// TODO: check if line exec build int shell command, and exec built in
+/** Careful, comparison fails if command is pwdabc for example. If line > len("pwd")
+ *  we need to compare to "pwd " and compare one more char
+ **/
+int	is_built_in(const char *line, char **e)
+{
+	if (!ft_strncmp("pwd", line, 3))
+	{
+		pwd();
+		return (1);
+	}
+	if (!ft_strncmp("cd", line, 2))
+	{
+		cd(&line[3]);
+		return (1);
+	}
+	if (!ft_strncmp("env", line, 3))
+	{
+		env(e);
+		return (1);
+	}
+	if (!ft_strncmp("exit", line, 4))
+		exit(0);
+	return (0);
 }
 
 char	*free_path_search(char *s, DIR *dir)
@@ -106,7 +148,7 @@ void	search_exec(char *line, char **env)
 	char	*path;
 	char	*command;
 
-	if (is_built_in(line))
+	if (is_built_in(line, env))
 		return ;
 	path = get_env(env, "PATH");
 	args = ft_split(line, ' ');
