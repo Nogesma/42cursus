@@ -29,4 +29,13 @@ void	free_list(char **lst);
 
 char	*ft_strjoin_path(char *s1, char *s2);
 
+//built_ins
+int		pwd();
+int		env(char **environ);
+int		export();
+int		unset();
+int		echo();
+int		cd(char **args);
+
+
 #endif //MINISHELL_H

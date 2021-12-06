@@ -29,59 +29,21 @@ void	exec_binary(char *path, char **args, char **env)
 		wait(&status);
 }
 
-void pwd()
+int	is_built_in(char **args, char **environ)
 {
-	char *cwd;
-
-	cwd = getcwd(NULL, 0);
-	ft_printf("%s\n", cwd);
-	free(cwd);
-}
-
-void cd(const char *path)
-{
-	if (chdir(path) == -1)
-	{
-		ft_putstr_fd("minish: cd: ", 2);
-		perror(path);
-	}
-}
-
-void	print_list(char **lst)
-{
-	for (int i = 0; lst[i]; i++)
-	{
-		ft_printf("%s\n", lst[i]);
-	}
-}
-
-void env(char **env)
-{
-	print_list(env);
-}
-
-// TODO: check if line exec build int shell command, and exec built in
-/** Careful, comparison fails if command is pwdabc for example. If line > len("pwd")
- *  we need to compare to "pwd " and compare one more char
- **/
-int	is_built_in(const char *line, char **e)
-{
-	if (!ft_strncmp("pwd", line, 3))
-	{
-		pwd();
-		return (1);
-	}
-	if (!ft_strncmp("cd", line, 2))
-	{
-		cd(&line[3]);
-		return (1);
-	}
-	if (!ft_strncmp("env", line, 3))
-	{
-		env(e);
-		return (1);
-	}
-	if (!ft_strncmp("exit", line, 4))
+	if (!ft_strncmp("pwd", args[0], 4))
+		return (pwd());
+	if (!ft_strncmp("cd", args[0], 3))
+		return (cd(args + 1));
+	if (!ft_strncmp("env", args[0], 4))
+		return (env(environ));
+	if (!ft_strncmp("echo", args[0], 5))
+		return (echo(args + 1));
+	if (!ft_strncmp("unset", args[0], 6))
+		return (unset(environ));
+	if (!ft_strncmp("export", args[0], 7))
+		return (export(environ));
+	if (!ft_strncmp("exit", args[0], 5))
 		exit(0);
 	return (0);
 }
@@ -148,10 +110,10 @@ void	search_exec(char *line, char **env)
 	char	*path;
 	char	*command;
 
-	if (is_built_in(line, env))
-		return ;
 	path = get_env(env, "PATH");
 	args = ft_split(line, ' ');
+	if (is_built_in(args, env))
+		return ;
 	command = args[0];
 	if (!(line[0] == '.' || line[0] == '/'))
 		args[0] = get_exec_path(args[0], path);
