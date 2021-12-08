@@ -12,24 +12,28 @@
 
 #include "minishell.h"
 
-void	exec_binary(char *path, char **args, char **env)
+void	exec_binary(char *path, char **args, t_list **env)
 {
 	pid_t	child;
+	char **environ;
 	int		status;
 
 	child = fork();
 	if (child == -1)
 		return ;
-	if (child == 0 && execve(path, args, env) == -1)
+	environ = lst_to_char(*env);
+	if (child == 0 && execve(path, args, environ) == -1)
 	{
+		free(environ);
 		perror(path);
 		exit(1);
 	}
+	free(environ);
 	if (child > 0)
 		wait(&status);
 }
 
-int	is_built_in(char **args, char **environ)
+int	is_built_in(char **args, t_list **environ)
 {
 	if (!ft_strncmp("pwd", args[0], 4))
 		return (pwd());
@@ -104,13 +108,13 @@ char	*get_exec_path(char *exec, char *PATH)
 	return (exec_path);
 }
 
-void	search_exec(char *line, char **env)
+void	search_exec(char *line, t_list **env)
 {
 	char	**args;
 	char	*path;
 	char	*command;
 
-	path = get_env(env, "PATH");
+	path = get_env(env, "PATH=");
 	args = ft_split(line, ' ');
 	if (is_built_in(args, env))
 		return ;
@@ -130,6 +134,7 @@ void	search_exec(char *line, char **env)
 	free_list(args);
 }
 
+// TODO: cat followed by a sigint displays two prompts without a newline
 void	sigint(__attribute__ ((unused)) int sig)
 {
 	write(1, "\n", 1);
@@ -142,7 +147,9 @@ int	main(__attribute__ ((unused)) int ac, __attribute__ ((unused)) char **av,
 		char **env)
 {
 	char	*line;
+	t_list **environ;
 
+	environ = char_to_lst(env);
 	signal(SIGINT, sigint);
 	line = readline("minish$ ");
 	while (line)
@@ -150,7 +157,7 @@ int	main(__attribute__ ((unused)) int ac, __attribute__ ((unused)) char **av,
 		if (*line)
 		{
 			add_history(line);
-			search_exec(line, env);
+			search_exec(line, environ);
 		}
 		free(line);
 		line = readline("minish$ ");

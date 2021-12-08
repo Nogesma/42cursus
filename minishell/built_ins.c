@@ -4,12 +4,12 @@
 
 #include "minishell.h"
 
-static void	print_list(char **lst)
+static void	print_list(t_list *lst)
 {
-	while(*lst)
+	while(lst)
 	{
-		ft_printf("%s\n", *lst);
-		lst++;
+		ft_printf("%s\n", lst->content);
+		lst = lst->next;
 	}
 }
 
@@ -35,22 +35,22 @@ int	echo(char **args)
 	return (1);
 }
 
-int	unset()
+int	unset(__attribute__ ((unused)) t_list **env)
 {
 	//todo
 	return(1);
 }
 
-int	export()
+int	export(__attribute__ ((unused)) t_list **env)
 {
 	//todo
 	return (1);
 }
 
 
-int	env(char **environ)
+int	env(t_list **environ)
 {
-	print_list(environ);
+	print_list(*environ);
 	return (1);
 }
 
