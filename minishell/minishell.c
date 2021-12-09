@@ -15,7 +15,7 @@
 void	exec_binary(char *path, char **args, t_list **env)
 {
 	pid_t	child;
-	char **environ;
+	char	**environ;
 	int		status;
 
 	child = fork();
@@ -40,7 +40,7 @@ int	is_built_in(char **args, t_list **environ)
 	else if (!ft_strncmp("cd", args[0], 3))
 		cd(args + 1);
 	else if (!ft_strncmp("env", args[0], 4))
-		env(environ);
+		print_list(*environ);
 	else if (!ft_strncmp("echo", args[0], 5))
 		echo(args + 1);
 	else if (!ft_strncmp("unset", args[0], 6))
@@ -48,7 +48,7 @@ int	is_built_in(char **args, t_list **environ)
 	else if (!ft_strncmp("export", args[0], 7))
 		export(args + 1, environ);
 	else if (!ft_strncmp("exit", args[0], 5))
-		exit(0); //todo exit arg
+		exit_cmd(args + 1);
 	else
 		return (0);
 	return (1);
@@ -141,7 +141,7 @@ int	main(__attribute__ ((unused)) int ac, __attribute__ ((unused)) char **av,
 		char **env)
 {
 	char	*line;
-	t_list **environ;
+	t_list	**environ;
 
 	environ = char_to_lst(env);
 	signal(SIGINT, sigint);

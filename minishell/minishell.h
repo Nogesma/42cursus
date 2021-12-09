@@ -29,6 +29,8 @@ char	*ft_strjoin_path(char *s1, char *s2);
 
 void	mem_error(void);
 
+void	print_list(t_list *lst);
+
 //env list
 t_list	**char_to_lst(char **args);
 char	**lst_to_char(t_list *head);
@@ -36,12 +38,11 @@ t_list	**free_env(t_list **head, char *name);
 char	*get_env(t_list **env, char *name);
 
 //built_ins
-int		pwd();
-int		env(t_list **environ);
+void	pwd(void);
 void	export(char **args, t_list **env);
-int		unset(char **args, t_list **env);
-int		echo();
-int		cd(char **args);
-
+void	unset(char **args, t_list **env);
+void	echo(char **args);
+void	cd(char **args);
+void	exit_cmd(char **args);
 
 #endif //MINISHELL_H

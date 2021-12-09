@@ -1,19 +1,27 @@
-//
-// Created by Tadeusz Kondracki on 12/2/21.
-//
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   built_ins.c                                        :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: msegrans <msegrans@student.42lausan>       +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2021/12/09 18:05:10 by msegrans          #+#    #+#             */
+/*   Updated: 2021/12/09 18:05:13 by msegrans         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
 
 #include "minishell.h"
 
-static void	print_list(t_list *lst)
+void	print_list(t_list *lst)
 {
-	while(lst)
+	while (lst)
 	{
 		ft_printf("%s\n", lst->content);
 		lst = lst->next;
 	}
 }
 
-int	echo(char **args)
+void	echo(char **args)
 {
 	int	newline;
 
@@ -32,17 +40,15 @@ int	echo(char **args)
 	}
 	if (newline)
 		ft_putchar_fd('\n', 1);
-	return (1);
 }
 
-int	unset(char **args, t_list **env)
+void	unset(char **args, t_list **env)
 {
 	int	i;
 
 	i = -1;
 	while (args[++i])
 		free_env(env, args[i]);
-	return (1);
 }
 
 void	export(char **args, t_list **env)
@@ -71,31 +77,46 @@ void	export(char **args, t_list **env)
 	}
 }
 
-
-int	env(t_list **environ)
+void	pwd(void)
 {
-	print_list(*environ);
-	return (1);
-}
-
-int	pwd()
-{
-	char *cwd;
+	char	*cwd;
 
 	cwd = getcwd(NULL, 0);
 	ft_printf("%s\n", cwd);
 	free(cwd);
-	return (1);
 }
 
-int	cd(char **args)
+void	cd(char **args)
 {
 	if (chdir(args[0]) == -1)
 	{
 		ft_putstr_fd("minish: cd: ", 2);
 		perror(args[1]);
 	}
-	return (1);
+}
+
+void	exit_cmd(char **args)
+{
+	int				i;
+
+	ft_putendl_fd("exit", 2);
+	if (*args == NULL)
+		exit(0);
+	i = -1;
+	while (args[0][++i])
+	{
+		if (!ft_isdigit(args[0][i]))
+		{
+			ft_putstr_fd("minish: exit: ", 2);
+			ft_putstr_fd(args[0], 2);
+			ft_putendl_fd(": numeric argument required", 2);
+			exit(255);
+		}
+	}
+	if (args[1] != NULL)
+		return (ft_putendl_fd("minish: exit: too many arguments", 2));
+	i = (unsigned char) ft_atoi(args[0]);
+	exit(i);
 }
 
 void	mem_error(void)

@@ -57,11 +57,11 @@ char	*ft_strjoin_path(char *s1, char *s2)
 	return (str);
 }
 
-t_list **char_to_lst(char **args)
+t_list	**char_to_lst(char **args)
 {
-	t_list **head;
-	t_list *elem;
-	int i;
+	t_list	**head;
+	t_list	*elem;
+	int		i;
 
 	if (!args)
 		return (NULL);
@@ -69,7 +69,6 @@ t_list **char_to_lst(char **args)
 	if (!head)
 		return (NULL);
 	*head = NULL;
-
 	i = -1;
 	while (args[++i])
 	{
@@ -87,10 +86,10 @@ t_list **char_to_lst(char **args)
 	return (head);
 }
 
-char **lst_to_char(t_list *head)
+char	**lst_to_char(t_list *head)
 {
-	char **lst;
-	int i;
+	char	**lst;
+	int		i;
 
 	lst = (char **) malloc(sizeof(char *) * ft_lstsize(head));
 	if (!lst)
@@ -104,7 +103,7 @@ char **lst_to_char(t_list *head)
 	return (lst);
 }
 
-t_list **free_env(t_list **head, char *name)
+t_list	**free_env(t_list **head, char *name)
 {
 	t_list	*elem;
 	t_list	*prev;
