@@ -75,8 +75,7 @@ char	*search_path(char *path, char *exec)
 	dp = readdir(dir);
 	while (dp)
 	{
-		if (dp->d_type != DT_DIR && dp->d_namlen == len
-			&& !ft_strncmp(exec, dp->d_name, len))
+		if (dp->d_type != DT_DIR && !ft_strncmp(exec, dp->d_name, len))
 		{
 			exec_path = ft_strjoin_path(path, exec);
 			if (stat(exec_path, &statbuf) == 0 && statbuf.st_mode & S_IXUSR)

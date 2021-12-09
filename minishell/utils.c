@@ -91,7 +91,7 @@ char	**lst_to_char(t_list *head)
 	char	**lst;
 	int		i;
 
-	lst = (char **) malloc(sizeof(char *) * ft_lstsize(head));
+	lst = (char **) malloc(sizeof(char *) * (ft_lstsize(head) + 1));
 	if (!lst)
 		return (NULL);
 	i = 0;
@@ -100,6 +100,7 @@ char	**lst_to_char(t_list *head)
 		lst[i++] = head->content;
 		head = head->next;
 	}
+    lst[i] = 0;
 	return (lst);
 }
 

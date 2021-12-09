@@ -22,6 +22,7 @@
 # include <dirent.h>
 # include <sys/stat.h>
 # include <sys/errno.h>
+# include <sys/wait.h>
 
 void	free_list(char **lst);
 

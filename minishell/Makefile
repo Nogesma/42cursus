@@ -23,7 +23,7 @@ ifneq ($(UNAME), Linux)
 	INCLUDE := $(INCLUDE) -I $(HOME)/.brew/Cellar/readline/8.1.1/include
     LIBS := $(LIBS) -L $(HOME)/.brew/Cellar/readline/8.1.1/lib
 else
-    LIBS := $(LIBS) -ledit
+    LIBS := $(LIBS)
 endif
 
 .c.o:
