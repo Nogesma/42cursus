@@ -93,7 +93,6 @@ char	*search_path(char *path, char *exec)
 	struct stat		statbuf;
 	size_t			len;
 	char			*exec_path;
-	char			*temp;
 
 	len = ft_strlen(exec);
 	dir = opendir(path);
@@ -102,15 +101,8 @@ char	*search_path(char *path, char *exec)
 	dp = readdir(dir);
 	while (dp)
 	{
-		if (dp->d_type == DT_DIR && ft_strncmp(".", dp->d_name, 1))
-		{
-			temp = ft_strjoin_path(path, dp->d_name);
-			exec_path = search_path(temp, exec);
-			free(temp);
-			if (exec_path)
-				return (free_path_search(exec_path, dir));
-		}
-		else if (dp->d_namlen == len && !ft_strncmp(exec, dp->d_name, len))
+		if (dp->d_type != DT_DIR && dp->d_namlen == len
+			&& !ft_strncmp(exec, dp->d_name, len))
 		{
 			exec_path = ft_strjoin_path(path, exec);
 			if (stat(exec_path, &statbuf) == 0 && statbuf.st_mode & S_IXUSR)
