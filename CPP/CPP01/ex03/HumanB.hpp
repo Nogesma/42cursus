@@ -16,7 +16,7 @@ public:
   ~HumanB( void );
 
   void 	attack ( void );
-  void 	setWeapon ( Weapon* );
+  void 	setWeapon ( Weapon& );
 
 
 private:
