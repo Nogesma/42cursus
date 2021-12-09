@@ -12,7 +12,7 @@
 
 CFLAGS = -Wall -Wextra -Werror
 CC     = gcc $(CFLAGS)
-OBJ    = minishell.o utils.o
+OBJ    = minishell.o utils.o built_ins.o
 NAME   = minishell
 LIB    = libft/libft.a
 INCLUDE = -Ilibft

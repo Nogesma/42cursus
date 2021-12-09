@@ -12,72 +12,46 @@
 
 #include "minishell.h"
 
-void	exec_binary(char *path, char **args, char **env)
+void	exec_binary(char *path, char **args, t_list **env)
 {
 	pid_t	child;
+	char **environ;
 	int		status;
 
 	child = fork();
 	if (child == -1)
 		return ;
-	if (child == 0 && execve(path, args, env) == -1)
+	environ = lst_to_char(*env);
+	if (child == 0 && execve(path, args, environ) == -1)
 	{
+		free(environ);
 		perror(path);
 		exit(1);
 	}
+	free(environ);
 	if (child > 0)
 		wait(&status);
 }
 
-int	pwd()
+int	is_built_in(char **args, t_list **environ)
 {
-	char *cwd;
-
-	cwd = getcwd(NULL, 0);
-	ft_printf("%s\n", cwd);
-	free(cwd);
+	if (!ft_strncmp("pwd", args[0], 4))
+		pwd();
+	else if (!ft_strncmp("cd", args[0], 3))
+		cd(args + 1);
+	else if (!ft_strncmp("env", args[0], 4))
+		env(environ);
+	else if (!ft_strncmp("echo", args[0], 5))
+		echo(args + 1);
+	else if (!ft_strncmp("unset", args[0], 6))
+		unset(args + 1, environ);
+	else if (!ft_strncmp("export", args[0], 7))
+		export(args + 1, environ);
+	else if (!ft_strncmp("exit", args[0], 5))
+		exit(0); //todo exit arg
+	else
+		return (0);
 	return (1);
-}
-
-int	cd(const char *path)
-{
-	if (chdir(path) == -1)
-	{
-		ft_putstr_fd("minish: cd: ", 2);
-		perror(path);
-	}
-	return (1);
-}
-
-void	print_list(char **lst)
-{
-	for (int i = 0; lst[i]; i++)
-	{
-		ft_printf("%s\n", lst[i]);
-	}
-}
-
-int	env(char **env)
-{
-	print_list(env);
-	return (1);
-}
-
-// TODO: check if line exec build int shell command, and exec built in
-/** Careful, comparison fails if command is pwdabc for example. If line > len("pwd")
- *  we need to compare to "pwd " and compare one more char
- **/
-int	is_built_in(const char *line, char **e)
-{
-	if (!ft_strncmp("pwd", line, 3))
-		return (pwd());
-	if (!ft_strncmp("cd", line, 2))
-		return (cd(&line[3]));
-	if (!ft_strncmp("env", line, 3))
-		return (env(e));
-	if (!ft_strncmp("exit", line, 4))
-		exit(0);
-	return (0);
 }
 
 char	*free_path_search(char *s, DIR *dir)
@@ -128,16 +102,16 @@ char	*get_exec_path(char *exec, char *PATH)
 	return (exec_path);
 }
 
-void	search_exec(char *line, char **env)
+void	search_exec(char *line, t_list **env)
 {
 	char	**args;
 	char	*path;
 	char	*command;
 
-	if (is_built_in(line, env))
-		return ;
-	path = get_env(env, "PATH");
+	path = get_env(env, "PATH=");
 	args = ft_split(line, ' ');
+	if (is_built_in(args, env) == 1)
+		return ;
 	command = args[0];
 	if (!(line[0] == '.' || line[0] == '/'))
 		args[0] = get_exec_path(args[0], path);
@@ -154,6 +128,7 @@ void	search_exec(char *line, char **env)
 	free_list(args);
 }
 
+// TODO: cat followed by a sigint displays two prompts without a newline
 void	sigint(__attribute__ ((unused)) int sig)
 {
 	write(1, "\n", 1);
@@ -166,7 +141,9 @@ int	main(__attribute__ ((unused)) int ac, __attribute__ ((unused)) char **av,
 		char **env)
 {
 	char	*line;
+	t_list **environ;
 
+	environ = char_to_lst(env);
 	signal(SIGINT, sigint);
 	line = readline("minish$ ");
 	while (line)
@@ -174,7 +151,7 @@ int	main(__attribute__ ((unused)) int ac, __attribute__ ((unused)) char **av,
 		if (*line)
 		{
 			add_history(line);
-			search_exec(line, env);
+			search_exec(line, environ);
 		}
 		free(line);
 		line = readline("minish$ ");
