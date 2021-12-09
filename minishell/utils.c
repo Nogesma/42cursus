@@ -63,12 +63,12 @@ t_list **char_to_lst(char **args)
 	{
 		if (!(*head))
 		{
-			*head = ft_lstnew(args[i]);
+			*head = ft_lstnew(args[i], 0);
 			elem = *head;
 		}
 		else
 		{
-			elem->next = ft_lstnew(args[i]);
+			elem->next = ft_lstnew(args[i], 0);
 			elem = elem->next;
 		}
 	}
@@ -103,10 +103,11 @@ t_list **free_env(t_list **head, char *name)
 	prev = *head;
 	while (elem)
 	{
-		if (!ft_strncmp(name, elem->content, len))
+		if (!ft_strncmp(name, elem->content, len)
+			&& ((char *)elem->content)[len] == '=')
 		{
 			prev->next = elem->next;
-			free(elem);
+			ft_lstdelone(elem, free);
 			return (head);
 		}
 		prev = elem;

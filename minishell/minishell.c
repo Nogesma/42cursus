@@ -36,20 +36,22 @@ void	exec_binary(char *path, char **args, t_list **env)
 int	is_built_in(char **args, t_list **environ)
 {
 	if (!ft_strncmp("pwd", args[0], 4))
-		return (pwd());
-	if (!ft_strncmp("cd", args[0], 3))
-		return (cd(args + 1));
-	if (!ft_strncmp("env", args[0], 4))
-		return (env(environ));
-	if (!ft_strncmp("echo", args[0], 5))
-		return (echo(args + 1));
-	if (!ft_strncmp("unset", args[0], 6))
-		return (unset(environ));
-	if (!ft_strncmp("export", args[0], 7))
-		return (export(environ));
-	if (!ft_strncmp("exit", args[0], 5))
-		exit(0);
-	return (0);
+		pwd();
+	else if (!ft_strncmp("cd", args[0], 3))
+		cd(args + 1);
+	else if (!ft_strncmp("env", args[0], 4))
+		env(environ);
+	else if (!ft_strncmp("echo", args[0], 5))
+		echo(args + 1);
+	else if (!ft_strncmp("unset", args[0], 6))
+		unset(args + 1, environ);
+	else if (!ft_strncmp("export", args[0], 7))
+		export(args + 1, environ);
+	else if (!ft_strncmp("exit", args[0], 5))
+		exit(0); //todo exit arg
+	else
+		return (0);
+	return (1);
 }
 
 char	*free_path_search(char *s, DIR *dir)
@@ -116,7 +118,7 @@ void	search_exec(char *line, t_list **env)
 
 	path = get_env(env, "PATH=");
 	args = ft_split(line, ' ');
-	if (is_built_in(args, env))
+	if (is_built_in(args, env) == 1)
 		return ;
 	command = args[0];
 	if (!(line[0] == '.' || line[0] == '/'))

@@ -23,21 +23,23 @@
 #include <sys/stat.h>
 #include <sys/errno.h>
 
-char	*get_env(t_list **env, char *name);
-
 void	free_list(char **lst);
 
 char	*ft_strjoin_path(char *s1, char *s2);
 
-t_list **char_to_lst(char **args);
+void	mem_error(void);
 
-char **lst_to_char(t_list *head);
+//env list
+t_list	**char_to_lst(char **args);
+char	**lst_to_char(t_list *head);
+t_list	**free_env(t_list **head, char *name);
+char	*get_env(t_list **env, char *name);
 
 //built_ins
 int		pwd();
 int		env(t_list **environ);
-int		export(t_list **env);
-int		unset(t_list **env);
+void	export(char **args, t_list **env);
+int		unset(char **args, t_list **env);
 int		echo();
 int		cd(char **args);
 
