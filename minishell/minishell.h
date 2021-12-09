@@ -17,11 +17,11 @@
 # include <stdlib.h>
 # include <readline/readline.h>
 # include <readline/history.h>
-#include <libft.h>
-#include <signal.h>
-#include <dirent.h>
-#include <sys/stat.h>
-#include <sys/errno.h>
+# include <libft.h>
+# include <signal.h>
+# include <dirent.h>
+# include <sys/stat.h>
+# include <sys/errno.h>
 
 void	free_list(char **lst);
 

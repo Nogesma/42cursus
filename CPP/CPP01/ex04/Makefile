@@ -11,39 +11,23 @@
 # **************************************************************************** #
 
 CFLAGS = -Wall -Wextra -Werror
-CC     = gcc $(CFLAGS)
-OBJ    = minishell.o utils.o built_ins.o
-NAME   = minishell
-LIB    = libft/libft.a
-INCLUDE = -Ilibft
-LIBS = -Llibft -lft -lreadline
+CC     = c++ $(CFLAGS)
+OBJ    = main.o
+NAME   = zombie
 
-UNAME = $(shell uname -s)
-ifneq ($(UNAME), Linux)
-	INCLUDE := $(INCLUDE) -I $(HOME)/.brew/Cellar/readline/8.1.1/include
-    LIBS := $(LIBS) -L $(HOME)/.brew/Cellar/readline/8.1.1/lib
-else
-    LIBS := $(LIBS) -ledit
-endif
+.cpp.o:
+	$(CC) -c $< -o $@
 
-.c.o:
-	$(CC) -c $< -o $@ $(INCLUDE)
-
-$(NAME): $(LIB) $(OBJ)
-	$(CC) -o $(NAME) $(OBJ) $(INCLUDE) $(LIBS)
+$(NAME): $(OBJ)
+	$(CC) -o $(NAME) $(OBJ) $(LIB)
 
 all: $(NAME)
 
-$(LIB):
-	$(MAKE) -C libft printf
-
 clean:
 	$(RM) $(OBJ)
-	$(MAKE) -C libft clean
 
 fclean: clean
 	$(RM) $(NAME)
-	$(MAKE) -C libft fclean
 
 re: fclean all
 
