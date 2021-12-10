@@ -26,7 +26,9 @@ void	echo(char **args)
 	int	newline;
 
 	newline = 1;
-	if (!ft_strncmp("-n", args[0], 3))
+    if (!*args)
+        return ;
+    if (!ft_strncmp("-n", args[0], 3))
 	{
 		newline = 0;
 		args++;

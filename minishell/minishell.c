@@ -12,25 +12,28 @@
 
 #include "minishell.h"
 
-void	exec_binary(char *path, char **args, t_list **env)
+int	exec_binary(char *path, char **args, t_list **env)
 {
 	pid_t	child;
 	char	**environ;
 	int		status;
 
+    status = 0;
 	child = fork();
 	if (child == -1)
-		return ;
-	environ = lst_to_char(*env);
-	if (child == 0 && execve(path, args, environ) == -1)
+		return (1);
+	if (child == 0)
 	{
-		free(environ);
-		perror(path);
-		exit(1);
+        environ = lst_to_char(*env);
+        if (execve(path, args, environ) == -1)
+        {
+            free(environ);
+            perror(path);
+            exit(1);
+        }
 	}
-	free(environ);
-	if (child > 0)
-		wait(&status);
+    wait(&status);
+    return (status);
 }
 
 int	is_built_in(char **args, t_list **environ)
@@ -107,6 +110,7 @@ void	search_exec(char *line, t_list **env)
 	char	*path;
 	char	*command;
 
+    //todo recursive token analysis and execution
 	path = get_env(env, "PATH=");
 	args = ft_split(line, ' ');
 	if (is_built_in(args, env) == 1)
@@ -150,6 +154,7 @@ int	main(__attribute__ ((unused)) int ac, __attribute__ ((unused)) char **av,
 		if (*line)
 		{
 			add_history(line);
+            //todo cleanup_tokens()
 			search_exec(line, environ);
 		}
 		free(line);
