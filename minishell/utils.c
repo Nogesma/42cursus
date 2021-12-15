@@ -128,7 +128,7 @@ t_list	**free_env(t_list **head, char *name)
 	return (head);
 }
 
-char    *get_env_value(char *s, t_list **env, int *size)
+char    *get_env_value(char *s, t_list **env)
 {
     t_list  *pos;
     int     j;
@@ -144,10 +144,7 @@ char    *get_env_value(char *s, t_list **env, int *size)
             j++;
         }
         if (((char *)(pos->content))[j] == '=' && !ft_isalnum(s[j]))
-        {
-            *size += j;
             return (((char *)(pos->content)) + j + 1);
-        }
         pos = pos->next;
     }
     return (NULL);
@@ -162,4 +159,5 @@ void    print_args_debug(char **args)
         printf("%s\n", *args);
         args++;
     }
+    printf("end args\n");
 }

@@ -65,6 +65,8 @@ static int  word_size(char *s, t_list **env)
     i = 0;
     is_special = 0;
     size = 0;
+    while (s[i] == ' ')
+        s++;
     while (s[i] && (s[i] != ' ' || is_special))
     {
         if(s[i] == 39 && is_special != 1)
@@ -80,10 +82,18 @@ static int  word_size(char *s, t_list **env)
     return (size);
 }
 
+static int get_env_name_size(char *s) {
+    int i;
+
+    i = 0;
+    while (ft_isalnum(s[i]))
+        i++;
+    return (i);
+}
+
 static int  unpack_env(char *s, char *new, t_list **env, int *i)
 {
     char    *env_val;
-    int     size;
     int     j;
 
     if (!s[1] || !ft_isalnum(s[1]))
@@ -91,13 +101,13 @@ static int  unpack_env(char *s, char *new, t_list **env, int *i)
         new[(*i)++] = '$';
         return (1);
     }
-    env_val = get_env_value(s + 1, env, &size);
+    env_val = get_env_value(s + 1, env);
     if (!env_val)
-        return (0);
+        return (get_env_name_size(s + 1));
     j = 0;
     while(env_val[j])
         new[(*i)++] = env_val[j++];
-    return (j);
+    return (get_env_name_size(s + 1));
 }
 
 static char *next_word(char *s, t_list **env)
@@ -114,7 +124,9 @@ static char *next_word(char *s, t_list **env)
     }
     is_special = 0;
     i = 0;
-    new = malloc(sizeof(char) * (word_size(s + pos, env) + 1));
+    while (s[pos] == ' ')
+        pos++;
+    new = (char *)ft_calloc(sizeof(char), (word_size(s + pos, env) + 1));
     if (!new)
         return (NULL);
     while(s[pos] && (s[pos] != ' ' || is_special))
@@ -155,6 +167,5 @@ char	**ft_arg_split(char *s, t_list **env)
             return (NULL);
     }
     dest[i] = next_word(NULL, NULL);
-    print_args_debug(dest);
     return (dest);
 }

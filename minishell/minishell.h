@@ -39,7 +39,7 @@ t_list	**char_to_lst(char **args);
 char	**lst_to_char(t_list *head);
 t_list	**free_env(t_list **head, char *name);
 char	*get_env(t_list **env, char *name);
-char    *get_env_value(char *s, t_list **env, int *size);
+char    *get_env_value(char *s, t_list **env);
 
 //built_ins
 void	pwd(void);
