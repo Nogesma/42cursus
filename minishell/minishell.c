@@ -112,7 +112,7 @@ void	search_exec(char *line, t_list **env)
 
     //todo recursive token analysis and execution
 	path = get_env(env, "PATH=");
-	args = ft_split(line, ' ');
+	args = ft_arg_split(line, env); //testing " ' and $ expansion
 	if (is_built_in(args, env) == 1)
 		return ;
 	command = args[0];

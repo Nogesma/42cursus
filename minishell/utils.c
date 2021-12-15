@@ -12,7 +12,7 @@
 
 #include "minishell.h"
 
-char	*get_env(t_list **env, char *name)
+char	*get_env(t_list **env, char *name) //todo check if = exists after name
 {
 	t_list	*elem;
 	size_t	len;
@@ -126,4 +126,40 @@ t_list	**free_env(t_list **head, char *name)
 		elem = elem->next;
 	}
 	return (head);
+}
+
+char    *get_env_value(char *s, t_list **env, int *size)
+{
+    t_list  *pos;
+    int     j;
+
+    pos = *env;
+    while(pos)
+    {
+        j = 0;
+        while (((char *)(pos->content))[j] && ((char *)(pos->content))[j] != '=' && ft_isalnum(s[j]))
+        {
+            if (((char *)(pos->content))[j] != s[j])
+                break ;
+            j++;
+        }
+        if (((char *)(pos->content))[j] == '=' && !ft_isalnum(s[j]))
+        {
+            *size += j;
+            return (((char *)(pos->content)) + j + 1);
+        }
+        pos = pos->next;
+    }
+    return (NULL);
+}
+
+//todo remove debug
+void    print_args_debug(char **args)
+{
+    printf("args:\n");
+    while (*args)
+    {
+        printf("%s\n", *args);
+        args++;
+    }
 }

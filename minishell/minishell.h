@@ -32,11 +32,14 @@ void	mem_error(void);
 
 void	print_list(t_list *lst);
 
+char	**ft_arg_split(char *s, t_list **env);
+
 //env list
 t_list	**char_to_lst(char **args);
 char	**lst_to_char(t_list *head);
 t_list	**free_env(t_list **head, char *name);
 char	*get_env(t_list **env, char *name);
+char    *get_env_value(char *s, t_list **env, int *size);
 
 //built_ins
 void	pwd(void);
@@ -45,5 +48,8 @@ void	unset(char **args, t_list **env);
 void	echo(char **args);
 void	cd(char **args);
 void	exit_cmd(char **args);
+
+//debug
+void    print_args_debug(char **args);
 
 #endif //MINISHELL_H
