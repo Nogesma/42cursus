@@ -18,25 +18,24 @@ int	exec_binary(char *path, char **args, t_list **env)
 	char	**environ;
 	int		status;
 
-    status = 0;
-    environ = lst_to_char(*env);
-    child = fork();
-    if (child == -1)
-    {
-        free(environ);
-        return (1);
-    }
-    if (child == 0)
+	environ = lst_to_char(*env);
+	child = fork();
+	if (child == -1)
 	{
-        if (execve(path, args, environ) == -1)
-        {
-            perror(path);
-            exit(1);
-        }
+		free(environ);
+		return (1);
 	}
-    wait(&status);
-    free(environ);
-    return (status);
+	if (child == 0)
+	{
+		if (execve(path, args, environ) == -1)
+		{
+			perror(path);
+			exit(1);
+		}
+	}
+	wait(&status);
+	free(environ);
+	return (status);
 }
 
 int	is_built_in(char **args, t_list **environ)
@@ -98,7 +97,7 @@ char	*get_exec_path(char *exec, char *PATH)
 	int		i;
 	char	*exec_path;
 
-	paths = ft_split(&PATH[5], ':');
+	paths = ft_split(PATH, ':');
 	i = -1;
 	exec_path = NULL;
 	while (paths[++i] && exec_path == NULL)
@@ -113,8 +112,8 @@ void	search_exec(char *line, t_list **env)
 	char	*path;
 	char	*command;
 
-    //todo recursive token analysis and execution
-	path = get_env(env, "PATH=");
+	//todo recursive token analysis and execution
+	path = get_env(env, "PATH");
 	args = ft_arg_split(line, env); //testing " ' and $ expansion
 	if (is_built_in(args, env) == 1)
 		return ;
@@ -157,7 +156,7 @@ int	main(__attribute__ ((unused)) int ac, __attribute__ ((unused)) char **av,
 		if (*line)
 		{
 			add_history(line);
-            //todo cleanup_tokens()
+			//todo cleanup_tokens()
 			search_exec(line, environ);
 		}
 		free(line);
