@@ -21,7 +21,7 @@ LIBS = -Llibft -lft -lreadline
 UNAME = $(shell uname -s)
 ifneq ($(UNAME), Linux)
 	INCLUDE := $(INCLUDE) -I $(HOME)/.brew/Cellar/readline/8.1.1/include
-    LIBS := $(LIBS) -L $(HOME)/.brew/Cellar/readline/8.1.1/lib
+    LIBS := $(LIBS) -L $(HOME)/.brew/Cellar/readline/8.1.1/lib -ledit
 else
     LIBS := $(LIBS)
 endif
