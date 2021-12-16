@@ -19,20 +19,23 @@ int	exec_binary(char *path, char **args, t_list **env)
 	int		status;
 
     status = 0;
-	child = fork();
-	if (child == -1)
-		return (1);
-	if (child == 0)
+    environ = lst_to_char(*env);
+    child = fork();
+    if (child == -1)
+    {
+        free(environ);
+        return (1);
+    }
+    if (child == 0)
 	{
-        environ = lst_to_char(*env);
         if (execve(path, args, environ) == -1)
         {
-            free(environ);
             perror(path);
             exit(1);
         }
 	}
     wait(&status);
+    free(environ);
     return (status);
 }
 
