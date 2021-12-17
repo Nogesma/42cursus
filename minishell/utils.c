@@ -16,14 +16,17 @@ char	*get_env(t_list **env, char *name) //todo check if = exists after name
 {
 	t_list	*elem;
 	size_t	len;
+	char	*content;
 
-	len = ft_strlen(name);
 	elem = *env;
 	while (elem)
 	{
-		if (!ft_strncmp(name, elem->content, len))
-			if (((char *)elem->content)[len] == '=')
-				return ((char *)(elem->content) + len + 1);
+		len = 0;
+		content = elem->content;
+		while (content[len] && content[len] != '=' && ft_isalnum(name[len]) && content[len] == name[len])
+			len++;
+		if (content[len] == '=' && !ft_isalnum(name[len]))
+			return (content);
 		elem = elem->next;
 	}
 	return (NULL);

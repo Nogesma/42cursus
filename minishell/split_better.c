@@ -36,7 +36,7 @@ static int	get_env_name_size(const char *s)
 	int	i;
 
 	i = 0;
-	while (s[i] && s[i] != '=')
+	while (ft_isalnum(s[i]))
 		i++;
 	return (i);
 }
@@ -61,7 +61,7 @@ static int	word_size(char *s, t_list **env)
 		else if (s[i] == '$' && is_special != -1)
 		{
 			size += (int)ft_strlen(get_env(env, s + i + 1));
-			i += get_env_name_size(s + i);
+			i += get_env_name_size(s + i + 1);
 		}
 		else
 			size++;
@@ -75,7 +75,7 @@ static int	unpack_env(char *s, char *new, t_list **env, int *i)
 	char	*env_val;
 	int		j;
 
-	if (!s[1])
+	if (!s[1] || !ft_isalnum(s[1]))
 	{
 		new[(*i)++] = '$';
 		return (1);
