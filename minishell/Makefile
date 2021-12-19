@@ -12,7 +12,7 @@
 
 CFLAGS = -Wall -Wextra -Werror
 CC     = gcc $(CFLAGS)
-OBJ    = minishell.o utils.o built_ins.o
+OBJ    = minishell.o utils.o built_ins.o split_better.o
 NAME   = minishell
 LIB    = libft/libft.a
 INCLUDE = -Ilibft
@@ -23,7 +23,7 @@ ifneq ($(UNAME), Linux)
 	INCLUDE := $(INCLUDE) -I $(HOME)/.brew/Cellar/readline/8.1.1/include
     LIBS := $(LIBS) -L $(HOME)/.brew/Cellar/readline/8.1.1/lib
 else
-    LIBS := $(LIBS) -ledit
+    LIBS := $(LIBS)
 endif
 
 .c.o:

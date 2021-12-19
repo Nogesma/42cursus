@@ -12,17 +12,21 @@
 
 #include "minishell.h"
 
-char	*get_env(t_list **env, char *name)
+char	*get_env(t_list **env, char *name) //todo check if = exists after name
 {
 	t_list	*elem;
 	size_t	len;
+	char	*content;
 
-	len = ft_strlen(name);
 	elem = *env;
 	while (elem)
 	{
-		if (!ft_strncmp(name, elem->content, len))
-			return (elem->content);
+		len = 0;
+		content = elem->content;
+		while (content[len] && content[len] != '=' && ft_isalnum(name[len]) && content[len] == name[len])
+			len++;
+		if (content[len] == '=' && !ft_isalnum(name[len]))
+			return (content);
 		elem = elem->next;
 	}
 	return (NULL);
@@ -91,7 +95,7 @@ char	**lst_to_char(t_list *head)
 	char	**lst;
 	int		i;
 
-	lst = (char **) malloc(sizeof(char *) * ft_lstsize(head));
+	lst = (char **) malloc(sizeof(char *) * (ft_lstsize(head) + 1));
 	if (!lst)
 		return (NULL);
 	i = 0;
@@ -100,6 +104,7 @@ char	**lst_to_char(t_list *head)
 		lst[i++] = head->content;
 		head = head->next;
 	}
+	lst[i] = 0;
 	return (lst);
 }
 
@@ -125,4 +130,16 @@ t_list	**free_env(t_list **head, char *name)
 		elem = elem->next;
 	}
 	return (head);
+}
+
+//todo remove debug
+void	print_args_debug(char **args)
+{
+	printf("args:\n");
+	while (*args)
+	{
+		printf("%s\n", *args);
+		args++;
+	}
+	printf("end args\n");
 }

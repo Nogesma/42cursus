@@ -12,25 +12,30 @@
 
 #include "minishell.h"
 
-void	exec_binary(char *path, char **args, t_list **env)
+int	exec_binary(char *path, char **args, t_list **env)
 {
 	pid_t	child;
 	char	**environ;
 	int		status;
 
+	environ = lst_to_char(*env);
 	child = fork();
 	if (child == -1)
-		return ;
-	environ = lst_to_char(*env);
-	if (child == 0 && execve(path, args, environ) == -1)
 	{
 		free(environ);
-		perror(path);
-		exit(1);
+		return (1);
 	}
+	if (child == 0)
+	{
+		if (execve(path, args, environ) == -1)
+		{
+			perror(path);
+			exit(1);
+		}
+	}
+	wait(&status);
 	free(environ);
-	if (child > 0)
-		wait(&status);
+	return (status);
 }
 
 int	is_built_in(char **args, t_list **environ)
@@ -75,8 +80,7 @@ char	*search_path(char *path, char *exec)
 	dp = readdir(dir);
 	while (dp)
 	{
-		if (dp->d_type != DT_DIR && dp->d_namlen == len
-			&& !ft_strncmp(exec, dp->d_name, len))
+		if (dp->d_type != DT_DIR && !ft_strncmp(exec, dp->d_name, len))
 		{
 			exec_path = ft_strjoin_path(path, exec);
 			if (stat(exec_path, &statbuf) == 0 && statbuf.st_mode & S_IXUSR)
@@ -93,7 +97,7 @@ char	*get_exec_path(char *exec, char *PATH)
 	int		i;
 	char	*exec_path;
 
-	paths = ft_split(&PATH[5], ':');
+	paths = ft_split(PATH, ':');
 	i = -1;
 	exec_path = NULL;
 	while (paths[++i] && exec_path == NULL)
@@ -108,8 +112,9 @@ void	search_exec(char *line, t_list **env)
 	char	*path;
 	char	*command;
 
-	path = get_env(env, "PATH=");
-	args = ft_split(line, ' ');
+	//todo recursive token analysis and execution
+	path = get_env(env, "PATH");
+	args = ft_arg_split(line, env); //testing " ' and $ expansion
 	if (is_built_in(args, env) == 1)
 		return ;
 	command = args[0];
@@ -151,6 +156,7 @@ int	main(__attribute__ ((unused)) int ac, __attribute__ ((unused)) char **av,
 		if (*line)
 		{
 			add_history(line);
+			//todo cleanup_tokens()
 			search_exec(line, environ);
 		}
 		free(line);

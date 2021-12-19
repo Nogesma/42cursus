@@ -22,6 +22,7 @@
 # include <dirent.h>
 # include <sys/stat.h>
 # include <sys/errno.h>
+# include <sys/wait.h>
 
 void	free_list(char **lst);
 
@@ -30,6 +31,8 @@ char	*ft_strjoin_path(char *s1, char *s2);
 void	mem_error(void);
 
 void	print_list(t_list *lst);
+
+char	**ft_arg_split(char *s, t_list **env);
 
 //env list
 t_list	**char_to_lst(char **args);
@@ -44,5 +47,8 @@ void	unset(char **args, t_list **env);
 void	echo(char **args);
 void	cd(char **args);
 void	exit_cmd(char **args);
+
+//debug
+void	print_args_debug(char **args);
 
 #endif //MINISHELL_H
