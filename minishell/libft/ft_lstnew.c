@@ -12,7 +12,7 @@
 
 #include "libft.h"
 
-t_list	*ft_lstnew(void *content, char is_freeable)
+t_list	*ft_lstnew(void *content)
 {
 	t_list	*elem;
 
@@ -21,6 +21,5 @@ t_list	*ft_lstnew(void *content, char is_freeable)
 		return (NULL);
 	elem->content = content;
 	elem->next = NULL;
-	elem->is_freeable = is_freeable;
 	return (elem);
 }

@@ -12,7 +12,7 @@
 
 #include "minishell.h"
 
-char	*get_env(t_list **env, char *name) //todo check if = exists after name
+t_list	*get_env(t_list **env, char *name)
 {
 	t_list	*elem;
 	size_t	len;
@@ -23,13 +23,24 @@ char	*get_env(t_list **env, char *name) //todo check if = exists after name
 	{
 		len = 0;
 		content = elem->content;
-		while (content[len] && content[len] != '=' && ft_isalnum(name[len]) && content[len] == name[len])
+		while (content[len] && content[len] != '='
+			&& ft_isalnum(name[len]) && content[len] == name[len])
 			len++;
 		if (content[len] == '=' && !ft_isalnum(name[len]))
-			return (content);
+			return (elem);
 		elem = elem->next;
 	}
 	return (NULL);
+}
+
+char	*get_env_content(t_list **env, char *name)
+{
+	t_list	*elem;
+
+	elem = get_env(env, name);
+	if (!elem)
+		return (NULL);
+	return (elem->content);
 }
 
 void	free_list(char **lst)
@@ -78,12 +89,12 @@ t_list	**char_to_lst(char **args)
 	{
 		if (!(*head))
 		{
-			*head = ft_lstnew(args[i], 0);
+			*head = ft_lstnew(ft_strdup(args[i]));
 			elem = *head;
 		}
 		else
 		{
-			elem->next = ft_lstnew(args[i], 0);
+			elem->next = ft_lstnew(ft_strdup(args[i]));
 			elem = elem->next;
 		}
 	}

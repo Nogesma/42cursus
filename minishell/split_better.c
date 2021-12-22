@@ -60,7 +60,7 @@ static int	word_size(char *s, t_list **env)
 			is_special = is_special ^ 1;
 		else if (s[i] == '$' && is_special != -1)
 		{
-			size += (int)ft_strlen(get_env(env, s + i + 1));
+			size += (int)ft_strlen(get_env_content(env, s + i + 1));
 			i += get_env_name_size(s + i + 1);
 		}
 		else
@@ -80,7 +80,7 @@ static int	unpack_env(char *s, char *new, t_list **env, int *i)
 		new[(*i)++] = '$';
 		return (1);
 	}
-	env_val = get_env(env, s + 1);
+	env_val = get_env_content(env, s + 1);
 	if (!env_val)
 		return (get_env_name_size(s + 1));
 	j = 0;

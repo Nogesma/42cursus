@@ -12,11 +12,11 @@
 
 #include "minishell.h"
 
-void	print_list(t_list *lst)
+void	print_list(t_list *lst, char *prefix)
 {
 	while (lst)
 	{
-		ft_printf("%s\n", lst->content);
+		ft_printf("%s%s\n", prefix, lst->content);
 		lst = lst->next;
 	}
 }
@@ -60,23 +60,30 @@ void	export(char **args, t_list **env)
 	char	*content;
 
 	i = -1;
-	while (args[++i])
+	while (args[++i]) // todo: env name should start with letter or '_', also need to check if name is alphanumeric + '_'
 	{
 		content = ft_strdup(args[i]);
 		if (!content)
+			return (mem_error());
+		new = get_env(env, content);
+		if (new)
 		{
-			mem_error();
-			return ;
+			free(new->content);
+			new->content = content;
 		}
-		new = ft_lstnew(content, 1);
-		if (!new)
+		else
 		{
-			free(content);
-			mem_error();
-			return ;
+			new = ft_lstnew(content);
+			if (!new)
+			{
+				free(content);
+				return (mem_error());
+			}
+			ft_lstadd_front(env, new);
 		}
-		ft_lstadd_front(env, new);
 	}
+	if (i == 0) // todo: sort list before print, also dont print _
+		print_list(*env, "declare -x ");
 }
 
 void	pwd(void)
@@ -88,13 +95,29 @@ void	pwd(void)
 	free(cwd);
 }
 
-void	cd(char **args)
+void	cd(char **args, t_list **env)
 {
+	char	*old_pwd;
+	char	*pwd;
+	char	*lst[3];
+
+	old_pwd = getcwd(NULL, 0);
 	if (chdir(args[0]) == -1)
 	{
+		free(old_pwd);
 		ft_putstr_fd("minish: cd: ", 2);
 		perror(args[1]);
+		return ;
 	}
+	pwd = getcwd(NULL, 0);
+	lst[0] = ft_strjoin("PWD=", pwd);
+	lst[1] = ft_strjoin("OLDPWD=", old_pwd);
+	lst[2] = NULL;
+	free(pwd);
+	free(old_pwd);
+	export(lst, env);
+	free(lst[0]);
+	free(lst[1]);
 }
 
 void	exit_cmd(char **args)

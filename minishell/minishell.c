@@ -43,9 +43,9 @@ int	is_built_in(char **args, t_list **environ)
 	if (!ft_strncmp("pwd", args[0], 4))
 		pwd();
 	else if (!ft_strncmp("cd", args[0], 3))
-		cd(args + 1);
+		cd(args + 1, environ);
 	else if (!ft_strncmp("env", args[0], 4))
-		print_list(*environ);
+		print_list(*environ, "");
 	else if (!ft_strncmp("echo", args[0], 5))
 		echo(args + 1);
 	else if (!ft_strncmp("unset", args[0], 6))
@@ -113,7 +113,7 @@ void	search_exec(char *line, t_list **env)
 	char	*command;
 
 	//todo recursive token analysis and execution
-	path = get_env(env, "PATH");
+	path = get_env_content(env, "PATH");
 	args = ft_arg_split(line, env); //testing " ' and $ expansion
 	if (is_built_in(args, env) == 1)
 		return ;
