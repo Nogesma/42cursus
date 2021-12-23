@@ -53,6 +53,30 @@ void	unset(char **args, t_list **env)
 		free_env(env, args[i]);
 }
 
+int is_valid_env(char *str)
+{
+	int i;
+
+	if(!ft_isalpha(*str) && *str != '_')
+	{
+		ft_printf("minishell: export: `%s': not a valid identifier\n", str);
+		return (0);
+	}
+	i = 0;
+	while (str[i] && str[i] != '=')
+	{
+		if (!ft_isalnum(str[i]) && str[i] != '_')
+		{
+			ft_printf("minishell: export: `%s': not a valid identifier\n", str);
+			return (0);
+		}
+		i++;
+	}
+	if (str[i] == '=')
+		return (1);
+	return (0);
+}
+
 void	export(char **args, t_list **env)
 {
 	int		i;
@@ -62,6 +86,8 @@ void	export(char **args, t_list **env)
 	i = -1;
 	while (args[++i]) // todo: env name should start with letter or '_', also need to check if name is alphanumeric + '_'
 	{
+		if (!is_valid_env(args[i]))
+			continue ;
 		content = ft_strdup(args[i]);
 		if (!content)
 			return (mem_error());
