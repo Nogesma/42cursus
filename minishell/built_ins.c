@@ -12,11 +12,11 @@
 
 #include "minishell.h"
 
-void	print_list(t_list *lst, char *prefix)
+void	print_list(t_list *lst, char *prefix, int fd)
 {
 	while (lst)
 	{
-		ft_printf("%s%s\n", prefix, lst->content);
+		ft_printf(fd, "%s%s\n", prefix, lst->content);
 		lst = lst->next;
 	}
 }
@@ -59,7 +59,7 @@ int is_valid_env(char *str)
 
 	if(!ft_isalpha(*str) && *str != '_')
 	{
-		ft_printf("minishell: export: `%s': not a valid identifier\n", str);
+		ft_printf(2, "minishell: export: `%s': not a valid identifier\n", str);
 		return (0);
 	}
 	i = 0;
@@ -67,7 +67,7 @@ int is_valid_env(char *str)
 	{
 		if (!ft_isalnum(str[i]) && str[i] != '_')
 		{
-			ft_printf("minishell: export: `%s': not a valid identifier\n", str);
+			ft_printf(2, "minishell: export: `%s': not a valid identifier\n", str);
 			return (0);
 		}
 		i++;
@@ -109,7 +109,7 @@ void	export(char **args, t_list **env)
 		}
 	}
 	if (i == 0) // todo: sort list before print, also dont print _
-		print_list(*env, "declare -x ");
+		print_list(*env, "declare -x ", 1);
 }
 
 void	pwd(void)
@@ -117,7 +117,7 @@ void	pwd(void)
 	char	*cwd;
 
 	cwd = getcwd(NULL, 0);
-	ft_printf("%s\n", cwd);
+	ft_printf(1, "%s\n", cwd);
 	free(cwd);
 }
 
@@ -150,7 +150,7 @@ void	exit_cmd(char **args)
 {
 	int				i;
 
-	ft_putendl_fd("exit", 2);
+	ft_printf(2, "exit\n");
 	if (*args == NULL)
 		exit(0);
 	i = -1;
@@ -158,9 +158,7 @@ void	exit_cmd(char **args)
 	{
 		if (!ft_isdigit(args[0][i]))
 		{
-			ft_putstr_fd("minish: exit: ", 2);
-			ft_putstr_fd(args[0], 2);
-			ft_putendl_fd(": numeric argument required", 2);
+			ft_printf(2, "minish: exit: %s: numeric argument required", args[0]);
 			exit(255);
 		}
 	}
@@ -172,5 +170,5 @@ void	exit_cmd(char **args)
 
 void	mem_error(void)
 {
-	ft_putendl_fd("mem alloc error: couldnt complete task", 2);
+	ft_printf(2, "mem alloc error: couldnt complete task");
 }

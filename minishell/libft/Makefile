@@ -21,7 +21,7 @@ OBJ    = ft_atoi.o ft_bzero.o ft_calloc.o ft_isalnum.o ft_isalpha.o \
 	ft_strtrim.o ft_substr.o ft_tolower.o ft_toupper.o
 BONUS  = ft_lstadd_back.o ft_lstadd_front.o ft_lstclear.o \
 	ft_lstlast.o ft_lstnew.o ft_lstsize.o ft_lstdelone.o ft_lstiter.o
-PRINTF = ft_printf/ft_printf.o ft_printf/print1.o ft_printf/print2.o
+PRINTF = ft_printf/ft_printf.o ft_printf/print.o
 NAME   = libft.a
 
 .c.o:

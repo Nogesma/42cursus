@@ -116,20 +116,14 @@ t_list	*ft_lstmap(t_list *lst, void *(*f)(void *), void (*del)(void *));
 
 /** ft_printf **/
 
-int		print_c(va_list args);
+int		print_s(va_list args, int fd);
 
-int		print_s(va_list args);
+int		print_d(va_list args, int fd);
 
-int		print_d(va_list args);
+int		print_p(va_list args, int fd);
 
-int		print_p(va_list args);
+int		print_base(unsigned long n, char *base, int fd);
 
-int		print_x(va_list args);
-
-int		print_bigx(va_list args);
-
-int		print_u(va_list args);
-
-int		ft_printf(const char *str, ...);
+int		ft_printf(int fd, const char *str, ...);
 
 #endif //LIBFT_H

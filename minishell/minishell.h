@@ -30,7 +30,7 @@ char	*ft_strjoin_path(char *s1, char *s2);
 
 void	mem_error(void);
 
-void	print_list(t_list *lst, char *prefix);
+void	print_list(t_list *lst, char *prefix, int fd);
 
 char	**ft_arg_split(char *s, t_list **env);
 
