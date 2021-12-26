@@ -38,7 +38,7 @@ int	exec_binary(char *path, char **args, t_list **env)
 	return (status);
 }
 
-int	is_built_in(char **args, t_list **environ)
+int	is_built_in(char **args, t_list **environ) //todo return codes for exec
 {
 	if (!ft_strncmp("pwd", args[0], 4))
 		pwd();
@@ -55,7 +55,7 @@ int	is_built_in(char **args, t_list **environ)
 	else if (!ft_strncmp("exit", args[0], 5))
 		exit_cmd(args + 1);
 	else
-		return (0);
+		return (-1);
 	return (1);
 }
 
@@ -106,31 +106,35 @@ char	*get_exec_path(char *exec, char *PATH)
 	return (exec_path);
 }
 
-void	search_exec(char *line, t_list **env)
+int	search_exec(char *line, t_list **env)
 {
 	char	**args;
 	char	*path;
 	char	*command;
+    int     ret;
 
 	//todo recursive token analysis and execution
 	path = get_env_content(env, "PATH");
 	args = ft_arg_split(line, env); //testing " ' and $ expansion
-	if (is_built_in(args, env) == 1)
-		return ;
+    ret = is_built_in(args, env);
+	if (ret != -1)
+		return (0);
 	command = args[0];
 	if (!(line[0] == '.' || line[0] == '/'))
 		args[0] = get_exec_path(args[0], path);
 	if (args[0])
-		exec_binary(args[0], args, env);
+		ret = exec_binary(args[0], args, env);
 	else
 	{
 		ft_putstr_fd("minish: ", 2);
 		ft_putstr_fd(command, 2);
 		ft_putstr_fd(": command not found\n", 2);
+        ret = 1;
 	}
 	if (!args[0])
 		free(command);
 	free_list(args);
+    return (ret);
 }
 
 // TODO: cat followed by a sigint displays two prompts without a newline

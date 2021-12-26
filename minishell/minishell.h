@@ -24,6 +24,8 @@
 # include <sys/errno.h>
 # include <sys/wait.h>
 
+int	search_exec(char *line, t_list **env);
+
 void	free_list(char **lst);
 
 char	*ft_strjoin_path(char *s1, char *s2);

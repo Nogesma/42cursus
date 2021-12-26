@@ -17,7 +17,7 @@ add_executable(minishell
         minishell.c
         utils.c
         built_ins.c
-        split_better.c)
+        split_better.c rec_mult.c)
 
 TARGET_LINK_LIBRARIES(minishell readline)
 TARGET_LINK_LIBRARIES(minishell ft)
