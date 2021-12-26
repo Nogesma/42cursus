@@ -161,7 +161,7 @@ int	main(__attribute__ ((unused)) int ac, __attribute__ ((unused)) char **av,
 		{
 			add_history(line);
 			//todo cleanup_tokens()
-			search_exec(line, environ);
+			rec_cmds(line, environ);
 		}
 		free(line);
 		line = readline("minish$ ");

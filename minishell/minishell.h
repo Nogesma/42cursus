@@ -36,6 +36,8 @@ void	print_list(t_list *lst, char *prefix, int fd);
 
 char	**ft_arg_split(char *s, t_list **env);
 
+int		rec_cmds(char *line, t_list **env);
+
 //env list
 t_list	**char_to_lst(char **args);
 char	**lst_to_char(t_list *head);
@@ -52,6 +54,6 @@ void	cd(char **args, t_list **env);
 void	exit_cmd(char **args);
 
 //debug
-void	print_args_debug(char **args);
+void	print_args_debug(char **args); //todo remove
 
 #endif //MINISHELL_H

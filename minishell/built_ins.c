@@ -27,7 +27,10 @@ void	echo(char **args)
 
 	newline = 1;
 	if (!*args)
+	{
+		ft_putchar_fd('\n', 1);
 		return ;
+	}
 	if (!ft_strncmp("-n", args[0], 3))
 	{
 		newline = 0;
