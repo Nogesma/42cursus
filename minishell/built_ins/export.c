@@ -1,0 +1,96 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   export.c                                           :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: msegrans <msegrans@student.42lausanne      +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2021/12/27 15:07:00 by msegrans          #+#    #+#             */
+/*   Updated: 2021/12/27 15:07:01 by msegrans         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
+#include "built_ins.h"
+#include "../minishell.h"
+
+static int	is_valid_env(char *str)
+{
+	int	i;
+
+	if (!ft_isalpha(*str) && *str != '_')
+	{
+		ft_printf(STDERR_FILENO,
+			"minishell: export: `%s': not a valid identifier\n", str);
+		return (0);
+	}
+	i = 0;
+	while (str[i] && str[i] != '=')
+	{
+		if (!ft_isalnum(str[i]) && str[i] != '_')
+		{
+			ft_printf(STDERR_FILENO,
+				"minishell: export: `%s': not a valid identifier\n", str);
+			return (0);
+		}
+		i++;
+	}
+	if (str[i] == '=')
+		return (1);
+	return (0);
+}
+
+static void	print_sorted_env(t_list **env)
+{
+	char	**lst;
+	int		i;
+
+	lst = lst_to_char(*env);
+	bubble_sort(lst);
+	i = -1;
+	while (lst[++i])
+	{
+		if (ft_strncmp(lst[i], "_=", 2))
+			ft_printf(STDOUT_FILENO, "%s %s\n", "declare -x", lst[i]);
+	}
+	free(lst);
+}
+
+static void	mem_error(void)
+{
+	ft_printf(STDERR_FILENO, "mem alloc error: couldnt complete task");
+}
+
+void	export(char **args, t_list **env)
+{
+	int		i;
+	t_list	*new;
+	char	*content;
+
+	i = -1;
+	while (args[++i])
+	{
+		if (!is_valid_env(args[i]))
+			continue ;
+		content = ft_strdup(args[i]);
+		if (!content)
+			return (mem_error());
+		new = get_env(env, content);
+		if (new)
+		{
+			free(new->content);
+			new->content = content;
+		}
+		else
+		{
+			new = ft_lstnew(content);
+			if (!new)
+			{
+				free(content);
+				return (mem_error());
+			}
+			ft_lstadd_front(env, new);
+		}
+	}
+	if (i == 0)
+		print_sorted_env(env);
+}

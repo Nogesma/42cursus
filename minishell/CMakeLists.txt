@@ -16,8 +16,15 @@ link_directories(~/.brew/Cellar/readline/8.1.1/lib)
 add_executable(minishell
         minishell.c
         utils.c
-        built_ins.c
-        split_better.c)
+        split_better.c
+        sort.c
+        built_ins/cd.c
+        built_ins/echo.c
+        built_ins/exit.c
+        built_ins/export.c
+        built_ins/pwd.c
+        built_ins/unset.c
+        utils/env.c)
 
 TARGET_LINK_LIBRARIES(minishell readline)
 TARGET_LINK_LIBRARIES(minishell ft)

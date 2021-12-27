@@ -12,37 +12,6 @@
 
 #include "minishell.h"
 
-t_list	*get_env(t_list **env, char *name)
-{
-	t_list	*elem;
-	size_t	len;
-	char	*content;
-
-	elem = *env;
-	while (elem)
-	{
-		len = 0;
-		content = elem->content;
-		while (content[len] && content[len] != '='
-			&& ft_isalnum(name[len]) && content[len] == name[len])
-			len++;
-		if (content[len] == '=' && !ft_isalnum(name[len]))
-			return (elem);
-		elem = elem->next;
-	}
-	return (NULL);
-}
-
-char	*get_env_content(t_list **env, char *name)
-{
-	t_list	*elem;
-
-	elem = get_env(env, name);
-	if (!elem)
-		return (NULL);
-	return (elem->content);
-}
-
 void	free_list(char **lst)
 {
 	int	i;
@@ -117,30 +86,6 @@ char	**lst_to_char(t_list *head)
 	}
 	lst[i] = 0;
 	return (lst);
-}
-
-t_list	**free_env(t_list **head, char *name)
-{
-	t_list	*elem;
-	t_list	*prev;
-	size_t	len;
-
-	len = ft_strlen(name);
-	elem = *head;
-	prev = *head;
-	while (elem)
-	{
-		if (!ft_strncmp(name, elem->content, len)
-			&& ((char *)elem->content)[len] == '=')
-		{
-			prev->next = elem->next;
-			ft_lstdelone(elem, free);
-			return (head);
-		}
-		prev = elem;
-		elem = elem->next;
-	}
-	return (head);
 }
 
 //todo remove debug

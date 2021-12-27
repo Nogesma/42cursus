@@ -12,6 +12,15 @@
 
 #include "minishell.h"
 
+void	print_list(t_list *lst, char *prefix, int fd)
+{
+	while (lst)
+	{
+		ft_printf(fd, "%s%s\n", prefix, lst->content);
+		lst = lst->next;
+	}
+}
+
 int	exec_binary(char *path, char **args, t_list **env)
 {
 	pid_t	child;
@@ -45,7 +54,7 @@ int	is_built_in(char **args, t_list **environ)
 	else if (!ft_strncmp("cd", args[0], 3))
 		cd(args + 1, environ);
 	else if (!ft_strncmp("env", args[0], 4))
-		print_list(*environ, "", 1);
+		print_list(*environ, "", STDOUT_FILENO);
 	else if (!ft_strncmp("echo", args[0], 5))
 		echo(args + 1);
 	else if (!ft_strncmp("unset", args[0], 6))
