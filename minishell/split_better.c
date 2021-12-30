@@ -4,6 +4,28 @@
 
 #include "minishell.h"
 #include "libft.h"
+#include <stdint.h>
+
+static int	count_wildcard()
+{
+	DIR		*dir;
+	struct dirent	*dp;
+	int				i;
+
+	dir = opendir(".");
+	if (!dir)
+		return (0);
+	dp = readdir(dir);
+	i = 0;
+	while (dp)
+	{
+		if (dp->d_name[0] != '.')
+			i++;
+		dp = readdir(dir);
+	}
+	closedir(dir);
+	return (i);
+}
 
 static int	ft_count(const char *str)
 {
@@ -23,7 +45,11 @@ static int	ft_count(const char *str)
 		if (!is_apostrophe && str[i] == '"')
 			is_quote = is_quote ^ 1;
 		if (!is_quote && !is_apostrophe && ' ' == str[i] && ' ' != str[i + 1])
+		{
+			if (str[i + 1] == '*' && (str[i + 2] == ' ' || str[i + 2] == 0))
+				size += count_wildcard();
 			size++;
+		}
 		i++;
 	}
 	if (' ' == str[0])
@@ -89,6 +115,59 @@ static int	unpack_env(char *s, char *new, t_list **env, int *i)
 	return (get_env_name_size(s + 1));
 }
 
+static char	*wildcard(int *pos)
+{
+	DIR		*dir;
+	struct dirent	*dp;
+	static t_list	**lst;
+	t_list			*elem;
+	char			*content;
+
+	if (lst)
+	{
+		elem = *lst;
+		*lst = elem->next;
+		content = elem->content;
+		free(elem);
+		if (!*lst)
+		{
+			free(lst);
+			lst = NULL;
+			(*pos)++;
+		}
+		return (content);
+	}
+	lst = (t_list **)malloc(sizeof(t_list *));
+	*lst = NULL;
+	dir = opendir(".");
+	if (!dir)
+		return (NULL);
+	dp = readdir(dir);
+	content = 0;
+	while (dp)
+	{
+		if (dp->d_name[0] != '.')
+		{
+			if (!(*lst))
+			{
+				*lst = ft_lstnew(ft_strdup(dp->d_name));
+				elem = *lst;
+			}
+			else
+			{
+				elem->next = ft_lstnew(ft_strdup(dp->d_name));
+				elem = elem->next;
+			}
+			content++;
+		}
+		dp = readdir(dir);
+	}
+	closedir(dir);
+	bubble_sort_lst(lst, (int)(uintptr_t)content); // todo: weird cast to bypass compiler error
+	return (wildcard(pos));
+}
+
+
 static char	*next_word(char *s, t_list **env)
 {
 	static int	pos;
@@ -105,7 +184,13 @@ static char	*next_word(char *s, t_list **env)
 	i = 0;
 	while (s[pos] == ' ')
 		pos++;
-	new = (char *)ft_calloc(sizeof(char), (word_size(s + pos, env) + 1));
+	if (s[pos] == '*' && (s[pos + 1] == ' ' || s[pos + 1] == 0))
+	{
+		new = wildcard(&pos);
+		if (new)
+			return (new);
+	}
+	new = (char *)ft_calloc((word_size(s + pos, env) + 1), sizeof(char));
 	if (!new)
 		return (NULL);
 	while (s[pos] && (s[pos] != ' ' || is_special))

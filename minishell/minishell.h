@@ -41,5 +41,6 @@ void	print_args_debug(char **args);
 
 //sort
 void	bubble_sort(char **lst);
+void	bubble_sort_lst(t_list **lst, int size);
 
 #endif //MINISHELL_H
