@@ -3,8 +3,6 @@
 //
 
 #include "minishell.h"
-#include "libft.h"
-#include <stdint.h>
 
 static int	count_wildcard(int is_wildcard)
 {
@@ -48,7 +46,7 @@ static int	ft_count(const char *str)
 			is_quote = is_quote ^ 1;
 		if (!is_quote && !is_apostrophe && ' ' == str[i] && ' ' != str[i + 1])
 			size += count_wildcard(str[i + 1] == '*'
-					&& (str[i + 2] == ' ' || str[i + 2] == 0)) - 1;
+					&& (str[i + 2] == ' ' || str[i + 2] == 0));
 		i++;
 	}
 	if (' ' == str[0])
@@ -114,56 +112,76 @@ static int	unpack_env(char *s, char *new, t_list **env, int *i)
 	return (get_env_name_size(s + 1));
 }
 
-static char	*wildcard(int *pos)
+static void	get_dir_content(t_list **lst)
 {
 	DIR				*dir;
 	struct dirent	*dp;
-	static t_list	**lst;
+	int				i;
 	t_list			*elem;
-	char			*content;
 
-	if (lst)
-	{
-		elem = *lst;
-		*lst = elem->next;
-		content = elem->content;
-		free(elem);
-		if (!*lst)
-		{
-			free(lst);
-			lst = NULL;
-			(*pos)++;
-		}
-		return (content);
-	}
-	lst = (t_list **)malloc(sizeof(t_list *));
-	*lst = NULL;
 	dir = opendir(".");
 	if (!dir)
-		return (NULL);
+		return ;
 	dp = readdir(dir);
-	content = 0;
+	i = 0;
 	while (dp)
 	{
 		if (dp->d_name[0] != '.')
 		{
-			if (!(*lst))
-			{
-				*lst = ft_lstnew(ft_strdup(dp->d_name));
-				elem = *lst;
-			}
-			else
-			{
-				elem->next = ft_lstnew(ft_strdup(dp->d_name));
-				elem = elem->next;
-			}
-			content++;
+			elem = new_lst(lst, elem, ft_strdup(dp->d_name));
+			i++;
 		}
 		dp = readdir(dir);
 	}
 	closedir(dir);
-	bubble_sort_lst(lst, (int)(uintptr_t)content); // todo: weird cast to bypass compiler error
-	return (wildcard(pos));
+	bubble_sort_lst(lst, i);
+}
+
+static char	*wildcard(int *pos)
+{
+	static t_list	**lst;
+	t_list			*elem;
+	char			*content;
+
+	if (!lst)
+	{
+		lst = (t_list **)malloc(sizeof(t_list *));
+		*lst = NULL;
+		get_dir_content(lst);
+	}
+	elem = *lst;
+	*lst = elem->next;
+	content = elem->content;
+	free(elem);
+	if (!*lst)
+	{
+		free(lst);
+		lst = NULL;
+		(*pos)++;
+	}
+	return (content);
+}
+
+static int	special_word(char *s, t_list **env, int *pos, char **new)
+{
+	*new = NULL;
+	if (!s || !env)
+	{
+		*pos = 0;
+		return (1);
+	}
+	while (s[*pos] == ' ')
+		(*pos)++;
+	if (s[*pos] == '*' && (s[(*pos) + 1] == ' ' || s[(*pos) + 1] == 0))
+	{
+		*new = wildcard(pos);
+		if (*new)
+			return (1);
+	}
+	*new = (char *)ft_calloc((word_size(s + *pos, env) + 1), sizeof(char));
+	if (!*new)
+		return (1);
+	return (0);
 }
 
 static char	*next_word(char *s, t_list **env)
@@ -173,24 +191,10 @@ static char	*next_word(char *s, t_list **env)
 	int			is_special;
 	int			i;
 
-	if (!s || !env)
-	{
-		pos = 0;
-		return (NULL);
-	}
+	if (special_word(s, env, &pos, &new))
+		return (new);
 	is_special = 0;
 	i = 0;
-	while (s[pos] == ' ')
-		pos++;
-	if (s[pos] == '*' && (s[pos + 1] == ' ' || s[pos + 1] == 0))
-	{
-		new = wildcard(&pos);
-		if (new)
-			return (new);
-	}
-	new = (char *)ft_calloc((word_size(s + pos, env) + 1), sizeof(char));
-	if (!new)
-		return (NULL);
 	while (s[pos] && (s[pos] != ' ' || is_special))
 	{
 		if (s[pos] == '\'' && is_special != 1)

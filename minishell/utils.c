@@ -41,6 +41,21 @@ char	*ft_strjoin_path(char *s1, char *s2)
 	return (str);
 }
 
+t_list	*new_lst(t_list **head, t_list *elem, void *content)
+{
+	if (!(*head))
+	{
+		*head = ft_lstnew(content);
+		elem = *head;
+	}
+	else
+	{
+		elem->next = ft_lstnew(content);
+		elem = elem->next;
+	}
+	return (elem);
+}
+
 t_list	**char_to_lst(char **args)
 {
 	t_list	**head;
@@ -55,18 +70,7 @@ t_list	**char_to_lst(char **args)
 	*head = NULL;
 	i = -1;
 	while (args[++i])
-	{
-		if (!(*head))
-		{
-			*head = ft_lstnew(ft_strdup(args[i]));
-			elem = *head;
-		}
-		else
-		{
-			elem->next = ft_lstnew(ft_strdup(args[i]));
-			elem = elem->next;
-		}
-	}
+		elem = new_lst(head, elem, ft_strdup(args[i]));
 	return (head);
 }
 

@@ -35,6 +35,7 @@ char	**ft_arg_split(char *s, t_list **env);
 //env list
 t_list	**char_to_lst(char **args);
 char	**lst_to_char(t_list *head);
+t_list	*new_lst(t_list **head, t_list *elem, void *content);
 
 //debug
 void	print_args_debug(char **args);

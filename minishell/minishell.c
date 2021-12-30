@@ -143,11 +143,14 @@ void	search_exec(char *line, t_list **env)
 }
 
 // TODO: cat followed by a sigint displays two prompts without a newline
-void	sigint(__attribute__ ((unused)) int sig)
+void	sig(int sig)
 {
-	write(1, "\n", 1);
+	if (sig == SIGINT)
+	{
+		write(1, "\n", 1);
+		rl_replace_line("", 0);
+	}
 	rl_on_new_line();
-	rl_replace_line("", 0);
 	rl_redisplay();
 }
 
@@ -158,7 +161,8 @@ int	main(__attribute__ ((unused)) int ac, __attribute__ ((unused)) char **av,
 	t_list	**environ;
 
 	environ = char_to_lst(env);
-	signal(SIGINT, sigint);
+	signal(SIGINT, sig);
+	signal(SIGQUIT, sig);
 	line = readline("minish$ ");
 	while (line)
 	{
