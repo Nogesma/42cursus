@@ -38,7 +38,7 @@ void	bubble_sort(char **lst)
 	}
 }
 
-int	ft_strncmp_case_insensitive(const char *s1, const char *s2, size_t n)
+int	strncmp_insensitive(const char *s1, const char *s2, size_t n)
 {
 	unsigned int	i;
 
@@ -48,34 +48,32 @@ int	ft_strncmp_case_insensitive(const char *s1, const char *s2, size_t n)
 	while (i < n)
 	{
 		if (s1[i] == '\0' || ft_tolower(s1[i]) != ft_tolower(s2[i]))
-			return ((unsigned char)ft_tolower(s1[i]) - (unsigned char)ft_tolower(s2[i]));
+			return ((unsigned char)ft_tolower(s1[i])
+				- (unsigned char)ft_tolower(s2[i]));
 		++i;
 	}
 	--i;
-	return ((unsigned char)ft_tolower(s1[i]) - (unsigned char)ft_tolower(s2[i]));
+	return ((unsigned char)ft_tolower(s1[i])
+		- (unsigned char)ft_tolower(s2[i]));
 }
-
 
 void	bubble_sort_lst(t_list **lst, int size)
 {
 	int		i;
-	int j;
 	t_list	*elem;
-
 
 	i = 0;
 	while (i < size)
 	{
 		elem = *lst;
-		j = 0;
 		while (elem->next != NULL)
 		{
-			j++;
-			if (ft_strncmp_case_insensitive(elem->content, elem->next->content, ft_strlen(elem->content) + 1) > 0)
-				ft_swap((char **)&(elem->content), (char **)&(elem->next->content));
+			if (strncmp_insensitive(elem->content, elem->next->content,
+					ft_strlen(elem->content) + 1) > 0)
+				ft_swap((char **)&(elem->content),
+					(char **)&(elem->next->content));
 			elem = elem->next;
 		}
 		i++;
 	}
 }
-

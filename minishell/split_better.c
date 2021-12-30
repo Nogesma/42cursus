@@ -6,12 +6,14 @@
 #include "libft.h"
 #include <stdint.h>
 
-static int	count_wildcard()
+static int	count_wildcard(int is_wildcard)
 {
-	DIR		*dir;
+	DIR				*dir;
 	struct dirent	*dp;
 	int				i;
 
+	if (!is_wildcard)
+		return (1);
 	dir = opendir(".");
 	if (!dir)
 		return (0);
@@ -45,11 +47,8 @@ static int	ft_count(const char *str)
 		if (!is_apostrophe && str[i] == '"')
 			is_quote = is_quote ^ 1;
 		if (!is_quote && !is_apostrophe && ' ' == str[i] && ' ' != str[i + 1])
-		{
-			if (str[i + 1] == '*' && (str[i + 2] == ' ' || str[i + 2] == 0))
-				size += count_wildcard();
-			size++;
-		}
+			size += count_wildcard(str[i + 1] == '*'
+					&& (str[i + 2] == ' ' || str[i + 2] == 0)) - 1;
 		i++;
 	}
 	if (' ' == str[0])
@@ -117,7 +116,7 @@ static int	unpack_env(char *s, char *new, t_list **env, int *i)
 
 static char	*wildcard(int *pos)
 {
-	DIR		*dir;
+	DIR				*dir;
 	struct dirent	*dp;
 	static t_list	**lst;
 	t_list			*elem;
@@ -166,7 +165,6 @@ static char	*wildcard(int *pos)
 	bubble_sort_lst(lst, (int)(uintptr_t)content); // todo: weird cast to bypass compiler error
 	return (wildcard(pos));
 }
-
 
 static char	*next_word(char *s, t_list **env)
 {
