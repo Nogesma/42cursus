@@ -31,10 +31,7 @@ void	exec_binary(char *path, char **args, t_list **env)
 	status_code(1, 0);
 	child = fork();
 	if (child == -1)
-	{
-		free(environ);
-		return ;
-	}
+		return (free(environ));
 	if (child == 0)
 	{
 		if (execve(path, args, environ) == -1)

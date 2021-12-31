@@ -44,8 +44,4 @@ void	print_args_debug(char **args);
 void	bubble_sort(char **lst);
 void	bubble_sort_lst(t_list **lst, int size);
 
-//global
-unsigned char	status_code(unsigned char set, unsigned char n);
-unsigned char	is_fork(unsigned char set, unsigned char n);
-
 #endif //MINISHELL_H

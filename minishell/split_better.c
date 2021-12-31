@@ -118,7 +118,7 @@ static int	unpack_env(char *s, char *new, t_list **env, int *i)
 {
 	char	*env_val;
 	int		j;
-	char 	*status;
+	char	*status;
 
 	if (s[1] == '?')
 	{

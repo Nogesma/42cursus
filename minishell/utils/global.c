@@ -1,26 +1,31 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   utils.h                                            :+:      :+:    :+:   */
+/*   global.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: msegrans <msegrans@student.42lausanne      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2021/12/27 15:06:26 by msegrans          #+#    #+#             */
-/*   Updated: 2021/12/27 15:06:29 by msegrans         ###   ########.fr       */
+/*   Created: 2021/12/31 05:31:27 by msegrans          #+#    #+#             */
+/*   Updated: 2021/12/31 05:31:30 by msegrans         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef UTILS_H
-# define UTILS_H
+unsigned char	status_code(unsigned char set, unsigned char n)
+{
+	static unsigned char	status;
 
-# include <libft.h>
+	if (set == 1)
+		status = n;
+	else if (set == 2)
+		status += n;
+	return (status);
+}
 
-t_list			*get_env(t_list **env, char *name);
+unsigned char	is_fork(unsigned char set, unsigned char n)
+{
+	static unsigned char	is_fork;
 
-char			*get_env_content(t_list **env, char *name);
-
-unsigned char	status_code(unsigned char set, unsigned char n);
-
-unsigned char	is_fork(unsigned char set, unsigned char n);
-
-#endif
+	if (set == 1)
+		is_fork = n;
+	return (is_fork);
+}

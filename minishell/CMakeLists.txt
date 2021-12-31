@@ -18,14 +18,14 @@ add_executable(minishell
         utils.c
         split_better.c
         sort.c
-        global.c
         built_ins/cd.c
         built_ins/echo.c
         built_ins/exit.c
         built_ins/export.c
         built_ins/pwd.c
         built_ins/unset.c
-        utils/env.c)
+        utils/env.c
+        utils/global.c)
 
 TARGET_LINK_LIBRARIES(minishell readline)
 TARGET_LINK_LIBRARIES(minishell ft)
