@@ -64,6 +64,30 @@ static int	get_env_name_size(const char *s)
 	return (i);
 }
 
+void	get_env_size(char *s, t_list **env, int *size, int *i)
+{
+	unsigned char	status;
+
+	if (s[*i + 1] == '?')
+	{
+		status = status_code(0, 0);
+		(*i)++;
+		if (status < 10)
+			(*size)++;
+		else if (status < 100)
+			(*size) += 2;
+		else
+			(*size) += 3;
+		while (s[*i] && s[*i] != ' ')
+			(*i)++;
+	}
+	else
+	{
+		*size += (int)ft_strlen(get_env_content(env, s + *i + 1));
+		*i += get_env_name_size(s + *i + 1);
+	}
+}
+
 static int	word_size(char *s, t_list **env)
 {
 	int	i;
@@ -82,10 +106,7 @@ static int	word_size(char *s, t_list **env)
 		else if (s[i] == '"' && is_special != -1)
 			is_special = is_special ^ 1;
 		else if (s[i] == '$' && is_special != -1)
-		{
-			size += (int)ft_strlen(get_env_content(env, s + i + 1));
-			i += get_env_name_size(s + i + 1);
-		}
+			get_env_size(s, env, &size, &i);
 		else
 			size++;
 		i++;
@@ -97,8 +118,16 @@ static int	unpack_env(char *s, char *new, t_list **env, int *i)
 {
 	char	*env_val;
 	int		j;
+	char 	*status;
 
-	if (!s[1] || !ft_isalnum(s[1]))
+	if (s[1] == '?')
+	{
+		status = ft_itoa(status_code(0, 0));
+		*i += (int)ft_strlcpy(new, status, 4);
+		free(status);
+		return (1);
+	}
+	if ((!s[1] || !ft_isalnum(s[1])))
 	{
 		new[(*i)++] = '$';
 		return (1);

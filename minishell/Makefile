@@ -12,7 +12,7 @@
 
 CFLAGS = -Wall -Wextra -Werror
 CC     = gcc $(CFLAGS)
-OBJ    = minishell.o utils.o split_better.o sort.o
+OBJ    = minishell.o utils.o split_better.o sort.o global.o
 OBJ    := $(OBJ) built_ins/cd.o built_ins/echo.o built_ins/exit.o built_ins/export.o \
 			built_ins/pwd.o built_ins/unset.o
 OBJ    := $(OBJ) utils/env.o

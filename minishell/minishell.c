@@ -21,18 +21,19 @@ void	print_list(t_list *lst, char *prefix, int fd)
 	}
 }
 
-int	exec_binary(char *path, char **args, t_list **env)
+void	exec_binary(char *path, char **args, t_list **env)
 {
 	pid_t	child;
 	char	**environ;
 	int		status;
 
 	environ = lst_to_char(*env);
+	status_code(1, 0);
 	child = fork();
 	if (child == -1)
 	{
 		free(environ);
-		return (1);
+		return ;
 	}
 	if (child == 0)
 	{
@@ -42,9 +43,12 @@ int	exec_binary(char *path, char **args, t_list **env)
 			exit(1);
 		}
 	}
+	is_fork(1, 1);
 	wait(&status);
+	is_fork(1, 0);
+	if (status_code(0, 0) != 130 && WIFEXITED(status))
+		status_code(1, WEXITSTATUS(status));
 	free(environ);
-	return (status);
 }
 
 int	is_built_in(char **args, t_list **environ)
@@ -149,8 +153,10 @@ void	sig(int sig)
 	{
 		write(1, "\n", 1);
 		rl_replace_line("", 0);
+		status_code(1, 130);
 	}
-	rl_on_new_line();
+	if (!is_fork(0, 0))
+		rl_on_new_line();
 	rl_redisplay();
 }
 
