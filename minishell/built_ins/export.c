@@ -45,6 +45,8 @@ static void	print_sorted_env(t_list **env)
 	int		i;
 
 	lst = lst_to_char(*env);
+	if (!lst)
+		return ;
 	bubble_sort(lst);
 	i = -1;
 	while (lst[++i])

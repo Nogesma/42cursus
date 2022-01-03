@@ -33,4 +33,5 @@ void	echo(char **args)
 	}
 	if (newline)
 		ft_putchar_fd('\n', STDOUT_FILENO);
+	status_code(1, 0);
 }

@@ -30,8 +30,11 @@ void	exit_cmd(char **args)
 		}
 	}
 	if (args[1] != NULL)
+	{
+		status_code(1, 1);
 		return (ft_putendl_fd(
-				"minish: exit: too many arguments", STDERR_FILENO));
+			"minish: exit: too many arguments", STDERR_FILENO));
+	}
 	i = (unsigned char) ft_atoi(args[0]);
 	exit(i);
 }

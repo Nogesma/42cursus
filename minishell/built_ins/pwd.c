@@ -17,6 +17,9 @@ void	pwd(void)
 	char	*cwd;
 
 	cwd = getcwd(NULL, 0);
+	if (!cwd)
+		return ;
 	ft_printf(STDOUT_FILENO, "%s\n", cwd);
 	free(cwd);
+	status_code(1, 0);
 }

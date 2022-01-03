@@ -43,4 +43,6 @@ void	unset(char **args, t_list **env)
 	i = -1;
 	while (args[++i])
 		free_env(env, args[i]);
+	if (i != 0)
+		status_code(1, 0);
 }
