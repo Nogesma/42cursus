@@ -12,7 +12,7 @@
 
 CFLAGS = -Wall -Wextra -Werror
 CC     = gcc $(CFLAGS)
-OBJ    = minishell.o utils.o split_better.o sort.o
+OBJ    = minishell.o utils.o split_better.o sort.o setup.o
 OBJ    := $(OBJ) built_ins/cd.o built_ins/echo.o built_ins/exit.o built_ins/export.o \
 			built_ins/pwd.o built_ins/unset.o
 OBJ    := $(OBJ) utils/env.o utils/global.o
@@ -23,11 +23,15 @@ LIBS = -Llibft -lft -lreadline
 
 UNAME = $(shell uname -s)
 ifneq ($(UNAME), Linux)
+	MAKEFLAGS := --jobs=$(shell nproc)
 	INCLUDE := $(INCLUDE) -I $(HOME)/.brew/Cellar/readline/8.1.1/include
     LIBS := $(LIBS) -L $(HOME)/.brew/Cellar/readline/8.1.1/lib
 else
+	MAKEFLAGS := --jobs=$(shell sysctl -n hw.ncpu)
     LIBS := $(LIBS)
 endif
+
+MAKEFLAGS += --output-sync=target
 
 .c.o:
 	$(CC) -c $< -o $@ $(INCLUDE)

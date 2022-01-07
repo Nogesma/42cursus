@@ -10,7 +10,8 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "built_ins.h"
+#include <libft.h>
+#include "../utils/utils.h"
 
 void	exit_cmd(char **args)
 {
@@ -33,7 +34,7 @@ void	exit_cmd(char **args)
 	{
 		status_code(1, 1);
 		return (ft_putendl_fd(
-			"minish: exit: too many arguments", STDERR_FILENO));
+				"minish: exit: too many arguments", STDERR_FILENO));
 	}
 	i = (unsigned char) ft_atoi(args[0]);
 	exit(i);

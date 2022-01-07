@@ -14,9 +14,6 @@
 # define BUILT_INS_H
 
 # include <libft.h>
-# include <stdio.h>
-
-# include "../utils/utils.h"
 
 void	cd(char **args, t_list **env);
 

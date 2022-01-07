@@ -11,6 +11,8 @@
 /* ************************************************************************** */
 
 #include "minishell.h"
+#include "utils/utils.h"
+#include "setup.h"
 
 void	print_list(t_list *lst, char *prefix, int fd)
 {
@@ -163,13 +165,24 @@ void	sig(int sig)
 int	main(__attribute__ ((unused)) int ac, __attribute__ ((unused)) char **av,
 		char **env)
 {
+	char	prompt[9];
+	int		ret;
 	char	*line;
 	t_list	**environ;
 
+	ret = termios_setup();
+	if (ret < 0)
+		return (-1);
+	if (ret != STDIN_FILENO)
+		prompt[0] = 0;
+	else
+		ft_strlcpy(prompt, "minish$ ", 9);
 	environ = char_to_lst(env);
+	if (!environ)
+		return (1);
 	signal(SIGINT, sig);
 	signal(SIGQUIT, sig);
-	line = readline("minish$ ");
+	line = readline(prompt);
 	while (line)
 	{
 		if (*line)
@@ -179,6 +192,6 @@ int	main(__attribute__ ((unused)) int ac, __attribute__ ((unused)) char **av,
 			search_exec(line, environ);
 		}
 		free(line);
-		line = readline("minish$ ");
+		line = readline(prompt);
 	}
 }

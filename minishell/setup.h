@@ -1,26 +1,18 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   pwd.c                                              :+:      :+:    :+:   */
+/*   setup.h                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: msegrans <msegrans@student.42lausanne      +#+  +:+       +#+        */
+/*   By: msegrans <msegrans@student.42lausan>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2021/12/27 15:07:02 by msegrans          #+#    #+#             */
-/*   Updated: 2021/12/27 15:07:04 by msegrans         ###   ########.fr       */
+/*   Created: 2022/01/07 14:55:34 by msegrans          #+#    #+#             */
+/*   Updated: 2022/01/07 14:55:36 by msegrans         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <libft.h>
-#include "../utils/utils.h"
+#ifndef SETUP_H
+# define SETUP_H
 
-void	pwd(void)
-{
-	char	*cwd;
+int	termios_setup(void);
 
-	cwd = getcwd(NULL, 0);
-	if (!cwd)
-		return ;
-	ft_printf(STDOUT_FILENO, "%s\n", cwd);
-	free(cwd);
-	status_code(1, 0);
-}
+#endif

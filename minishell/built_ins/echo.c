@@ -10,7 +10,8 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "built_ins.h"
+#include <libft.h>
+#include "../utils/utils.h"
 
 void	echo(char **args)
 {

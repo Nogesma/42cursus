@@ -10,7 +10,10 @@
 /*                                                                            */
 /* ************************************************************************** */
 
+#include <stdio.h>
+#include <libft.h>
 #include "built_ins.h"
+#include "../utils/utils.h"
 
 void	cd(char **args, t_list **env)
 {

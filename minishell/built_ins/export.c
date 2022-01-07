@@ -10,7 +10,8 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "built_ins.h"
+#include <libft.h>
+#include "../utils/utils.h"
 #include "../minishell.h"
 
 static int	is_valid_env(char *str)

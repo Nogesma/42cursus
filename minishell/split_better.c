@@ -3,6 +3,7 @@
 //
 
 #include "minishell.h"
+#include "utils/utils.h"
 
 static int	count_wildcard(int is_wildcard)
 {

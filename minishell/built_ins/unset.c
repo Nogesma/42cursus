@@ -10,7 +10,8 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "built_ins.h"
+#include <libft.h>
+#include "../utils/utils.h"
 
 static t_list	**free_env(t_list **head, char *name)
 {

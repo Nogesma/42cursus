@@ -18,6 +18,7 @@ add_executable(minishell
         utils.c
         split_better.c
         sort.c
+        setup.c
         built_ins/cd.c
         built_ins/echo.c
         built_ins/exit.c
