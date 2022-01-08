@@ -11,7 +11,6 @@ include_directories(libft)
 include_directories(~/.brew/Cellar/readline/8.1.1/include)
 link_directories(libft)
 link_directories(~/.brew/Cellar/readline/8.1.1/lib)
-#file(GLOB LIBFT libft/*.c)
 
 add_executable(minishell
         minishell.c

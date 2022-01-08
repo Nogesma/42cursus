@@ -131,7 +131,7 @@ void	search_exec(char *line, t_list **env)
 	path = get_env_content(env, "PATH");
 	args = ft_arg_split(line, env); //testing " ' and $ expansion
 	if (is_built_in(args, env) == 1)
-		return ;
+		return (free_list(args));
 	command = args[0];
 	if (!(line[0] == '.' || line[0] == '/'))
 		args[0] = get_exec_path(args[0], path);
@@ -143,7 +143,7 @@ void	search_exec(char *line, t_list **env)
 		ft_putstr_fd(command, 2);
 		ft_putstr_fd(": command not found\n", 2);
 	}
-	if (!args[0])
+	if (!(line[0] == '.' || line[0] == '/'))
 		free(command);
 	free_list(args);
 }
@@ -194,4 +194,7 @@ int	main(__attribute__ ((unused)) int ac, __attribute__ ((unused)) char **av,
 		free(line);
 		line = readline(prompt);
 	}
+	rl_clear_history();
+	ft_lstclear(environ, free);
+	free(environ);
 }
