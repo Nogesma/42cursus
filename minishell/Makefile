@@ -23,11 +23,11 @@ LIBS = -Llibft -lft -lreadline
 
 UNAME = $(shell uname -s)
 ifneq ($(UNAME), Linux)
-	MAKEFLAGS := --jobs=$(shell nproc)
+	MAKEFLAGS := --jobs=$(shell sysctl -n hw.ncpu)
 	INCLUDE := $(INCLUDE) -I $(HOME)/.brew/Cellar/readline/8.1.1/include
     LIBS := $(LIBS) -L $(HOME)/.brew/Cellar/readline/8.1.1/lib
 else
-	MAKEFLAGS := --jobs=$(shell sysctl -n hw.ncpu)
+	MAKEFLAGS := --jobs=$(shell nproc)
     LIBS := $(LIBS)
 endif
 
