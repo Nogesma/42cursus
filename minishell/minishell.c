@@ -16,14 +16,13 @@ int	exec_binary(char *path, char **args, t_list **env)
 {
 	pid_t	child;
 	char	**environ;
-	int		status;
 
 	environ = lst_to_char(*env);
 	child = fork();
 	if (child == -1)
 	{
 		free(environ);
-		return (1);
+		return (0);
 	}
 	if (child == 0)
 	{
@@ -33,9 +32,8 @@ int	exec_binary(char *path, char **args, t_list **env)
 			exit(1);
 		}
 	}
-	wait(&status);
 	free(environ);
-	return (status);
+	return (1);
 }
 
 int	is_built_in(char **args, t_list **environ) //todo return codes for exec
@@ -129,12 +127,12 @@ int	search_exec(char *line, t_list **env)
 		ft_putstr_fd("minish: ", 2);
 		ft_putstr_fd(command, 2);
 		ft_putstr_fd(": command not found\n", 2);
-        ret = 1;
+        ret = 0;
 	}
 	if (!args[0])
 		free(command);
 	free_list(args);
-    return (ret);
+	return (ret);
 }
 
 // TODO: cat followed by a sigint displays two prompts without a newline
@@ -150,6 +148,8 @@ int	main(__attribute__ ((unused)) int ac, __attribute__ ((unused)) char **av,
 		char **env)
 {
 	char	*line;
+	int		i;
+	int 	status;
 	t_list	**environ;
 
 	environ = char_to_lst(env);
@@ -161,7 +161,12 @@ int	main(__attribute__ ((unused)) int ac, __attribute__ ((unused)) char **av,
 		{
 			add_history(line);
 			//todo cleanup_tokens()
-			rec_cmds(line, environ);
+			i = rec_cmds(line, environ);
+			while (i > 0)
+			{
+				wait(&status);
+				i--;
+			}
 		}
 		free(line);
 		line = readline("minish$ ");
