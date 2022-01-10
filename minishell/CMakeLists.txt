@@ -28,7 +28,8 @@ add_executable(minishell
         src/utils/global.c
         src/utils/list.c
         src/utils/path.c
-        src/utils/setup.c)
+        src/utils/setup.c
+        rec_mult.c)
 
 TARGET_LINK_LIBRARIES(minishell readline)
 TARGET_LINK_LIBRARIES(minishell ft)
