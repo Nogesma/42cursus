@@ -2,8 +2,13 @@
 // Created by tkondrac on 10.12.21.
 //
 
-#include "minishell.h"
-#include "utils/utils.h"
+#include <libft.h>
+#include <dirent.h>
+
+#include "../utils/environ.h"
+#include "../utils/global.h"
+#include "../utils/list.h"
+#include "../utils/sort.h"
 
 static int	count_wildcard(int is_wildcard)
 {

@@ -1,30 +1,37 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   built_ins.h                                        :+:      :+:    :+:   */
+/*   echo.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: msegrans <msegrans@student.42lausanne      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2021/12/27 15:06:36 by msegrans          #+#    #+#             */
-/*   Updated: 2021/12/27 15:06:38 by msegrans         ###   ########.fr       */
+/*   Created: 2021/12/27 15:06:54 by msegrans          #+#    #+#             */
+/*   Updated: 2021/12/27 15:06:55 by msegrans         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef BUILT_INS_H
-# define BUILT_INS_H
+#include <libft.h>
 
-# include <libft.h>
+int	echo(char **args)
+{
+	int	newline;
 
-void	cd(char **args, t_list **env);
-
-void	echo(char **args);
-
-void	exit_cmd(char **args);
-
-void	export(char **args, t_list **env);
-
-void	pwd(void);
-
-void	unset(char **args, t_list **env);
-
-#endif
+	newline = 1;
+	if (!*args)
+		return (-1);
+	if (!ft_strncmp("-n", args[0], 3))
+	{
+		newline = 0;
+		args++;
+	}
+	while (*args)
+	{
+		ft_putstr_fd(*args, STDOUT_FILENO);
+		if (*(args + 1))
+			ft_putchar_fd(' ', STDOUT_FILENO);
+		args++;
+	}
+	if (newline)
+		ft_putchar_fd('\n', STDOUT_FILENO);
+	return (0);
+}

@@ -10,9 +10,9 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "libft.h"
+#include <libft.h>
 
-void	ft_swap(char **a, char **b)
+static void	ft_swap(char **a, char **b)
 {
 	char	*c;
 
@@ -38,7 +38,7 @@ void	bubble_sort(char **lst)
 	}
 }
 
-int	strncmp_insensitive(const char *s1, const char *s2, size_t n)
+static int	strncmp_insensitive(const char *s1, const char *s2, size_t n)
 {
 	unsigned int	i;
 

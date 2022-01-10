@@ -12,10 +12,10 @@
 
 #include <stdio.h>
 #include <libft.h>
-#include "built_ins.h"
-#include "../utils/utils.h"
 
-void	cd(char **args, t_list **env)
+#include "export.h"
+
+int	cd(char **args, t_list **env)
 {
 	char	*old_pwd;
 	char	*pwd;
@@ -23,29 +23,28 @@ void	cd(char **args, t_list **env)
 
 	old_pwd = getcwd(NULL, 0);
 	if (!old_pwd)
-		return ;
+		return (-1);
 	if (chdir(args[0]) == -1)
 	{
 		free(old_pwd);
 		ft_putstr_fd("minish: cd: ", 2);
 		perror(args[1]);
-		status_code(1, 1);
-		return ;
+		return (1);
 	}
 	pwd = getcwd(NULL, 0);
 	if (!pwd)
-		return ;
+		return (-1);
 	lst[0] = ft_strjoin("PWD=", pwd);
 	if (!lst[0])
-		return ;
+		return (-1);
 	lst[1] = ft_strjoin("OLDPWD=", old_pwd);
 	if (!lst[1])
-		return ;
+		return (-1);
 	lst[2] = NULL;
 	free(pwd);
 	free(old_pwd);
 	export(lst, env);
 	free(lst[0]);
 	free(lst[1]);
-	status_code(1, 0);
+	return (0);
 }

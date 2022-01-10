@@ -1,38 +1,40 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   echo.c                                             :+:      :+:    :+:   */
+/*   exit.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: msegrans <msegrans@student.42lausanne      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2021/12/27 15:06:54 by msegrans          #+#    #+#             */
-/*   Updated: 2021/12/27 15:06:55 by msegrans         ###   ########.fr       */
+/*   Created: 2021/12/27 15:06:56 by msegrans          #+#    #+#             */
+/*   Updated: 2021/12/27 15:06:58 by msegrans         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include <libft.h>
-#include "../utils/utils.h"
 
-void	echo(char **args)
+int	exit_cmd(char **args)
 {
-	int	newline;
+	int				i;
 
-	newline = 1;
-	if (!*args)
-		return ;
-	if (!ft_strncmp("-n", args[0], 3))
+	ft_printf(STDERR_FILENO, "exit\n");
+	if (*args == NULL)
+		exit(0);
+	i = -1;
+	while (args[0][++i])
 	{
-		newline = 0;
-		args++;
+		if (!ft_isdigit(args[0][i]))
+		{
+			ft_printf(STDERR_FILENO,
+				"minish: exit: %s: numeric argument required", args[0]);
+			exit(255);
+		}
 	}
-	while (*args)
+	if (args[1] != NULL)
 	{
-		ft_putstr_fd(*args, STDOUT_FILENO);
-		if (*(args + 1))
-			ft_putchar_fd(' ', STDOUT_FILENO);
-		args++;
+		ft_putendl_fd(
+			"minish: exit: too many arguments", STDERR_FILENO);
+		return (1);
 	}
-	if (newline)
-		ft_putchar_fd('\n', STDOUT_FILENO);
-	status_code(1, 0);
+	i = (unsigned char) ft_atoi(args[0]);
+	exit(i);
 }

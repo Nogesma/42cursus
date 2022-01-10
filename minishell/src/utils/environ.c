@@ -1,49 +1,44 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   unset.c                                            :+:      :+:    :+:   */
+/*   env.c                                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: msegrans <msegrans@student.42lausanne      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2021/12/27 15:07:05 by msegrans          #+#    #+#             */
-/*   Updated: 2021/12/27 15:07:07 by msegrans         ###   ########.fr       */
+/*   Created: 2021/12/27 15:06:20 by msegrans          #+#    #+#             */
+/*   Updated: 2021/12/27 15:06:22 by msegrans         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include <libft.h>
-#include "../utils/utils.h"
 
-static t_list	**free_env(t_list **head, char *name)
+t_list	*get_env(t_list **env, char *name)
 {
 	t_list	*elem;
-	t_list	*prev;
 	size_t	len;
+	char	*content;
 
-	len = ft_strlen(name);
-	elem = *head;
-	prev = *head;
+	elem = *env;
 	while (elem)
 	{
-		if (!ft_strncmp(name, elem->content, len)
-			&& ((char *)elem->content)[len] == '=')
-		{
-			prev->next = elem->next;
-			ft_lstdelone(elem, free);
-			return (head);
-		}
-		prev = elem;
+		len = 0;
+		content = elem->content;
+		while (content[len] && content[len] != '='
+			&& ft_isalnum(name[len]) && content[len] == name[len])
+			len++;
+		if (content[len] == '=' && !ft_isalnum(name[len]))
+			return (elem);
 		elem = elem->next;
 	}
-	return (head);
+	return (NULL);
 }
 
-void	unset(char **args, t_list **env)
+char	*get_env_content(t_list **env, char *name)
 {
-	int	i;
+	t_list	*elem;
 
-	i = -1;
-	while (args[++i])
-		free_env(env, args[i]);
-	if (i != 0)
-		status_code(1, 0);
+	elem = get_env(env, name);
+	if (!elem)
+		return (NULL);
+	return (elem->content);
 }

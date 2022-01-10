@@ -11,8 +11,10 @@
 /* ************************************************************************** */
 
 #include <libft.h>
-#include "../utils/utils.h"
-#include "../minishell.h"
+
+#include "../utils/list.h"
+#include "../utils/environ.h"
+#include "../utils/sort.h"
 
 static int	is_valid_env(char *str)
 {
@@ -86,7 +88,7 @@ void	add_env(t_list **env, char *content)
 	}
 }
 
-void	export(char **args, t_list **env)
+int	export(char **args, t_list **env)
 {
 	int		i;
 	char	*content;
@@ -98,9 +100,13 @@ void	export(char **args, t_list **env)
 			continue ;
 		content = ft_strdup(args[i]);
 		if (!content)
-			return (mem_error(NULL, NULL));
+		{
+			mem_error(NULL, NULL);
+			return (-1);
+		}
 		add_env(env, content);
 	}
 	if (i == 0)
 		print_sorted_env(env);
+	return (0);
 }
