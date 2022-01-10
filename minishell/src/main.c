@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   main.c                                             :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: msegrans <msegrans@student.42lausanne      +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2022/01/10 17:35:36 by msegrans          #+#    #+#             */
+/*   Updated: 2022/01/10 17:35:38 by msegrans         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include <libft.h>
 #include <stdio.h>
 #include <readline/readline.h>
@@ -22,12 +34,30 @@ void	sig(int sig)
 	rl_redisplay();
 }
 
+void	readline_loop(t_list **environ, char *prompt)
+{
+	char	*line;
+
+	line = readline(prompt);
+	while (line)
+	{
+		if (*line)
+		{
+			add_history(line);
+			//todo cleanup_tokens()
+			search_exec(line, environ);
+		}
+		free(line);
+		line = readline(prompt);
+	}
+}
+
+// TODO: Put both our name in all headers if possible
 int	main(__attribute__ ((unused)) int ac, __attribute__ ((unused)) char **av,
 			char **env)
 {
 	char	prompt[9];
 	int		ret;
-	char	*line;
 	t_list	**environ;
 
 	ret = termios_setup();
@@ -42,18 +72,7 @@ int	main(__attribute__ ((unused)) int ac, __attribute__ ((unused)) char **av,
 		return (1);
 	signal(SIGINT, sig);
 	signal(SIGQUIT, sig);
-	line = readline(prompt);
-	while (line)
-	{
-		if (*line)
-		{
-			add_history(line);
-			//todo cleanup_tokens()
-			search_exec(line, environ);
-		}
-		free(line);
-		line = readline(prompt);
-	}
+	readline_loop(environ, prompt);
 	rl_clear_history();
 	ft_lstclear(environ, free);
 	free(environ);

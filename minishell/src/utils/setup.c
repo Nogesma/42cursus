@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   setup.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: msegrans <msegrans@student.42lausan>       +#+  +:+       +#+        */
+/*   By: msegrans <msegrans@student.42lausanne      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2022/01/07 14:55:26 by msegrans          #+#    #+#             */
-/*   Updated: 2022/01/07 14:55:28 by msegrans         ###   ########.fr       */
+/*   Created: 2022/01/10 17:50:18 by msegrans          #+#    #+#             */
+/*   Updated: 2022/01/10 17:50:22 by msegrans         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 

@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   list.c                                             :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: msegrans <msegrans@student.42lausanne      +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2022/01/10 17:48:54 by msegrans          #+#    #+#             */
+/*   Updated: 2022/01/10 17:48:56 by msegrans         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include <stdlib.h>
 #include <libft.h>
 
@@ -39,6 +51,7 @@ t_list	**char_to_lst(char **args)
 {
 	t_list	**head;
 	t_list	*elem;
+	char	*content;
 	int		i;
 
 	if (!args)
@@ -49,7 +62,16 @@ t_list	**char_to_lst(char **args)
 	*head = NULL;
 	i = -1;
 	while (args[++i])
-		elem = new_lst(head, elem, ft_strdup(args[i]));
+	{
+		content = ft_strdup(args[i]);
+		if (!content)
+		{
+			ft_lstclear(head, free);
+			free(head);
+			return (NULL);
+		}
+		elem = new_lst(head, elem, content);
+	}
 	return (head);
 }
 
