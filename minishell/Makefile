@@ -24,12 +24,8 @@ NAME ?= minishell
 BUILD_DIR ?= ./build
 SRC_DIRS ?= ./src
 
-# Find all the C and C++ files we want to compile
-# Note the single quotes around the * expressions. Make will incorrectly expand these otherwise.
 SRCS := $(shell find $(SRC_DIRS) -name '*.c')
-
 OBJS := $(SRCS:%=$(BUILD_DIR)/%.o)
-DEPS := $(OBJS:.o=.d)
 
 INC_DIRS := $(shell find $(SRC_DIRS) -type d)
 INC_FLAGS += $(addprefix -I,$(INC_DIRS))
@@ -40,28 +36,32 @@ CFLAGS += -Wall -Wextra -Werror
 #CFLAGS += -O2 -march=native
 #CFLAGS += -g
 
-CPPFLAGS ?= $(INC_FLAGS) -MMD -MP
-
 $(NAME): $(LIB) $(OBJS)
-	$(CC) $(INC_FLAGS) $(CFLAGS) $(OBJS) $(LIBS) -o $(NAME)
+	@echo Linking $@
+	@$(CC) $(INC_FLAGS) $(CFLAGS) $(OBJS) $(LIBS) -o $(NAME)
 
 $(BUILD_DIR)/%.c.o: %.c
-	mkdir -p $(dir $@)
-	$(CC) -c $(INC_FLAGS) $(CFLAGS) $< -o $@
+	@echo Compiling $@
+	@mkdir -p $(dir $@)
+	@$(CC) -c $(INC_FLAGS) $(CFLAGS) $< -o $@
 
 all: $(NAME)
 
 $(LIB):
-	$(MAKE) -C lib/libft printf
+	@$(MAKE) -C lib/libft
+	@echo Libft done
 
 clean:
-	rm -r $(BUILD_DIR)
+	@rm -r $(BUILD_DIR)
+	@$(MAKE) -C lib/libft clean
+	@echo Clean done
 
-fclean: clean
-	$(RM) $(NAME)
+fclean:
+	@rm -r $(BUILD_DIR)
+	@rm $(NAME)
+	@$(MAKE) -C lib/libft fclean
+	@echo Fclean done
 
 re: fclean all
 
 .PHONY: all clean fclean re
-
--include $(DEPS)
