@@ -24,7 +24,7 @@
 # include <sys/errno.h>
 # include <sys/wait.h>
 
-int	search_exec(char *line, t_list **env);
+int		search_exec(char *line, t_list **env);
 
 void	free_list(char **lst);
 
