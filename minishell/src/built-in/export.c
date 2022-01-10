@@ -11,6 +11,8 @@
 /* ************************************************************************** */
 
 #include <libft.h>
+#include <unistd.h>
+#include <stdlib.h>
 
 #include "../utils/list.h"
 #include "../utils/environ.h"
@@ -108,5 +110,5 @@ int	export(char **args, t_list **env)
 	}
 	if (i == 0)
 		print_sorted_env(env);
-	return (0);
+	exit(0);
 }

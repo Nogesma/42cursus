@@ -13,6 +13,8 @@
 #include <libft.h>
 #include <stdio.h>
 #include <sys/wait.h>
+#include <stdlib.h>
+#include <unistd.h>
 
 #include "../built-in/cd.h"
 #include "../built-in/echo.h"
@@ -33,10 +35,8 @@ void	exec_binary(char *path, char **args, t_list **env)
 {
 	pid_t	child;
 	char	**environ;
-	int		status;
 
 	environ = lst_to_char(*env);
-	status_code(1, 0);
 	child = fork();
 	if (child == -1)
 		return (free(environ));
@@ -49,47 +49,59 @@ void	exec_binary(char *path, char **args, t_list **env)
 		}
 	}
 	is_fork(1, 1);
-	wait(&status);
-	is_fork(1, 0);
-	if (status_code(0, 0) != 130 && WIFEXITED(status))
-		status_code(1, WEXITSTATUS(status));
 	free(environ);
 }
 
-int	built_in(char **args, t_list **environ)
+void	fork_built_in(int (*fn)(char **, t_list **),
+				char **a, t_list **b, char has_pipes)
 {
-	int	ret;
+	pid_t	child;
 
+	child = fork();
+	if (child == -1)
+		return ;
+	if (child == 0)
+	{
+		if (!has_pipes && fn == exit_cmd)
+			exit(1);
+		if (fn(a, b) == -1)
+			exit(1);
+	}
+	is_fork(1, 1);
+	if (!has_pipes)
+		fn(a, 0);
+}
+
+int	built_in(char **args, t_list **environ, char has_pipes)
+{
 	if (!ft_strncmp("cd", args[0], 3))
-		ret = cd(args + 1, environ);
+		fork_built_in(cd, args + 1, environ, 1);
 	else if (!ft_strncmp("echo", args[0], 5))
-		ret = echo(args + 1);
+		fork_built_in(echo, args + 1, environ, 1);
 	else if (!ft_strncmp("pwd", args[0], 4))
-		ret = pwd();
+		fork_built_in(pwd, args + 1, environ, 1);
 	else if (!ft_strncmp("env", args[0], 4))
-		ret = env(*environ);
+		fork_built_in(env, args + 1, environ, 1);
 	else if (!ft_strncmp("unset", args[0], 6))
-		ret = unset(args + 1, environ);
+		fork_built_in(unset, args + 1, environ, 1);
 	else if (!ft_strncmp("export", args[0], 7))
-		ret = export(args + 1, environ);
+		fork_built_in(export, args + 1, environ, 1);
 	else if (!ft_strncmp("exit", args[0], 5))
-		ret = exit_cmd(args + 1);
+		fork_built_in(exit_cmd, args + 1, environ, has_pipes);
 	else
 		return (0);
-	status_code(1, ret);
 	return (1);
 }
 
-void	search_exec(char *line, t_list **env)
+void	search_exec(char *line, t_list **env, char has_pipes)
 {
 	char	**args;
 	char	*path;
 	char	*command;
 
-	//todo recursive token analysis and execution
 	path = get_env_content(env, "PATH");
-	args = ft_arg_split(line, env); //testing " ' and $ expansion
-	if (built_in(args, env) == 1)
+	args = ft_arg_split(line, env);
+	if (built_in(args, env, has_pipes) == 1)
 		return (free_list(args));
 	command = args[0];
 	if (!(line[0] == '.' || line[0] == '/'))

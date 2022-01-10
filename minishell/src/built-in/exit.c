@@ -11,12 +11,15 @@
 /* ************************************************************************** */
 
 #include <libft.h>
+#include <unistd.h>
+#include <stdlib.h>
 
-int	exit_cmd(char **args)
+int	exit_cmd(char **args, t_list **print)
 {
 	int				i;
 
-	ft_printf(STDERR_FILENO, "exit\n");
+	if (print == NULL)
+		ft_printf(STDERR_FILENO, "exit\n");
 	if (*args == NULL)
 		exit(0);
 	i = -1;
@@ -25,7 +28,7 @@ int	exit_cmd(char **args)
 		if (!ft_isdigit(args[0][i]))
 		{
 			ft_printf(STDERR_FILENO,
-				"minish: exit: %s: numeric argument required", args[0]);
+				"minish: exit: %s: numeric argument required\n", args[0]);
 			exit(255);
 		}
 	}
@@ -33,7 +36,7 @@ int	exit_cmd(char **args)
 	{
 		ft_putendl_fd(
 			"minish: exit: too many arguments", STDERR_FILENO);
-		return (1);
+		return (-1);
 	}
 	i = (unsigned char) ft_atoi(args[0]);
 	exit(i);

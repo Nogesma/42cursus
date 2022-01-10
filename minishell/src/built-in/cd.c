@@ -11,6 +11,8 @@
 /* ************************************************************************** */
 
 #include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
 #include <libft.h>
 
 #include "export.h"
@@ -40,7 +42,7 @@ static int	update_pwd_env(char *pwd, char *old_pwd, t_list **env)
 	lst[2] = NULL;
 	export(lst, env);
 	free_all(old_pwd, pwd, lst[0], lst[1]);
-	return (0);
+	exit(0);
 }
 
 int	cd(char **args, t_list **env)
@@ -50,7 +52,7 @@ int	cd(char **args, t_list **env)
 
 	old_pwd = getcwd(NULL, 0);
 	if (!old_pwd)
-		return (-1);
+		exit(-1);
 	if (chdir(args[0]) == -1)
 	{
 		free(old_pwd);

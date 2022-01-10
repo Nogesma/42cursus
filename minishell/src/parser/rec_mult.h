@@ -1,27 +1,20 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   pwd.c                                              :+:      :+:    :+:   */
+/*   rec_mult.h                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: msegrans <msegrans@student.42lausanne      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2021/12/27 15:07:02 by msegrans          #+#    #+#             */
-/*   Updated: 2021/12/27 15:07:04 by msegrans         ###   ########.fr       */
+/*   Created: 2022/01/10 23:33:48 by msegrans          #+#    #+#             */
+/*   Updated: 2022/01/10 23:33:51 by msegrans         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <libft.h>
-#include <stdlib.h>
-#include <unistd.h>
+#ifndef REC_MULT_H
+# define REC_MULT_H
 
-int	pwd(__attribute__ ((unused)) char **a, __attribute__ ((unused)) t_list **_)
-{
-	char	*cwd;
+# include <libft.h>
 
-	cwd = getcwd(NULL, 0);
-	if (!cwd)
-		return (-1);
-	ft_printf(STDOUT_FILENO, "%s\n", cwd);
-	free(cwd);
-	exit(0);
-}
+int	rec_cmds(char *line, t_list **env, char has_pipes);
+
+#endif //REC_MULT_H

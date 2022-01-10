@@ -11,14 +11,19 @@
 /* ************************************************************************** */
 
 #include <libft.h>
+#include <unistd.h>
+#include <stdlib.h>
 
-int	echo(char **args)
+int	echo(char **args, __attribute__ ((unused)) t_list **_)
 {
 	int	newline;
 
 	newline = 1;
 	if (!*args)
-		return (-1);
+	{
+		ft_putchar_fd('\n', 1);
+		exit(0);
+	}
 	if (!ft_strncmp("-n", args[0], 3))
 	{
 		newline = 0;
@@ -33,5 +38,5 @@ int	echo(char **args)
 	}
 	if (newline)
 		ft_putchar_fd('\n', STDOUT_FILENO);
-	return (0);
+	exit(0);
 }

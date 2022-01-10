@@ -12,6 +12,7 @@
 
 #include <libft.h>
 #include <dirent.h>
+#include <stdlib.h>
 
 #include "../utils/environ.h"
 #include "../utils/global.h"

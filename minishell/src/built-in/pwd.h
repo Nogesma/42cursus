@@ -13,6 +13,6 @@
 #ifndef PWD_H
 # define PWD_H
 
-int	pwd(void);
+int	pwd(__attribute__ ((unused)) char **a, __attribute__ ((unused)) t_list **_);
 
 #endif

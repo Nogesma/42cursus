@@ -12,14 +12,17 @@
 
 #include <libft.h>
 #include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
 #include <readline/readline.h>
 #include <readline/history.h>
 #include <signal.h>
+#include <sys/wait.h>
 
 #include "utils/setup.h"
 #include "utils/global.h"
 #include "utils/list.h"
-#include "exec/exec.h"
+#include "parser/rec_mult.h"
 
 void	sig(int sig)
 {
@@ -36,6 +39,8 @@ void	sig(int sig)
 
 void	readline_loop(t_list **environ, char *prompt)
 {
+	int		pipes;
+	int		status;
 	char	*line;
 
 	line = readline(prompt);
@@ -45,7 +50,12 @@ void	readline_loop(t_list **environ, char *prompt)
 		{
 			add_history(line);
 			//todo cleanup_tokens()
-			search_exec(line, environ);
+			pipes = rec_cmds(line, environ, 0);
+			while (pipes-- > 0)
+				wait(&status);
+			is_fork(1, 0);
+			if (status_code(0, 0) != 130 && WIFEXITED(status))
+				status_code(1, WEXITSTATUS(status));
 		}
 		free(line);
 		line = readline(prompt);

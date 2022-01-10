@@ -10,6 +10,8 @@
 /*                                                                            */
 /* ************************************************************************** */
 
+#include <stdarg.h>
+#include <unistd.h>
 #include "../libft.h"
 
 int	print_special(char c, int fd, va_list args)

@@ -15,6 +15,6 @@
 
 # include <libft.h>
 
-void	search_exec(char *line, t_list **env);
+int	search_exec(char *line, t_list **env, char has_pipes);
 
 #endif //EXEC_H

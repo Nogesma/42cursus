@@ -13,6 +13,6 @@
 #ifndef ECHO_H
 # define ECHO_H
 
-int	echo(char **args);
+int	echo(char **args, __attribute__ ((unused)) t_list **_);
 
 #endif

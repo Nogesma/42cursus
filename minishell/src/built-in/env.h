@@ -15,6 +15,6 @@
 
 # include <libft.h>
 
-int	env(t_list *environ);
+int	env(__attribute__ ((unused)) char **a, t_list **environ);
 
 #endif //ENV_H

@@ -13,6 +13,6 @@
 #ifndef EXIT_H
 # define EXIT_H
 
-int	exit_cmd(char **args);
+int	exit_cmd(char **args, t_list **print);
 
 #endif

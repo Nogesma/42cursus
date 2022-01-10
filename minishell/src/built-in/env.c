@@ -11,13 +11,17 @@
 /* ************************************************************************** */
 
 #include <libft.h>
+#include <stdlib.h>
 
-int	env(t_list *environ)
+int	env(__attribute__ ((unused)) char **a, t_list **environ)
 {
-	while (environ)
+	t_list	*elem;
+
+	elem = *environ;
+	while (elem)
 	{
-		ft_printf(1, "%s\n", environ->content);
-		environ = environ->next;
+		ft_printf(1, "%s\n", elem->content);
+		elem = elem->next;
 	}
-	return (0);
+	exit(0);
 }

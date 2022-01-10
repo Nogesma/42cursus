@@ -11,6 +11,7 @@
 /* ************************************************************************** */
 
 #include <libft.h>
+#include <stdlib.h>
 
 static t_list	**free_env(t_list **head, char *name)
 {
@@ -43,5 +44,5 @@ int	unset(char **args, t_list **env)
 	i = -1;
 	while (args[++i])
 		free_env(env, args[i]);
-	return (0);
+	exit(0);
 }
