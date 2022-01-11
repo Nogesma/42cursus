@@ -51,10 +51,11 @@ void	readline_loop(t_list **environ, char *prompt)
 			add_history(line);
 			//todo cleanup_tokens()
 			pipes = rec_cmds(line, environ, 0);
+			status = -1;
 			while (pipes-- > 0)
 				wait(&status);
 			is_fork(1, 0);
-			if (status_code(0, 0) != 130 && WIFEXITED(status))
+			if (status != -1 && status_code(0, 0) != 130 && WIFEXITED(status))
 				status_code(1, WEXITSTATUS(status));
 		}
 		free(line);
@@ -86,4 +87,5 @@ int	main(__attribute__ ((unused)) int ac, __attribute__ ((unused)) char **av,
 	rl_clear_history();
 	ft_lstclear(environ, free);
 	free(environ);
+	return (1);
 }

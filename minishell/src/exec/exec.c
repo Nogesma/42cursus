@@ -31,7 +31,7 @@
 
 #include "../parser/parser.h"
 
-void	exec_binary(char *path, char **args, t_list **env)
+int	exec_binary(char *path, char **args, t_list **env)
 {
 	pid_t	child;
 	char	**environ;
@@ -39,17 +39,21 @@ void	exec_binary(char *path, char **args, t_list **env)
 	environ = lst_to_char(*env);
 	child = fork();
 	if (child == -1)
-		return (free(environ));
+	{
+		free(environ);
+		return (0);
+	}
 	if (child == 0)
 	{
 		if (execve(path, args, environ) == -1)
 		{
 			perror(path);
-			exit(1);
+			exit(127);
 		}
 	}
 	is_fork(1, 1);
 	free(environ);
+	return (1);
 }
 
 void	fork_built_in(int (*fn)(char **, t_list **),
@@ -93,28 +97,31 @@ int	built_in(char **args, t_list **environ, char has_pipes)
 	return (1);
 }
 
-void	search_exec(char *line, t_list **env, char has_pipes)
+int	search_exec(char *line, t_list **env, char has_pipes)
 {
 	char	**args;
 	char	*path;
 	char	*command;
+	int		ret;
 
 	path = get_env_content(env, "PATH");
 	args = ft_arg_split(line, env);
 	if (built_in(args, env, has_pipes) == 1)
-		return (free_list(args));
+		return (free_list(args, 1)); //TODO: should return 0 if fork fails?
 	command = args[0];
 	if (!(line[0] == '.' || line[0] == '/'))
 		args[0] = get_exec_path(args[0], path);
 	if (args[0])
-		exec_binary(args[0], args, env);
+		ret = exec_binary(args[0], args, env);
 	else
 	{
 		ft_putstr_fd("minish: ", 2);
 		ft_putstr_fd(command, 2);
 		ft_putstr_fd(": command not found\n", 2);
+		status_code(1, 127);
+		ret = 0;
 	}
 	if (!(line[0] == '.' || line[0] == '/'))
 		free(command);
-	free_list(args);
+	return (free_list(args, ret));
 }

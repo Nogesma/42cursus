@@ -138,6 +138,8 @@ static int	unpack_env(char *s, char *new, t_list **env, int *i)
 	if (s[1] == '?')
 	{
 		status = ft_itoa(status_code(0, 0));
+		if (!status)
+			return (1);
 		*i += (int)ft_strlcpy(new, status, 4);
 		free(status);
 		return (1);

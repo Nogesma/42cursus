@@ -15,7 +15,7 @@
 
 # include <libft.h>
 
-void	free_list(char **lst);
+int		free_list(char **lst, int ret);
 
 t_list	*new_lst(t_list **head, t_list *elem, void *content);
 

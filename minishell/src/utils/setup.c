@@ -27,7 +27,7 @@ int	termios_setup(void)
 	if (isatty(STDIN_FILENO))
 		ttyfd = STDIN_FILENO;
 	else
-		ttyfd = open("/dev/tty", O_RDONLY);
+		ttyfd = open("/dev/tty", O_NONBLOCK);
 	if (ttyfd < 0)
 		return (-1);
 	if (tcgetattr(ttyfd, &cfg) < 0)

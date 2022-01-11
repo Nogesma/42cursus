@@ -65,7 +65,7 @@ static int	piped_exec(char *line, char *cmd_two, t_list **env) //todo maybe deal
 	if (dup2(p[1], 1) == -1)
 		return (1);
 	close(p[1]);
-	rec_cmds(line, env, 1);
+	n_pipes = rec_cmds(line, env, 1);
 	if (dup2(saved_fd, 1) == -1)
 		return (1);
 	saved_fd = dup(0);
@@ -74,11 +74,11 @@ static int	piped_exec(char *line, char *cmd_two, t_list **env) //todo maybe deal
 	if (dup2(p[0], 0) == -1)
 		return (1);
 	close(p[0]);
-	n_pipes = rec_cmds(cmd_two, env, 1);
+	n_pipes += rec_cmds(cmd_two, env, 1);
 	if (dup2(saved_fd, 0) == -1)
 		return (1);
 	close(saved_fd);
-	return (n_pipes + 1);
+	return (n_pipes);
 }
 
 int	rec_cmds(char *line, t_list **env, char has_pipes)
@@ -94,7 +94,6 @@ int	rec_cmds(char *line, t_list **env, char has_pipes)
 	if (token == 2)
 		return (piped_exec(line, cmd_two, env));
 //	set_redirect(line, env);
-	search_exec(line, env, has_pipes);
+	return (search_exec(line, env, has_pipes));
 //	unset_redirect(line, env);
-	return (1);
 }

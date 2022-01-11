@@ -13,7 +13,7 @@
 #include <stdlib.h>
 #include <libft.h>
 
-void	free_list(char **lst)
+int	free_list(char **lst, int ret)
 {
 	int	i;
 
@@ -21,6 +21,7 @@ void	free_list(char **lst)
 	while (lst[++i])
 		free(lst[i]);
 	free(lst);
+	return (ret);
 }
 
 void	print_list_fd(int fd, char *prefix, t_list *lst)
