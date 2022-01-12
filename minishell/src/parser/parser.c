@@ -11,36 +11,9 @@
 /* ************************************************************************** */
 
 #include <libft.h>
-#include <dirent.h>
-#include <stdlib.h>
 
-#include "../utils/environ.h"
-#include "../utils/global.h"
-#include "../utils/list.h"
-#include "../utils/sort.h"
-
-static int	count_wildcard(int is_wildcard)
-{
-	DIR				*dir;
-	struct dirent	*dp;
-	int				i;
-
-	if (!is_wildcard)
-		return (1);
-	dir = opendir(".");
-	if (!dir)
-		return (0);
-	dp = readdir(dir);
-	i = 0;
-	while (dp)
-	{
-		if (dp->d_name[0] != '.')
-			i++;
-		dp = readdir(dir);
-	}
-	closedir(dir);
-	return (i);
-}
+#include "parse_env.h"
+#include "wildcard.h"
 
 static int	ft_count(const char *str)
 {
@@ -69,40 +42,6 @@ static int	ft_count(const char *str)
 	return (size + 1);
 }
 
-static int	get_env_name_size(const char *s)
-{
-	int	i;
-
-	i = 0;
-	while (ft_isalnum(s[i]))
-		i++;
-	return (i);
-}
-
-void	get_env_size(char *s, t_list **env, int *size, int *i)
-{
-	unsigned char	status;
-
-	if (s[*i + 1] == '?')
-	{
-		status = status_code(0, 0);
-		(*i)++;
-		if (status < 10)
-			(*size)++;
-		else if (status < 100)
-			(*size) += 2;
-		else
-			(*size) += 3;
-		while (s[*i] && s[*i] != ' ')
-			(*i)++;
-	}
-	else
-	{
-		*size += (int)ft_strlen(get_env_content(env, s + *i + 1));
-		*i += get_env_name_size(s + *i + 1);
-	}
-}
-
 static int	word_size(char *s, t_list **env)
 {
 	int	i;
@@ -127,85 +66,6 @@ static int	word_size(char *s, t_list **env)
 		i++;
 	}
 	return (size);
-}
-
-static int	unpack_env(char *s, char *new, t_list **env, int *i)
-{
-	char	*env_val;
-	int		j;
-	char	*status;
-
-	if (s[1] == '?')
-	{
-		status = ft_itoa(status_code(0, 0));
-		if (!status)
-			return (1);
-		*i += (int)ft_strlcpy(new, status, 4);
-		free(status);
-		return (1);
-	}
-	if ((!s[1] || !ft_isalnum(s[1])))
-	{
-		new[(*i)++] = '$';
-		return (1);
-	}
-	env_val = get_env_content(env, s + 1);
-	if (!env_val)
-		return (get_env_name_size(s + 1));
-	j = 0;
-	while (env_val[j])
-		new[(*i)++] = env_val[j++];
-	return (get_env_name_size(s + 1));
-}
-
-static void	get_dir_content(t_list **lst)
-{
-	DIR				*dir;
-	struct dirent	*dp;
-	int				i;
-	t_list			*elem;
-
-	dir = opendir(".");
-	if (!dir)
-		return ;
-	dp = readdir(dir);
-	i = 0;
-	while (dp)
-	{
-		if (dp->d_name[0] != '.')
-		{
-			elem = new_lst(lst, elem, ft_strdup(dp->d_name));
-			i++;
-		}
-		dp = readdir(dir);
-	}
-	closedir(dir);
-	bubble_sort_lst(lst, i);
-}
-
-static char	*wildcard(int *pos)
-{
-	static t_list	**lst;
-	t_list			*elem;
-	char			*content;
-
-	if (!lst)
-	{
-		lst = (t_list **)malloc(sizeof(t_list *));
-		*lst = NULL;
-		get_dir_content(lst);
-	}
-	elem = *lst;
-	*lst = elem->next;
-	content = elem->content;
-	free(elem);
-	if (!*lst)
-	{
-		free(lst);
-		lst = NULL;
-		(*pos)++;
-	}
-	return (content);
 }
 
 static int	special_word(char *s, t_list **env, int *pos, char **new)

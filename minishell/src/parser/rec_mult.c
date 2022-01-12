@@ -20,7 +20,8 @@
 #include "../exec/exec.h"
 #include "rec_mult.h"
 
-//finds next occurence of tokens &&, || or | in string, zeros their chars, stores pointer to characters just
+//finds next occurence of tokens &&, || or | in string, zeros their chars,
+// stores pointer to characters just
 // after in cmd_two and returns which one it found, -1 if none
 static int	find_token(char *line, char **cmd_two)
 {
@@ -51,7 +52,8 @@ static int	find_token(char *line, char **cmd_two)
 	return (-1);
 }
 
-static int	piped_exec(char *line, char *cmd_two, t_list **env) //todo maybe deal with errors and errno of pipe and dup, dup2
+//todo maybe deal with errors and errno of pipe and dup, dup2
+static int	piped_exec(char *line, char *cmd_two, t_list **env)
 {
 	int	saved_fd;
 	int	p[2];
