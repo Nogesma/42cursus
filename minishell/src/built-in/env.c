@@ -23,5 +23,5 @@ int	env(__attribute__ ((unused)) char **a, t_list **environ)
 		ft_printf(1, "%s\n", elem->content);
 		elem = elem->next;
 	}
-	exit(0);
+	return (0);
 }

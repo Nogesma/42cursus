@@ -22,7 +22,7 @@ int	echo(char **args, __attribute__ ((unused)) t_list **_)
 	if (!*args)
 	{
 		ft_putchar_fd('\n', 1);
-		exit(0);
+		return (0);
 	}
 	if (!ft_strncmp("-n", args[0], 3))
 	{
@@ -38,5 +38,5 @@ int	echo(char **args, __attribute__ ((unused)) t_list **_)
 	}
 	if (newline)
 		ft_putchar_fd('\n', STDOUT_FILENO);
-	exit(0);
+	return (0);
 }

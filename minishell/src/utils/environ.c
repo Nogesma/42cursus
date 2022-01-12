@@ -36,9 +36,14 @@ t_list	*get_env(t_list **env, char *name)
 char	*get_env_content(t_list **env, char *name)
 {
 	t_list	*elem;
+	char	*content;
 
 	elem = get_env(env, name);
 	if (!elem)
 		return (NULL);
-	return (elem->content);
+	content = elem->content;
+	while (*content != '=')
+		content++;
+	content++;
+	return (content);
 }

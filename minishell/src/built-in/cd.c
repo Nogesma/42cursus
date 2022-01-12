@@ -14,7 +14,10 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <libft.h>
+#include <sys/errno.h>
+#include <string.h>
 
+#include "../utils/environ.h"
 #include "export.h"
 
 static int	free_all(void *a, void *b, void *c, void *d)
@@ -42,7 +45,7 @@ static int	update_pwd_env(char *pwd, char *old_pwd, t_list **env)
 	lst[2] = NULL;
 	export(lst, env);
 	free_all(old_pwd, pwd, lst[0], lst[1]);
-	exit(0);
+	return (0);
 }
 
 int	cd(char **args, t_list **env)
@@ -52,12 +55,13 @@ int	cd(char **args, t_list **env)
 
 	old_pwd = getcwd(NULL, 0);
 	if (!old_pwd)
-		exit(-1);
+		return (-1);
+	if (args[0] == NULL)
+		args[0] = ft_strdup(get_env_content(env, "HOME"));
 	if (chdir(args[0]) == -1)
 	{
 		free(old_pwd);
-		ft_putstr_fd("minish: cd: ", 2);
-		perror(args[1]);
+		ft_printf(2, "minish: cd: %s: %s\n", args[0], strerror(errno));
 		return (1);
 	}
 	pwd = getcwd(NULL, 0);

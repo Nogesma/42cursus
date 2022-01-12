@@ -44,5 +44,5 @@ int	unset(char **args, t_list **env)
 	i = -1;
 	while (args[++i])
 		free_env(env, args[i]);
-	exit(0);
+	return (0);
 }

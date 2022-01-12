@@ -110,5 +110,5 @@ int	export(char **args, t_list **env)
 	}
 	if (i == 0)
 		print_sorted_env(env);
-	exit(0);
+	return (0);
 }

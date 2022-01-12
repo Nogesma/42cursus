@@ -23,5 +23,5 @@ int	pwd(__attribute__ ((unused)) char **a, __attribute__ ((unused)) t_list **_)
 		return (-1);
 	ft_printf(STDOUT_FILENO, "%s\n", cwd);
 	free(cwd);
-	exit(0);
+	return (0);
 }
