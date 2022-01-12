@@ -13,7 +13,7 @@ ifeq ($(UNAME), Linux)
 	MAKEFLAGS := --jobs=$(shell nproc)
 else
 	MAKEFLAGS := --jobs=$(shell sysctl -n hw.ncpu)
-	INCLUDE += -I$(HOME)/.brew/Cellar/readline/8.1.1/include
+	INC_FLAGS += -I$(HOME)/.brew/Cellar/readline/8.1.1/include
     LIBS += -L$(HOME)/.brew/Cellar/readline/8.1.1/lib
 endif
 
@@ -52,13 +52,13 @@ $(LIB):
 	@echo Libft done
 
 clean:
-	@rm -r $(BUILD_DIR)
+	@rm -rf $(BUILD_DIR)
 	@$(MAKE) -C lib/libft clean
 	@echo Clean done
 
 fclean:
-	@rm -r $(BUILD_DIR)
-	@rm $(NAME)
+	@rm -rf $(BUILD_DIR)
+	@rm -f $(NAME)
 	@$(MAKE) -C lib/libft fclean
 	@echo Fclean done
 

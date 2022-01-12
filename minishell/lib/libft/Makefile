@@ -30,10 +30,10 @@ $(BUILD_DIR)/%.c.o: %.c
 all: $(NAME)
 
 clean:
-	@rm -r $(BUILD_DIR)
+	@rm -rf $(BUILD_DIR)
 
 fclean: clean
-	@rm $(NAME)
+	@rm -f $(NAME)
 
 re: fclean all
 

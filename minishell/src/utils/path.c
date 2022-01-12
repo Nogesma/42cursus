@@ -78,6 +78,6 @@ char	*get_exec_path(char *exec, char *PATH)
 	exec_path = NULL;
 	while (paths[++i] && exec_path == NULL)
 		exec_path = search_path(paths[i], exec);
-	free_list(paths);
+	free_list(paths, 0);
 	return (exec_path);
 }
