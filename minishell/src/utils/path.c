@@ -35,24 +35,14 @@ static char	*ft_strjoin_path(char *s1, char *s2)
 	return (str);
 }
 
-static char	*free_path_search(char *s, DIR *dir)
+static char	*search_path(DIR *dir, char *path, char *exec)
 {
-	closedir(dir);
-	return (s);
-}
-
-static char	*search_path(char *path, char *exec)
-{
-	DIR				*dir;
 	struct dirent	*dp;
 	struct stat		statbuf;
 	size_t			len;
 	char			*exec_path;
 
 	len = ft_strlen(exec);
-	dir = opendir(path);
-	if (!dir)
-		return (NULL);
 	dp = readdir(dir);
 	while (dp)
 	{
@@ -60,15 +50,16 @@ static char	*search_path(char *path, char *exec)
 		{
 			exec_path = ft_strjoin_path(path, exec);
 			if (stat(exec_path, &statbuf) == 0 && statbuf.st_mode & S_IXUSR)
-				return (free_path_search(exec_path, dir));
+				return (exec_path);
 		}
 		dp = readdir(dir);
 	}
-	return (free_path_search(NULL, dir));
+	return (NULL);
 }
 
 char	*get_exec_path(char *exec, char *PATH)
 {
+	DIR		*dir;
 	char	**paths;
 	int		i;
 	char	*exec_path;
@@ -77,7 +68,14 @@ char	*get_exec_path(char *exec, char *PATH)
 	i = -1;
 	exec_path = NULL;
 	while (paths[++i] && exec_path == NULL)
-		exec_path = search_path(paths[i], exec);
+	{
+		dir = opendir(paths[i]);
+		if (dir)
+		{
+			exec_path = search_path(dir, paths[i], exec);
+			closedir(dir);
+		}
+	}
 	free_list(paths, 0);
 	return (exec_path);
 }
