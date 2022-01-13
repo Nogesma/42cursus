@@ -15,6 +15,6 @@
 
 # include <libft.h>
 
-int	rec_cmds(char *line, t_list **env, char has_pipes);
+void	cmds_loop(char *line, t_list **env);
 
 #endif //REC_MULT_H

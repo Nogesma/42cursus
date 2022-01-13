@@ -39,8 +39,6 @@ void	sig(int sig)
 
 void	readline_loop(t_list **environ, char *prompt)
 {
-	int		forks;
-	int		status;
 	char	*line;
 
 	line = readline(prompt);
@@ -50,13 +48,7 @@ void	readline_loop(t_list **environ, char *prompt)
 		{
 			add_history(line);
 			//todo cleanup_tokens()
-			forks = rec_cmds(line, environ, 0);
-			status = -1;
-			while (forks-- > 0)
-				wait(&status);
-			is_fork(1, 0);
-			if (status != -1 && status_code(0, 0) != 130 && WIFEXITED(status))
-				status_code(1, WEXITSTATUS(status));
+			cmds_loop(line, environ);
 		}
 		free(line);
 		line = readline(prompt);

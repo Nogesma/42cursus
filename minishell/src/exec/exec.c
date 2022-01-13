@@ -57,7 +57,7 @@ int	exec_binary(char *path, char **args, t_list **env)
 }
 
 int	fork_built_in(int (*fn)(char **, t_list **),
-				char **a, t_list **b, char has_pipes)
+				char **a, t_list **b, int has_pipes)
 {
 	pid_t	child;
 	int		ret;
@@ -77,7 +77,7 @@ int	fork_built_in(int (*fn)(char **, t_list **),
 	return (1);
 }
 
-int	built_in(char **args, t_list **environ, char has_pipes)
+int	built_in(char **args, t_list **environ, int has_pipes)
 {
 	if (!ft_strncmp("cd", args[0], 3))
 		return (fork_built_in(cd, args + 1, environ, has_pipes));
@@ -96,7 +96,7 @@ int	built_in(char **args, t_list **environ, char has_pipes)
 	return (0);
 }
 
-int	search_exec(char *line, t_list **env, char has_pipes)
+int	search_exec(char *line, t_list **env, int has_pipes)
 {
 	char	**args;
 	char	*path;
