@@ -25,7 +25,7 @@ $(NAME): $(OBJS)
 
 $(BUILD_DIR)/%.c.o: %.c
 	@mkdir -p $(dir $@)
-	@$(CC) -c $(INC_FLAGS) $(CFLAGS) $< -o $@
+	@$(CC) -c $(CFLAGS) $(INC_FLAGS) $< -o $@
 
 all: $(NAME)
 

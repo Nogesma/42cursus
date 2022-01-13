@@ -38,12 +38,12 @@ CFLAGS += -Wall -Wextra -Werror
 
 $(NAME): $(LIB) $(OBJS)
 	@echo Linking $@
-	@$(CC) $(INC_FLAGS) $(CFLAGS) $(OBJS) $(LIBS) -o $(NAME)
+	@$(CC) $(CFLAGS) $(INC_FLAGS) $(OBJS) $(LIBS) -o $(NAME)
 
 $(BUILD_DIR)/%.c.o: %.c
 	@echo Compiling $@
 	@mkdir -p $(dir $@)
-	@$(CC) -c $(INC_FLAGS) $(CFLAGS) $< -o $@
+	@$(CC) -c  $(CFLAGS) $(INC_FLAGS) $< -o $@
 
 all: $(NAME)
 
