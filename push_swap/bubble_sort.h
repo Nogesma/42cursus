@@ -15,6 +15,8 @@
 
 # include <libft.h>
 
-int	*get_sorted(t_list *lst, int n);
+int		*get_sorted(t_list *lst, int n);
+
+void	ft_swap(int *a, int *b);
 
 #endif //BUBBLE_SORT_H

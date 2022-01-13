@@ -40,10 +40,16 @@ void	brute_force3(t_list *lst)
 
 void	free_all(t_list **a, t_list **b)
 {
-	ft_lstclear(b);
-	free(b);
-	ft_lstclear(a);
-	free(a);
+	if (b)
+	{
+		ft_lstclear(b);
+		free(b);
+	}
+	if (a)
+	{
+		ft_lstclear(a);
+		free(a);
+	}
 }
 
 void	sort(t_list **head_a, int n)
@@ -56,7 +62,7 @@ void	sort(t_list **head_a, int n)
 		return (brute_force3(*head_a));
 	head_b = (t_list **)malloc(sizeof(t_list *));
 	if (!head_b)
-		return (free_all(head_a, head_b));
+		return (free_all(head_a, NULL));
 	(*head_b) = 0;
 	if (n <= 5)
 		sort5(head_a, head_b);

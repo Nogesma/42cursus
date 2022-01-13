@@ -15,25 +15,28 @@
 
 int	create_list(t_list **head, int argc, char **argv)
 {
-	int	i;
-	int	length;
+	int		n;
+	int		length;
+	t_list	*elem;
 
+	n = 0;
 	if (argc == 2)
 	{
+		n = -1;
 		argv = ft_split(argv[1], ' ');
-		i = 0;
-		while (argv[i])
-			i++;
-		length = i;
-		while (i-- > 0)
-			ft_lstadd_front(head, ft_lstnew(ft_atoi(argv[i])));
+		argc = 0;
+		while (argv[argc])
+			argc++;
+		length = argc;
 	}
 	else
-	{
 		length = argc - 1;
-		i = length;
-		while (i-- > 0)
-			ft_lstadd_front(head, ft_lstnew(ft_atoi(argv[i + 1])));
+	while (--argc > n)
+	{
+		elem = ft_lstnew(ft_atoi(argv[argc]));
+		if (!elem)
+			return (0);
+		ft_lstadd_front(head, elem);
 	}
 	return (length);
 }
@@ -52,5 +55,10 @@ int	main(int argc, char **argv)
 		return (1);
 	}
 	length = create_list(head_a, argc, argv);
+	if (length == 0)
+	{
+		free_all(head_a, NULL);
+		return (1);
+	}
 	sort(head_a, length);
 }

@@ -95,6 +95,8 @@ void	sort5(t_list **head_a, t_list **head_b)
 
 	lstsize = ft_lstsize(*head_a);
 	sorted = get_sorted(*head_a, lstsize);
+	if (!sorted)
+		return ;
 	while (!iss(head_a) && ft_lstsize(*head_b) != 2)
 	{
 		ft_printf("pb\n");

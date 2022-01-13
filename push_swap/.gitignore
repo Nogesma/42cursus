@@ -1,0 +1,10 @@
+.DS_Store
+.idea
+a.out
+*.o
+*.a
+CMakeLists.txt
+cmake-build-debug
+checker
+push_swap
+tester.sh

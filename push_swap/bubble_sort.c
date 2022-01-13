@@ -51,6 +51,8 @@ static int	*clone_list(t_list *src, int n)
 	int	i;
 
 	dest = (int *)malloc((n) * sizeof(int));
+	if (!dest)
+		return (NULL);
 	i = -1;
 	while (++i < n && src)
 	{
@@ -65,6 +67,8 @@ int	*get_sorted(t_list *lst, int n)
 	int	*sort;
 
 	sort = clone_list(lst, n);
+	if (!sort)
+		return (NULL);
 	bubble_sort(sort, n);
 	return (sort);
 }
