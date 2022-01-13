@@ -126,13 +126,11 @@ static int pipe_out(int *saved_fd2, int p[2])
 	return (0);
 }
 
-int	cmds_redirect(char *line, t_list **env, char has_pipes)
+int	cmds_redirect(char *line, t_list **env, int has_pipes)
 {
-	int	forks;
 //	set_redirect(line, env);
-	forks = search_exec(line, env, has_pipes);
+	return (search_exec(line, env, has_pipes));
 //	unset_redirect(line, env);
-	return (forks);
 }
 
 void	wait_forks(int *forks)
@@ -147,32 +145,29 @@ void	wait_forks(int *forks)
 		status_code(1, WEXITSTATUS(status));
 }
 
-int	do_cmds(char *line, t_list **env, int token)
+void	do_cmds(char *line, t_list **env, int token, int *forks)
 {
-	static int	forks;
-
 	if (token == 2)
 	{
 		if (pipe_manage(1))
-			return (0);
-		forks += cmds_redirect(line, env, 1);
+			return ;
+		*forks += cmds_redirect(line, env, 1);
 		if (pipe_manage(-1))
-			return (forks);
+			return ;
 		pipe_manage(0);
-		return (forks);
+		return ;
 	}
 	if (token == 0)
 	{
-		forks += cmds_redirect(line, env, forks);
-		wait_forks(&forks);
+		forks += cmds_redirect(line, env, *forks);
+		wait_forks(forks);
 	}
 	if (token == 1)
 	{
-		forks += cmds_redirect(line, env, forks);
-		wait_forks(&forks);
+		forks += cmds_redirect(line, env, *forks);
+		wait_forks(forks);
 	}
 	pipe_manage(-1);
-	return (0);
 }
 
 void	cmds_loop(char *line, t_list **env)
@@ -185,7 +180,7 @@ void	cmds_loop(char *line, t_list **env)
 	token = find_token(line, &cmd_two);
 	while (token >= 0)
 	{
-		forks += do_cmds(line, env, token);
+		do_cmds(line, env, token, &forks);
 		if ((status_code(0, 0) && token == 0) || (!status_code(0, 0) && token == 1))
 			return ;
 		line = cmd_two;

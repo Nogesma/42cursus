@@ -17,7 +17,6 @@
 #include <readline/readline.h>
 #include <readline/history.h>
 #include <signal.h>
-#include <sys/wait.h>
 
 #include "utils/setup.h"
 #include "utils/global.h"
