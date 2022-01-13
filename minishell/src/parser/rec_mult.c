@@ -128,9 +128,9 @@ static int pipe_out(int *saved_fd2, int p[2])
 
 int	cmds_redirect(char *line, t_list **env, int has_pipes)
 {
-//	set_redirect(line, env);
+//	redirects(line, env, 1);
 	return (search_exec(line, env, has_pipes));
-//	unset_redirect(line, env);
+//	redirects(line, env, 0);
 }
 
 void	wait_forks(int *forks)
@@ -181,7 +181,8 @@ void	cmds_loop(char *line, t_list **env)
 	while (token >= 0)
 	{
 		do_cmds(line, env, token, &forks);
-		if ((status_code(0, 0) && token == 0) || (!status_code(0, 0) && token == 1))
+		if ((status_code(0, 0) && token == 0)
+			|| (!status_code(0, 0) && token == 1))
 			return ;
 		line = cmd_two;
 		token = find_token(line, &cmd_two);
