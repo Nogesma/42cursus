@@ -37,6 +37,7 @@ int	exec_binary(char *path, char **args, t_list **env)
 	char	**environ;
 
 	environ = lst_to_char(*env);
+	status_code(1, 0);
 	child = fork();
 	if (child == -1)
 	{
@@ -62,6 +63,7 @@ int	fork_built_in(int (*fn)(char **, t_list **),
 	pid_t	child;
 	int		ret;
 
+	status_code(1, 0);
 	if (!has_pipes)
 		ret = fn(a, b);
 	child = fork();

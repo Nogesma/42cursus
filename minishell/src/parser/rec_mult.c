@@ -140,6 +140,7 @@ void	wait_forks(int *forks)
 	status = -1;
 	while ((*forks)-- > 0)
 		wait(&status);
+	*forks = 0;
 	is_fork(1, 0);
 	if (status != -1 && status_code(0, 0) != 130 && WIFEXITED(status))
 		status_code(1, WEXITSTATUS(status));
@@ -159,12 +160,12 @@ void	do_cmds(char *line, t_list **env, int token, int *forks)
 	}
 	if (token == 0)
 	{
-		forks += cmds_redirect(line, env, *forks);
+		*forks += cmds_redirect(line, env, *forks);
 		wait_forks(forks);
 	}
 	if (token == 1)
 	{
-		forks += cmds_redirect(line, env, *forks);
+		*forks += cmds_redirect(line, env, *forks);
 		wait_forks(forks);
 	}
 	pipe_manage(-1);
@@ -187,7 +188,7 @@ void	cmds_loop(char *line, t_list **env)
 		line = cmd_two;
 		token = find_token(line, &cmd_two);
 	}
-	forks += cmds_redirect(line, env, 0);
+	forks += cmds_redirect(line, env, forks);
 	wait_forks(&forks);
 	pipe_manage(-1);
 }
