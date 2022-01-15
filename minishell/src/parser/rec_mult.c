@@ -22,6 +22,7 @@
 #include "../exec/exec.h"
 #include "rec_mult.h"
 #include "../utils/global.h"
+#include "redirect.h"
 
 static int pipe_in(int *saved_fd, int p[2]);
 static int pipe_out(int *saved_fd, int p[2]);
@@ -128,9 +129,9 @@ static int pipe_out(int *saved_fd2, int p[2])
 
 int	cmds_redirect(char *line, t_list **env, int has_pipes)
 {
-//	redirects(line, env, 1);
+	redirects(line, env, 1);
 	return (search_exec(line, env, has_pipes));
-//	redirects(line, env, 0);
+	redirects(line, env, 0);
 }
 
 void	wait_forks(int *forks)
