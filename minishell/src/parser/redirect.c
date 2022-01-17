@@ -7,9 +7,12 @@
 #include <stdlib.h>
 #include <sys/fcntl.h>
 
+#include "../utils/error.h"
+#include "../utils/global.h"
 #include "parse_env.h"
 #include "redirect.h"
 #include "heredoc.h"
+#include "../utils/parsing.h"
 
 static int	word_size_redirecct(char *s, t_list **env)
 {
@@ -68,51 +71,6 @@ static char *next_word_redirect(char *line, t_list **env)
 	return (new);
 }
 
-static int	skip_till_valid(char **line)
-{
-	if (**line == '"')
-	{
-		(*line)++;
-		while (**line != '"' && **line)
-			(*line)++;
-		if (**line)
-			(*line)++;
-	}
-	else if (**line == '\'')
-	{
-		(*line)++;
-		while (**line != '\'' && **line)
-			(*line)++;
-		if (**line)
-			(*line)++;
-	}
-	else
-		return (0);
-	return (1);
-}
-
-static int	erase_word(char *line)
-{
-	char	*tmp;
-	int		pos;
-
-	pos = 0;
-	while(line[pos] && line[pos] == ' ')
-		pos++;
-	while(line[pos] && line[pos] != ' ' && line[pos] != '<' && line[pos] != '>')
-	{
-		tmp = line + pos;
-		if (skip_till_valid(&tmp))
-		{
-			while (line + pos != tmp)
-				line[pos++] = ' ';
-		}
-		else
-			line[pos++] = ' ';
-	}
-	return (pos);
-}
-
 static int	find_next_redirect(char *line, t_list **env, char **target)
 {
 	int	ret;
@@ -153,10 +111,7 @@ int	redirect_out(char *target, int token, int *sfd, int *of)
 	{
 		sfd[1] = dup(1);
 		if (sfd[1] == -1)
-		{
-			perror("minishell : pipe error ");
-			return (1);
-		}
+			return (ft_perror("minishell: pipe error"));
 	}
 	else if (of[1] != -1)
 		close(of[1]);
@@ -164,19 +119,13 @@ int	redirect_out(char *target, int token, int *sfd, int *of)
 	{
 		of[1] = open(target, O_WRONLY | O_APPEND | O_CREAT, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
 		if (of[1] == -1 || dup2(of[1], 1) == -1)
-		{
-			perror("minishell : pipe error ");
-			return (1);
-		}
+			return (ft_perror("minishell: pipe error"));
 	}
 	if (token == 1)
 	{
 		of[1] = open(target, O_WRONLY | O_TRUNC | O_CREAT, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
 		if (of[1] == -1 || dup2(of[1], 1) == -1)
-		{
-			perror("minishell : pipe error ");
-			return (1);
-		}
+			return (ft_perror("minishell: pipe error"));
 	}
 	return (0);
 }
@@ -187,51 +136,43 @@ static int redirect_in(char *target, int *sfd, int *of)
 	{
 		sfd[0] = dup(0);
 		if (sfd[0] == -1)
-		{
-			perror("minishell : pipe error ");
-			return (1);
-		}
+			return (ft_perror("minishell: pipe error"));
 	}
 	else if (of[0] != -1)
 		close(of[0]);
 	of[0] = open(target, O_RDONLY);
 	if (of[0] == -1 || dup2(of[0], 0) == -1)
-	{
-		perror("minishell : pipe error ");
-		return (1);
-	}
+		return (ft_perror("minishell: pipe error"));
 	return (0);
 }
 
 static int heredoc_insert(char *target, int *sfd, int *of)
 {
 	int		p[2];
+	int		status;
 
 	if (sfd[0] == -1)
 	{
 		sfd[0] = dup(0);
 		if (sfd[0] == -1)
-		{
-			perror("minishell : pipe error ");
-			return (1);
-		}
+			return (ft_perror("minishell: pipe error"));
 	}
 	else if (of[0] != -1)
 		close(of[0]);
 	if(pipe(p))
+		return (ft_perror("minishell: pipe error"));
+	if (heredoc(target, p[1]))
 	{
-		perror("minishell : pipe error ");
-		return (1);
-	}
-	heredoc(target, p[1]);
-	int status;
-	wait(&status);
-	ft_printf(2, "%d\n", WEXITSTATUS(status));
-	of[0] = p[0];
-	if (of[0] == -1 || dup2(of[0], 0) == -1)
-	{
-		perror("minishell : pipe error ");
-		return (1);
+		wait(&status);
+		if (WEXITSTATUS(status) != 2)
+		{
+			status_code(1, WEXITSTATUS(status));
+			of[0] = p[0];
+			if (of[0] == -1 || dup2(of[0], 0) == -1)
+				return (ft_perror("minishell: pipe error"));
+		}
+		else
+			return (status_code(1, 1));
 	}
 	close(p[1]);
 	return (0);
@@ -247,13 +188,12 @@ static int	set_redirects(char *line, t_list **env, int *sfd, int *of) // todo ma
 	token = find_next_redirect(line, env, &target);
 	while (token >= 0)
 	{
-		if (token == 0 || token == 1)
-			redirect_out(target, token, sfd, of);
-		if (token == 3)
-			redirect_in(target, sfd, of);
-		if (token == 2)
-//			ft_printf(2,"target:%s| line:%s|\n", target, line);
-			heredoc_insert(target, sfd, of);
+		if ((token == 0 || token == 1) && redirect_out(target, token, sfd, of))
+			return (1);
+		if (token == 3 && redirect_in(target, sfd, of))
+			return (1);
+		if (token == 2 && heredoc_insert(target, sfd, of))
+			return (1);
 		if (target != NULL)
 			free(target);
 		token = find_next_redirect(line, env, &target);
@@ -274,16 +214,10 @@ int	redirects(char *line, t_list **env, int set)
 	{
 		if (saved_fd[1] != -1 && !close(open_files[1])
 			&& dup2(saved_fd[1], 1) == -1 && !close(saved_fd[1]))
-		{
-			perror("minishell : pipe error ");
-			return (1);
-		}
+			return (ft_perror("minishell: pipe error"));
 		if (saved_fd[0] != -1 && !close(open_files[0])
 			&& dup2(saved_fd[0], 0) == -1 && !close(saved_fd[0]))
-		{
-			perror("minishell : pipe error ");
-			return (1);
-		}
+			return (ft_perror("minishell: pipe error"));
 		open_files[0] = -1;
 		open_files[1] = -1;
 		saved_fd[0] = -1;

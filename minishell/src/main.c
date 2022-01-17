@@ -37,6 +37,7 @@ void	sig(__attribute__ ((unused)) int sig)
 void	readline_loop(t_list **environ, char *prompt)
 {
 	char	*line;
+	int		forks;
 
 	line = readline(prompt);
 	while (line)
@@ -45,7 +46,10 @@ void	readline_loop(t_list **environ, char *prompt)
 		{
 			add_history(line);
 			if (!check_line(line))
-				cmds_loop(line, environ);
+      {
+        forks = cmds_loop(line, environ);
+			  wait_forks(&forks);
+      }
 		}
 		free(line);
 		line = readline(prompt);
