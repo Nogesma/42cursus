@@ -5,9 +5,11 @@
 #include <unistd.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <sys/fcntl.h>
 
 #include "parse_env.h"
 #include "redirect.h"
+#include "heredoc.h"
 
 static int	word_size_redirecct(char *s, t_list **env)
 {
@@ -145,7 +147,98 @@ static int	find_next_redirect(char *line, t_list **env, char **target)
 	return (-1);
 }
 
-static int	set_redirects(char *line, t_list **env, int *sfd, int *of) // todo malloc secure
+int	redirect_out(char *target, int token, int *sfd, int *of)
+{
+	if (sfd[1] == -1)
+	{
+		sfd[1] = dup(1);
+		if (sfd[1] == -1)
+		{
+			perror("minishell : pipe error ");
+			return (1);
+		}
+	}
+	else if (of[1] != -1)
+		close(of[1]);
+	if (token == 0)
+	{
+		of[1] = open(target, O_WRONLY | O_APPEND | O_CREAT, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
+		if (of[1] == -1 || dup2(of[1], 1) == -1)
+		{
+			perror("minishell : pipe error ");
+			return (1);
+		}
+	}
+	if (token == 1)
+	{
+		of[1] = open(target, O_WRONLY | O_TRUNC | O_CREAT, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
+		if (of[1] == -1 || dup2(of[1], 1) == -1)
+		{
+			perror("minishell : pipe error ");
+			return (1);
+		}
+	}
+	return (0);
+}
+
+static int redirect_in(char *target, int *sfd, int *of)
+{
+	if (sfd[0] == -1)
+	{
+		sfd[0] = dup(0);
+		if (sfd[0] == -1)
+		{
+			perror("minishell : pipe error ");
+			return (1);
+		}
+	}
+	else if (of[0] != -1)
+		close(of[0]);
+	of[0] = open(target, O_RDONLY);
+	if (of[0] == -1 || dup2(of[0], 0) == -1)
+	{
+		perror("minishell : pipe error ");
+		return (1);
+	}
+	return (0);
+}
+
+static int heredoc_insert(char *target, int *sfd, int *of)
+{
+	int		p[2];
+	char	*insert;
+
+	if (sfd[0] == -1)
+	{
+		sfd[0] = dup(0);
+		if (sfd[0] == -1)
+		{
+			perror("minishell : pipe error ");
+			return (1);
+		}
+	}
+	else if (of[0] != -1)
+		close(of[0]);
+	if(pipe(p))
+	{
+		perror("minishell : pipe error ");
+		return (1);
+	}
+	of[0] = p[0];
+	if (of[0] == -1 || dup2(of[0], 0) == -1)
+	{
+		perror("minishell : pipe error ");
+		return (1);
+	}
+	insert = heredoc(target);
+	if (!insert)
+		return (1);
+	ft_putstr_fd(insert, p[1]);
+	free(insert);
+	return (0);
+}
+
+static int	set_redirects(char *line, t_list **env, int *sfd, int *of) // todo malloc secure/return codes
 {
 	char	*target;
 	int		token;
@@ -156,14 +249,12 @@ static int	set_redirects(char *line, t_list **env, int *sfd, int *of) // todo ma
 	while (token >= 0)
 	{
 		if (token == 0 || token == 1)
-			printf("target:%s| line:%s|\n", target, line);
-//			redirect_out(target, token);
-		if (token == 2)
-			printf("target:%s| line:%s|\n", target, line);
-//			redirect_in(target);
+			redirect_out(target, token, sfd, of);
 		if (token == 3)
-			printf("target:%s| line:%s|\n", target, line);
-//			heredoc_shenanigans(target);
+			redirect_in(target, sfd, of);
+		if (token == 2)
+//			ft_printf(2,"target:%s| line:%s|\n", target, line);
+			heredoc_insert(target, sfd, of);
 		if (target != NULL)
 			free(target);
 		token = find_next_redirect(line, env, &target);
@@ -183,17 +274,21 @@ int	redirects(char *line, t_list **env, int set)
 	else
 	{
 		if (saved_fd[1] != -1 && !close(open_files[1])
-			&& dup2(saved_fd[1], 1) == -1)
+			&& dup2(saved_fd[1], 1) == -1 && !close(saved_fd[1]))
 		{
-			perror("minishell : pipe error :");
+			perror("minishell : pipe error ");
 			return (1);
 		}
 		if (saved_fd[0] != -1 && !close(open_files[0])
-			&& dup2(saved_fd[0], 0) == -1)
+			&& dup2(saved_fd[0], 0) == -1 && !close(saved_fd[0]))
 		{
-			perror("minishell : pipe error :");
+			perror("minishell : pipe error ");
 			return (1);
 		}
+		open_files[0] = -1;
+		open_files[1] = -1;
+		saved_fd[0] = -1;
+		saved_fd[1] = -1;
 	}
 	return (0);
 }

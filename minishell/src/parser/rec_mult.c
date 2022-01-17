@@ -129,9 +129,12 @@ static int pipe_out(int *saved_fd2, int p[2])
 
 int	cmds_redirect(char *line, t_list **env, int has_pipes)
 {
+	int	ret;
+
 	redirects(line, env, 1);
-	return (search_exec(line, env, has_pipes));
+	ret = search_exec(line, env, has_pipes);
 	redirects(line, env, 0);
+	return (ret);
 }
 
 void	wait_forks(int *forks)
