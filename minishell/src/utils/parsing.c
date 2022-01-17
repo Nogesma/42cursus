@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   parsing.c                                          :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: msegrans <msegrans@student.42lausan>       +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2022/01/17 21:31:03 by msegrans          #+#    #+#             */
+/*   Updated: 2022/01/17 21:31:05 by msegrans         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 //
 // Created by Tadeusz Kondracki on 1/17/22.
 //
@@ -33,9 +45,10 @@ int	erase_word(char *line)
 	int		pos;
 
 	pos = 0;
-	while(line[pos] && line[pos] == ' ')
+	while (line[pos] && line[pos] == ' ')
 		pos++;
-	while(line[pos] && line[pos] != ' ' && line[pos] != '<' && line[pos] != '>')
+	while (line[pos] && line[pos] != ' '
+		&& line[pos] != '<' && line[pos] != '>')
 	{
 		tmp = line + pos;
 		if (skip_till_valid(&tmp))

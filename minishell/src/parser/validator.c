@@ -1,6 +1,18 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   validator.c                                        :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: msegrans <msegrans@student.42lausan>       +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2022/01/17 21:29:36 by msegrans          #+#    #+#             */
+/*   Updated: 2022/01/17 21:29:37 by msegrans         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include <libft.h>
 
-#include "validator.h"
+#include "../utils/parsing.h"
 
 int	print_error(char *err)
 {
@@ -30,15 +42,20 @@ int	check_quotes(char *line)
 	return (0);
 }
 
-int check_pipes(char *line)
+int	check_pipes(char *line)
 {
+	char	*line_head;
 	char	has_char;
 
+	line_head = line;
 	has_char = 0;
 	while (*line)
 	{
+		skip_till_valid(&line);
 		if (*line == '|')
 		{
+			if (line > line_head && *(line - 1) == '|')
+				has_char = 1;
 			if (!has_char)
 				return (print_error("|"));
 			has_char = 0;
@@ -52,15 +69,16 @@ int check_pipes(char *line)
 	return (0);
 }
 
-int check_double(char *line, char *token)
+int	check_double(char *line, char *token)
 {
 	char	*line_head;
 	char	has_char;
 
-	has_char = 0;
 	line_head = line;
+	has_char = 0;
 	while (*line)
 	{
+		skip_till_valid(&line);
 		if (!ft_strncmp(token, line, 2))
 		{
 			if (!has_char)
@@ -78,6 +96,28 @@ int check_double(char *line, char *token)
 	return (0);
 }
 
+int	check_redir(char *line, char *token)
+{
+	char	*line_head;
+	char	has_char;
+
+	line_head = line;
+	has_char = 0;
+	while (*line)
+	{
+		skip_till_valid(&line);
+		if (!ft_strncmp(token, line, 2)
+			|| (line > line_head && !ft_strncmp(token, line - 1, 2)))
+			has_char = 0;
+		else if (!ft_isspace(*line))
+			has_char = 1;
+		++line;
+	}
+	if (!has_char)
+		return (print_error("newline"));
+	return (0);
+}
+
 int	check_line(char *line)
 {
 	if (check_quotes(line))
@@ -87,6 +127,14 @@ int	check_line(char *line)
 	if (check_double(line, "||"))
 		return (1);
 	if (check_pipes(line))
+		return (1);
+	if (check_redir(line, ">>"))
+		return (1);
+	if (check_redir(line, "<<"))
+		return (1);
+	if (check_redir(line, "<"))
+		return (1);
+	if (check_redir(line, ">"))
 		return (1);
 	return (0);
 }

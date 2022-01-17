@@ -27,10 +27,10 @@
 #include "../utils/parsing.h"
 #include "redirect.h"
 
-static int pipe_in(int *saved_fd, int p[2]);
-static int pipe_out(int *saved_fd, int p[2]);
+static int	pipe_in(int *saved_fd, int p[2]);
+static int	pipe_out(int *saved_fd, int p[2]);
 
-static int is_parenthesis(char c)
+static int	is_parenthesis(char c)
 {
 	if (c == '(')
 		return (1);
@@ -78,12 +78,12 @@ static int	find_token(char *line, char **cmd_two)
 	return (-1);
 }
 
-int static	pipe_manage(int set, t_pipe_data *data)
+static int	pipe_manage(int set, t_pipe_data *data)
 {
 	if (set == 1)
-		return pipe_in(&(data->saved_fd_pipe[0]), data->p);
+		return (pipe_in(&(data->saved_fd_pipe[0]), data->p));
 	if (set == 0)
-		return pipe_out(&(data->saved_fd_pipe[1]), data->p);
+		return (pipe_out(&(data->saved_fd_pipe[1]), data->p));
 	if (data->saved_fd_pipe[0] != -1 && dup2(data->saved_fd_pipe[0], 1) == -1)
 		return (ft_perror("minishell: pipe error"));
 	close(data->saved_fd_pipe[0]);
@@ -95,7 +95,7 @@ int static	pipe_manage(int set, t_pipe_data *data)
 	return (0);
 }
 
-static int pipe_in(int *saved_fd, int p[2])
+static int	pipe_in(int *saved_fd, int p[2])
 {
 	*saved_fd = dup(1);
 	if (*saved_fd == -1)
@@ -108,7 +108,7 @@ static int pipe_in(int *saved_fd, int p[2])
 	return (0);
 }
 
-static int pipe_out(int *saved_fd2, int p[2])
+static int	pipe_out(int *saved_fd2, int p[2])
 {
 	*saved_fd2 = dup(0);
 	if (*saved_fd2 == -1)
@@ -119,7 +119,7 @@ static int pipe_out(int *saved_fd2, int p[2])
 	return (0);
 }
 
-int		check_parenthesis(char **line)
+int	check_parenthesis(char **line)
 {
 	char	*pos;
 	int		count;
@@ -151,7 +151,7 @@ int	cmds_redirect(char *line, t_list **env, int has_pipes)
 {
 	int	ret;
 
-	if(check_parenthesis(&line))
+	if (check_parenthesis(&line))
 		return (cmds_loop(line, env));
 	if (redirects(line, env, 1))
 	{

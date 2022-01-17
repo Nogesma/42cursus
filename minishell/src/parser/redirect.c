@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   redirect.c                                         :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: msegrans <msegrans@student.42lausan>       +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2022/01/17 21:27:15 by msegrans          #+#    #+#             */
+/*   Updated: 2022/01/17 21:27:17 by msegrans         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 //
 // Created by Tadeusz Kondracki on 1/13/22.
 //
@@ -40,12 +52,12 @@ static int	word_size_redirecct(char *s, t_list **env)
 	return (size);
 }
 
-static char *next_word_redirect(char *line, t_list **env)
+static char	*next_word_redirect(char *line, t_list **env)
 {
-	int			pos;
-	char		*new;
-	int			is_special;
-	int			i;
+	int		pos;
+	char	*new;
+	int		is_special;
+	int		i;
 
 	pos = 0;
 	new = (char *)ft_calloc((word_size_redirecct(line, env) + 1), sizeof(char));
@@ -76,7 +88,7 @@ static int	find_next_redirect(char *line, t_list **env, char **target)
 	int	ret;
 
 	ret = -1;
-	while(*line)
+	while (*line)
 	{
 		skip_till_valid(&line);
 		if (ft_strncmp(line, ">>", 2) == 0)
@@ -130,7 +142,7 @@ int	redirect_out(char *target, int token, int *sfd, int *of)
 	return (0);
 }
 
-static int redirect_in(char *target, int *sfd, int *of)
+static int	redirect_in(char *target, int *sfd, int *of)
 {
 	if (sfd[0] == -1)
 	{
@@ -146,10 +158,10 @@ static int redirect_in(char *target, int *sfd, int *of)
 	return (0);
 }
 
-static int heredoc_insert(char *target, int *sfd, int *of)
+static int	heredoc_insert(char *target, int *sfd, int *of)
 {
-	int		p[2];
-	int		status;
+	int	p[2];
+	int	status;
 
 	if (sfd[0] == -1)
 	{
@@ -159,7 +171,7 @@ static int heredoc_insert(char *target, int *sfd, int *of)
 	}
 	else if (of[0] != -1)
 		close(of[0]);
-	if(pipe(p))
+	if (pipe(p))
 		return (ft_perror("minishell: pipe error"));
 	if (heredoc(target, p[1]))
 	{

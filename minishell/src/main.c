@@ -46,10 +46,10 @@ void	readline_loop(t_list **environ, char *prompt)
 		{
 			add_history(line);
 			if (!check_line(line))
-      {
-        forks = cmds_loop(line, environ);
-			  wait_forks(&forks);
-      }
+			{
+				forks = cmds_loop(line, environ);
+				wait_forks(&forks);
+			}
 		}
 		free(line);
 		line = readline(prompt);
