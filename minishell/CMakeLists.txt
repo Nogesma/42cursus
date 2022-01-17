@@ -29,7 +29,7 @@ add_executable(minishell
         src/utils/list.c
         src/utils/path.c
         src/utils/setup.c
-        src/parser/rec_mult.c src/parser/wildcard.c src/parser/wildcard.h src/parser/parse_env.c src/parser/parse_env.h src/parser/heredoc.c src/parser/heredoc.h src/parser/redirect.c)
+        src/parser/rec_mult.c src/parser/wildcard.c src/parser/wildcard.h src/parser/parse_env.c src/parser/parse_env.h src/parser/heredoc.c src/parser/heredoc.h src/parser/redirect.c src/parser/validator.c src/parser/validator.h)
 
 TARGET_LINK_LIBRARIES(minishell readline)
 TARGET_LINK_LIBRARIES(minishell ft)

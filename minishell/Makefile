@@ -10,9 +10,9 @@ LIBS := -Llib/libft -lft -lreadline
 
 UNAME = $(shell uname -s)
 ifeq ($(UNAME), Linux)
-	MAKEFLAGS := --jobs=$(shell nproc)
+	NPROC := $(shell nproc)
 else
-	MAKEFLAGS := --jobs=$(shell sysctl -n hw.ncpu)
+	NPROC := $(shell sysctl -n hw.ncpu)
 	INC_FLAGS += -I$(HOME)/.brew/Cellar/readline/8.1.1/include
     LIBS += -L$(HOME)/.brew/Cellar/readline/8.1.1/lib
 endif
@@ -36,6 +36,9 @@ CFLAGS += -Wall -Wextra -Werror
 #CFLAGS += -O2 -march=native
 #CFLAGS += -g
 
+all:
+	@$(MAKE) -j$(NPROC) $(NAME)
+
 $(NAME): $(LIB) $(OBJS)
 	@echo Linking $@
 	@$(CC) $(CFLAGS) $(INC_FLAGS) $(OBJS) $(LIBS) -o $(NAME)
@@ -44,8 +47,6 @@ $(BUILD_DIR)/%.c.o: %.c
 	@echo Compiling $@
 	@mkdir -p $(dir $@)
 	@$(CC) -c  $(CFLAGS) $(INC_FLAGS) $< -o $@
-
-all: $(NAME)
 
 $(LIB):
 	@$(MAKE) -C lib/libft
@@ -62,6 +63,7 @@ fclean:
 	@$(MAKE) -C lib/libft fclean
 	@echo Fclean done
 
-re: fclean all
+re: fclean
+	@$(MAKE) -j$(NPROC) $(NAME)
 
 .PHONY: all clean fclean re
