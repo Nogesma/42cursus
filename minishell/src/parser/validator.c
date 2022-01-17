@@ -54,24 +54,24 @@ int check_pipes(char *line)
 
 int check_double(char *line, char *token)
 {
-	size_t	i;
+	char	*line_head;
 	char	has_char;
 
 	has_char = 0;
-	i = 0;
-	while (line[i])
+	line_head = line;
+	while (*line)
 	{
-		if (!ft_strncmp(token, line + i, 2))
+		if (!ft_strncmp(token, line, 2))
 		{
 			if (!has_char)
 				return (print_error(token));
 			has_char = 0;
 		}
-		else if (i > 0 && !ft_strncmp(token, line + i - 1, 2))
+		else if (line > line_head && !ft_strncmp(token, line - 1, 2))
 			has_char = 0;
-		else if (!ft_isspace(line[i]))
+		else if (!ft_isspace(*line))
 			has_char = 1;
-		++i;
+		++line;
 	}
 	if (!has_char)
 		return (print_error(token));
