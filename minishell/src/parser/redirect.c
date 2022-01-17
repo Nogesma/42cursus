@@ -12,6 +12,7 @@
 #include "parse_env.h"
 #include "redirect.h"
 #include "heredoc.h"
+#include "../utils/parsing.h"
 
 static int	word_size_redirecct(char *s, t_list **env)
 {
@@ -68,51 +69,6 @@ static char *next_word_redirect(char *line, t_list **env)
 	}
 	new[i] = 0;
 	return (new);
-}
-
-static int	skip_till_valid(char **line)
-{
-	if (**line == '"')
-	{
-		(*line)++;
-		while (**line != '"' && **line)
-			(*line)++;
-		if (**line)
-			(*line)++;
-	}
-	else if (**line == '\'')
-	{
-		(*line)++;
-		while (**line != '\'' && **line)
-			(*line)++;
-		if (**line)
-			(*line)++;
-	}
-	else
-		return (0);
-	return (1);
-}
-
-static int	erase_word(char *line)
-{
-	char	*tmp;
-	int		pos;
-
-	pos = 0;
-	while(line[pos] && line[pos] == ' ')
-		pos++;
-	while(line[pos] && line[pos] != ' ' && line[pos] != '<' && line[pos] != '>')
-	{
-		tmp = line + pos;
-		if (skip_till_valid(&tmp))
-		{
-			while (line + pos != tmp)
-				line[pos++] = ' ';
-		}
-		else
-			line[pos++] = ' ';
-	}
-	return (pos);
 }
 
 static int	find_next_redirect(char *line, t_list **env, char **target)

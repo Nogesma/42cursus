@@ -30,6 +30,7 @@ add_executable(minishell
         src/utils/path.c
         src/utils/setup.c
         src/utils/error.c
+        src/utils/parsing.c
         src/parser/rec_mult.c src/parser/wildcard.c src/parser/wildcard.h src/parser/parse_env.c src/parser/parse_env.h src/parser/heredoc.c src/parser/heredoc.h src/parser/redirect.c)
 
 TARGET_LINK_LIBRARIES(minishell readline)
