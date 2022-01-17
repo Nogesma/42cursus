@@ -22,6 +22,7 @@
 #include "../exec/exec.h"
 #include "rec_mult.h"
 #include "../utils/global.h"
+#include "../utils/error.h"
 #include "redirect.h"
 
 static int pipe_in(int *saved_fd, int p[2]);
@@ -72,17 +73,11 @@ int static	pipe_manage(int set)
 	if (set == 0)
 		return pipe_out(&saved_fd2, p);
 	if (saved_fd != -1 && dup2(saved_fd, 1) == -1)
-	{
-		perror("minishell : pipe error :");
-		return (1);
-	}
+		return (ft_perror("minishell: pipe error"));
 	close(saved_fd);
 	saved_fd = -1;
 	if (saved_fd2 != -1 && dup2(saved_fd2, 0) == -1)
-	{
-		perror("minishell : pipe error :");
-		return (1);
-	}
+		return (ft_perror("minishell: pipe error"));
 	close(saved_fd2);
 	saved_fd2 = -1;
 	return (0);
@@ -92,20 +87,11 @@ static int pipe_in(int *saved_fd, int p[2])
 {
 	*saved_fd = dup(1);
 	if (*saved_fd == -1)
-	{
-		perror("minishell : pipe error :");
-		return (1);
-	}
+		return (ft_perror("minishell: pipe error"));
 	if (pipe(p) == -1)
-	{
-		perror("minishell : pipe error :");
-		return (1);
-	}
+		return (ft_perror("minishell: pipe error"));
 	if (dup2(p[1], 1) == -1)
-	{
-		perror("minishell : pipe error :");
-		return (1);
-	}
+		return (ft_perror("minishell: pipe error"));
 	close(p[1]);
 	return (0);
 }
@@ -114,15 +100,9 @@ static int pipe_out(int *saved_fd2, int p[2])
 {
 	*saved_fd2 = dup(0);
 	if (*saved_fd2 == -1)
-	{
-		perror("minishell : pipe error :");
-		return (1);
-	}
+		return (ft_perror("minishell: pipe error"));
 	if (dup2(p[0], 0) == -1)
-	{
-		perror("minishell : pipe error :");
-		return (1);
-	}
+		return (ft_perror("minishell: pipe error"));
 	close(p[0]);
 	return (0);
 }
@@ -131,7 +111,8 @@ int	cmds_redirect(char *line, t_list **env, int has_pipes)
 {
 	int	ret;
 
-	redirects(line, env, 1);
+	if (redirects(line, env, 1))
+		return (status_code(1, 1));
 	ret = search_exec(line, env, has_pipes);
 	redirects(line, env, 0);
 	return (ret);
