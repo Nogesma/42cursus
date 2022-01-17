@@ -13,6 +13,7 @@
 #include <dirent.h>
 #include <libft.h>
 #include <sys/stat.h>
+#include <stdlib.h>
 
 #include "list.h"
 

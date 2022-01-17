@@ -15,6 +15,7 @@
 #include <stdlib.h>
 #include <libft.h>
 #include <unistd.h>
+#include <signal.h>
 
 #include "../utils/global.h"
 

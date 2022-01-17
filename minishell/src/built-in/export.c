@@ -62,12 +62,10 @@ static void	print_sorted_env(t_list **env)
 	free(lst);
 }
 
-static void	mem_error(void *arg1, void *arg2)
+static void	mem_error(void *arg1)
 {
 	if (arg1)
 		free(arg1);
-	if (arg2)
-		free(arg2);
 	ft_printf(STDERR_FILENO, "mem alloc error: couldnt complete task");
 }
 
@@ -85,7 +83,7 @@ void	add_env(t_list **env, char *content)
 	{
 		new = ft_lstnew(content);
 		if (!new)
-			return (mem_error(content, NULL));
+			return (mem_error(content));
 		ft_lstadd_front(env, new);
 	}
 }
@@ -103,7 +101,7 @@ int	export(char **args, t_list **env)
 		content = ft_strdup(args[i]);
 		if (!content)
 		{
-			mem_error(NULL, NULL);
+			mem_error(NULL);
 			return (-1);
 		}
 		add_env(env, content);

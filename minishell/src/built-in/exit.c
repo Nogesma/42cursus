@@ -18,7 +18,7 @@ int	exit_cmd(char **args, t_list **print)
 {
 	int				i;
 
-	if (print == NULL) // todo:
+	if (print == NULL)
 		ft_printf(STDERR_FILENO, "exit\n");
 	if (*args == NULL)
 		exit(0);

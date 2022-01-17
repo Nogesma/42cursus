@@ -33,26 +33,30 @@ void	print_list_fd(int fd, char *prefix, t_list *lst)
 	}
 }
 
-t_list	*new_lst(t_list **head, t_list *elem, void *content)
+int	new_lst(t_list **head, void *content)
 {
-	if (!(*head))
+	t_list	*elem;
+
+	if (!content)
 	{
-		*head = ft_lstnew(content);
-		elem = *head;
+		ft_lstclear(head, free);
+		free(head);
+		return (1);
 	}
-	else
+	elem = ft_lstnew(content);
+	if (!elem)
 	{
-		elem->next = ft_lstnew(content);
-		elem = elem->next;
+		ft_lstclear(head, free);
+		free(head);
+		return (1);
 	}
-	return (elem);
+	ft_lstadd_front(head, elem);
+	return (0);
 }
 
 t_list	**char_to_lst(char **args)
 {
 	t_list	**head;
-	t_list	*elem;
-	char	*content;
 	int		i;
 
 	if (!args)
@@ -64,14 +68,8 @@ t_list	**char_to_lst(char **args)
 	i = -1;
 	while (args[++i])
 	{
-		content = ft_strdup(args[i]);
-		if (!content)
-		{
-			ft_lstclear(head, free);
-			free(head);
+		if (new_lst(head, ft_strdup(args[i])))
 			return (NULL);
-		}
-		elem = new_lst(head, elem, content);
 	}
 	return (head);
 }

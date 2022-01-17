@@ -120,21 +120,8 @@ int	check_redir(char *line, char *token)
 
 int	check_line(char *line)
 {
-	if (check_quotes(line))
-		return (1);
-	if (check_double(line, "&&"))
-		return (1);
-	if (check_double(line, "||"))
-		return (1);
-	if (check_pipes(line))
-		return (1);
-	if (check_redir(line, ">>"))
-		return (1);
-	if (check_redir(line, "<<"))
-		return (1);
-	if (check_redir(line, "<"))
-		return (1);
-	if (check_redir(line, ">"))
-		return (1);
-	return (0);
+	return (check_quotes(line) || check_double(line, "&&")
+		|| check_double(line, "||") || check_pipes(line)
+		|| check_redir(line, ">>") || check_redir(line, "<<")
+		|| check_redir(line, "<") || check_redir(line, ">"));
 }

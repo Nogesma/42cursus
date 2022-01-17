@@ -37,6 +37,8 @@ int	exec_binary(char *path, char **args, t_list **env)
 	char	**environ;
 
 	environ = lst_to_char(*env);
+	if (!environ)
+		return (0);
 	status_code(1, 0);
 	child = fork();
 	if (child == -1)
@@ -63,12 +65,18 @@ int	fork_built_in(int (*fn)(char **, t_list **),
 	pid_t	child;
 	int		ret;
 
+	ret = 0;
 	status_code(1, 0);
 	if (!has_pipes)
-		ret = fn(a, b);
+	{
+		if (fn == exit_cmd)
+			ret = fn(a, NULL);
+		else
+			ret = fn(a, b);
+	}
 	child = fork();
 	if (child == -1)
-		return (2);
+		return (0);
 	if (child == 0)
 	{
 		if (!has_pipes)
@@ -95,6 +103,18 @@ int	built_in(char **args, t_list **environ, int has_pipes)
 		return (fork_built_in(export, args + 1, environ, has_pipes));
 	if (!ft_strncmp("exit", args[0], 5))
 		return (fork_built_in(exit_cmd, args + 1, environ, has_pipes));
+	return (-1);
+}
+
+int	cmd_err(char *command)
+{
+	if (!(command[0] == '.' || command[0] == '/'))
+		ft_printf(STDERR_FILENO,
+			"minishell: %s: command not found\n", command);
+	else
+		ft_printf(STDERR_FILENO,
+			"minishell: %s: No such file or directory\n", command);
+	status_code(1, 127);
 	return (0);
 }
 
@@ -105,25 +125,23 @@ int	search_exec(char *line, t_list **env, int has_pipes)
 	char	*command;
 	int		ret;
 
-	path = get_env_content(env, "PATH");
 	args = ft_arg_split(line, env);
+	if (!args || !(*args))
+		return (0);
 	ret = built_in(args, env, has_pipes);
-	if (ret == 1)
-		return (free_list(args, 1));
-	else if (ret == 2)
+	if (ret != -1)
+		return (free_list(args, ret));
+	path = get_env_content(env, "PATH");
+	if (!path)
 		return (free_list(args, 0));
 	command = args[0];
 	if (!(line[0] == '.' || line[0] == '/'))
-		args[0] = get_exec_path(args[0], path);
-	if (args[0])
-		ret = exec_binary(args[0], args, env);
+		command = get_exec_path(args[0], path);
+	if (command)
+		ret = exec_binary(command, args, env);
 	else
-	{
-		ft_printf(STDERR_FILENO, "minish: %s: command not found\n", command);
-		status_code(1, 127);
-		ret = 0;
-	}
-	if (!(line[0] == '.' || line[0] == '/'))
+		ret = cmd_err(args[0]);
+	if (command && command != args[0])
 		free(command);
 	return (free_list(args, ret));
 }

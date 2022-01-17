@@ -44,7 +44,6 @@ static void	get_dir_content(t_list **lst)
 	DIR				*dir;
 	struct dirent	*dp;
 	int				i;
-	t_list			*elem;
 
 	dir = opendir(".");
 	if (!dir)
@@ -55,7 +54,8 @@ static void	get_dir_content(t_list **lst)
 	{
 		if (dp->d_name[0] != '.')
 		{
-			elem = new_lst(lst, elem, ft_strdup(dp->d_name));
+			if (new_lst(lst, ft_strdup(dp->d_name)))
+				return ;
 			i++;
 		}
 		dp = readdir(dir);
