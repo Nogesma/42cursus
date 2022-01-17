@@ -61,7 +61,7 @@ int	cd(char **args, t_list **env)
 	if (chdir(args[0]) == -1)
 	{
 		free(old_pwd);
-		ft_printf(2, "minish: cd: %s: %s\n", args[0], strerror(errno));
+		ft_printf(STDERR_FILENO, "minish: cd: %s: %s\n", args[0], strerror(errno));
 		return (1);
 	}
 	pwd = getcwd(NULL, 0);

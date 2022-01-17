@@ -119,7 +119,7 @@ int	search_exec(char *line, t_list **env, int has_pipes)
 		ret = exec_binary(args[0], args, env);
 	else
 	{
-		ft_printf(2, "minish: %s: command not found\n", command);
+		ft_printf(STDERR_FILENO, "minish: %s: command not found\n", command);
 		status_code(1, 127);
 		ret = 0;
 	}

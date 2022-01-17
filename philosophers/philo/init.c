@@ -17,7 +17,7 @@ void	*eat_think_sleep_die(void *ptr)
 	t_philosophers	*philo;
 
 	philo = (t_philosophers *)ptr;
-	if (philo->n % 2)
+	if (philo->n % 2 == 0)
 		usleep(philo->params->time_to_eat * 900);
 	if ((philo->params->number_of_philosophers % 2)
 		&& (philo->n + 1 == philo->params->number_of_philosophers))
@@ -31,9 +31,9 @@ void	*eat_think_sleep_die(void *ptr)
 			return (NULL);
 		pthread_mutex_lock(&(philo->params->time_mutex[philo->n]));
 		gettimeofday(&philo->last_meal, NULL);
-		philo->number_of_meals++;
 		pthread_mutex_unlock(&(philo->params->time_mutex[philo->n]));
 		do_action(philo, "is eating", philo->params->time_to_eat);
+		philo->number_of_meals++;
 		release_forks(philo);
 		do_action(philo, "is sleeping", philo->params->time_to_sleep);
 		do_action(philo, "is thinking", 0);

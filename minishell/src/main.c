@@ -23,14 +23,11 @@
 #include "utils/list.h"
 #include "parser/rec_mult.h"
 
-void	sig(int sig)
+void	sig(__attribute__ ((unused)) int sig)
 {
-	if (sig == SIGINT)
-	{
-		write(1, "\n", 1);
-		rl_replace_line("", 0);
-		status_code(1, 130);
-	}
+	write(1, "\n", 1);
+	rl_replace_line("", 0);
+	status_code(1, 130);
 	if (!is_fork(0, 0))
 		rl_on_new_line();
 	rl_redisplay();
@@ -73,7 +70,7 @@ int	main(__attribute__ ((unused)) int ac, __attribute__ ((unused)) char **av,
 	if (!environ)
 		return (1);
 	signal(SIGINT, sig);
-	signal(SIGQUIT, sig);
+	signal(SIGQUIT, SIG_IGN);
 	readline_loop(environ, prompt);
 	rl_clear_history();
 	ft_lstclear(environ, free);

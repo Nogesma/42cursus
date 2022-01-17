@@ -11,7 +11,7 @@
 /* ************************************************************************** */
 
 #include <libft.h>
-#include <stdlib.h>
+#include <unistd.h>
 
 int	env(__attribute__ ((unused)) char **a, t_list **environ)
 {
@@ -20,7 +20,7 @@ int	env(__attribute__ ((unused)) char **a, t_list **environ)
 	elem = *environ;
 	while (elem)
 	{
-		ft_printf(1, "%s\n", elem->content);
+		ft_printf(STDOUT_FILENO, "%s\n", elem->content);
 		elem = elem->next;
 	}
 	return (0);

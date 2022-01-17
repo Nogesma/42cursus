@@ -14,52 +14,34 @@
 #include <readline/readline.h>
 #include <stdlib.h>
 #include <libft.h>
+#include <unistd.h>
 
-static char	*strjoin_nl(char *s1, char const *s2)
-{
-	size_t	s1l;
-	size_t	s2l;
-	char	*str;
+#include "../utils/global.h"
 
-	if (!s1 || !s2)
-		return (NULL);
-	s1l = ft_strlen(s1);
-	s2l = ft_strlen(s2);
-	str = (char *)ft_calloc(s1l + s2l + 2, sizeof(char));
-	if (!str)
-		return (NULL);
-	ft_strlcpy(str, s1, s1l + 1);
-	str[s1l] = '\n';
-	ft_strlcpy(str + s1l + 1, s2, s2l + 1);
-	free(s1);
-	return (str);
-}
-
-char	*heredoc(char *word)
+int	heredoc(char *word, int fd)
 {
 	char	*line;
-	char	*buffer;
 	size_t	wordsize;
+	pid_t	child;
 
-	wordsize = ft_strlen(word) + 1;
-	buffer = (char *)ft_calloc(1, 1);
-	if (!buffer)
-		return (NULL);
-	line = readline("> ");
-	while (line)
+	child = fork();
+	if (child == -1)
+		return (0);
+	if (child == 0)
 	{
-		if (!ft_strncmp(word, line, wordsize))
-		{
-			buffer = ft_strjoin(buffer, "\n");
-			if (!buffer)
-				return (NULL);
-			return (buffer);
-		}
-		buffer = strjoin_nl(buffer, line);
-		if (!buffer)
-			return (NULL);
-		free(line);
+		signal(SIGINT, exit);
+		wordsize = ft_strlen(word) + 1;
 		line = readline("> ");
+		while (line)
+		{
+			if (!ft_strncmp(word, line, wordsize))
+				exit(0);
+			ft_printf(fd, "%s\n", line);
+			free(line);
+			line = readline("> ");
+		}
+		exit(1);
 	}
-	return (buffer);
+	is_fork(1, 1);
+	return (1);
 }

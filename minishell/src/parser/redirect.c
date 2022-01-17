@@ -206,7 +206,6 @@ static int redirect_in(char *target, int *sfd, int *of)
 static int heredoc_insert(char *target, int *sfd, int *of)
 {
 	int		p[2];
-	char	*insert;
 
 	if (sfd[0] == -1)
 	{
@@ -224,17 +223,17 @@ static int heredoc_insert(char *target, int *sfd, int *of)
 		perror("minishell : pipe error ");
 		return (1);
 	}
+	heredoc(target, p[1]);
+	int status;
+	wait(&status);
+	ft_printf(2, "%d\n", WEXITSTATUS(status));
 	of[0] = p[0];
 	if (of[0] == -1 || dup2(of[0], 0) == -1)
 	{
 		perror("minishell : pipe error ");
 		return (1);
 	}
-	insert = heredoc(target);
-	if (!insert)
-		return (1);
-	ft_putstr_fd(insert, p[1]);
-	free(insert);
+	close(p[1]);
 	return (0);
 }
 

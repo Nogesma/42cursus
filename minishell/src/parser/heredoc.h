@@ -13,6 +13,6 @@
 #ifndef HEREDOC_H
 # define HEREDOC_H
 
-char	*heredoc(char *word);
+char	*heredoc(char *word, int fd);
 
 #endif //HEREDOC_H

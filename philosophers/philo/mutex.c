@@ -15,13 +15,13 @@
 void	do_action(t_philosophers *p, char *s, int n)
 {
 	struct timeval	t;
+	long			timestamp;
 
-	if (p->params->ded)
-		return ;
-	gettimeofday(&t, NULL);
 	pthread_mutex_lock(&(p->params->print_mutex));
-	printf("%ld %d %s\n",
-		time_to_ms(t) - time_to_ms(p->params->start_time), p->n + 1, s);
+	gettimeofday(&t, NULL);
+	timestamp = time_to_ms(t) - time_to_ms(p->params->start_time);
+	if (!p->params->ded)
+		printf("%ld %d %s\n", timestamp, p->n + 1, s);
 	pthread_mutex_unlock(&(p->params->print_mutex));
 	usleep(n * 1000);
 }
@@ -30,7 +30,7 @@ void	take_forks(t_philosophers *p)
 {
 	pthread_mutex_lock(&(p->params->mutex[p->n]));
 	do_action(p, "has taken a fork", 0);
-	if (p->n < 2)
+	if (p->params->number_of_philosophers <= 1)
 		return ;
 	pthread_mutex_lock(&(p->params->mutex[(p->n + 1)
 			% p->params->number_of_philosophers]));
