@@ -22,6 +22,7 @@
 #include "utils/global.h"
 #include "utils/list.h"
 #include "parser/rec_mult.h"
+#include "parser/validator.h"
 
 void	sig(__attribute__ ((unused)) int sig)
 {
@@ -44,9 +45,11 @@ void	readline_loop(t_list **environ, char *prompt)
 		if (*line)
 		{
 			add_history(line);
-			//todo cleanup_tokens()
-			forks = cmds_loop(line, environ);
-			wait_forks(&forks);
+			if (!check_line(line))
+      {
+        forks = cmds_loop(line, environ);
+			  wait_forks(&forks);
+      }
 		}
 		free(line);
 		line = readline(prompt);

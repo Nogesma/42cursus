@@ -64,6 +64,8 @@ char	*get_exec_path(char *exec, char *PATH)
 	int		i;
 	char	*exec_path;
 
+	if (exec[0] == 0)
+		return (NULL);
 	paths = ft_split(PATH, ':');
 	i = -1;
 	exec_path = NULL;

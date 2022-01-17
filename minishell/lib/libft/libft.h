@@ -18,6 +18,8 @@
 
 /** Part I **/
 
+int		ft_isspace(char c);
+
 int		ft_isalpha(int c);
 
 int		ft_isdigit(int c);
