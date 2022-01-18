@@ -26,7 +26,7 @@
 #include "heredoc.h"
 #include "../utils/parsing.h"
 
-static int	word_size_redirecct(char *s, t_list **env)
+static int	word_size_redirect(char *s, t_list **env)
 {
 	int	i;
 	int	is_special;
@@ -35,9 +35,9 @@ static int	word_size_redirecct(char *s, t_list **env)
 	i = 0;
 	is_special = 0;
 	size = 0;
-	while (s[i] == ' ')
+	while (ft_isspace(s[i]))
 		s++;
-	while (s[i] && ((s[i] != ' ' && s[i] != '<' && s[i] != '>') || is_special))
+	while (s[i] && ((!ft_isspace(s[i]) && s[i] != '<' && s[i] != '>') || is_special))
 	{
 		if (s[i] == '\'' && is_special != 1)
 			is_special = is_special ^ -1;
@@ -60,14 +60,15 @@ static char	*next_word_redirect(char *line, t_list **env)
 	int		i;
 
 	pos = 0;
-	new = (char *)ft_calloc((word_size_redirecct(line, env) + 1), sizeof(char));
+	new = (char *)ft_calloc((word_size_redirect(line, env) + 1), sizeof(char));
 	if (!new)
 		return (NULL);
 	is_special = 0;
 	i = 0;
-	while (line[pos] && line[pos] == ' ')
+	while (line[pos] && ft_isspace(line[pos]))
 		pos++;
-	while (line[pos] && ((line[pos] != ' ' && line[pos] != '<' && line[pos] != '>') || is_special))
+	while (line[pos] && ((!ft_isspace(line[pos])
+			&& line[pos] != '<' && line[pos] != '>') || is_special))
 	{
 		if (line[pos] == '\'' && is_special != 1)
 			is_special = is_special ^ -1;
