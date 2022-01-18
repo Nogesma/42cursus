@@ -78,14 +78,14 @@ int	exec_binary(char *path, char **args, t_list **env, int fdi[2], int fdo[2])
 }
 
 int	fork_built_in(int (*fn)(char **, t_list **),
-				char **a, t_list **b, t_pipe_data *data)
+				char **a, t_list **b, int fdi[2], int fdo[2])
 {
 	pid_t	child;
 	int		ret;
 
 	ret = 0;
 	status_code(1, 0);
-	if (!data)
+	if (fdo[0] == fdo[1] && fdi[0] == fdi[1])
 	{
 		if (fn == exit_cmd)
 			ret = fn(a, NULL);
@@ -97,30 +97,31 @@ int	fork_built_in(int (*fn)(char **, t_list **),
 		return (0);
 	if (child == 0)
 	{
-		if (data)
-			exit(fn(a, b));
-		exit(ret);
+		mpipe(fdi, fdo);
+		if (fdo[0] == fdo[1] && fdi[0] == fdi[1])
+			exit(ret);
+		exit(fn(a, b));
 	}
 	is_fork(1, 1);
 	return (1);
 }
 
-int	built_in(char **args, t_list **environ, t_pipe_data *data)
+int	built_in(char **args, t_list **environ, int fdi[2], int fdo[2])
 {
 	if (!ft_strncmp("cd", args[0], 3))
-		return (fork_built_in(cd, args + 1, environ, data));
+		return (fork_built_in(cd, args + 1, environ, fdi, fdo));
 	if (!ft_strncmp("echo", args[0], 5))
-		return (fork_built_in(echo, args + 1, environ, data));
+		return (fork_built_in(echo, args + 1, environ, fdi, fdo));
 	if (!ft_strncmp("pwd", args[0], 4))
-		return (fork_built_in(pwd, args + 1, environ, data));
+		return (fork_built_in(pwd, args + 1, environ, fdi, fdo));
 	if (!ft_strncmp("env", args[0], 4))
-		return (fork_built_in(env, args + 1, environ, data));
+		return (fork_built_in(env, args + 1, environ, fdi, fdo));
 	if (!ft_strncmp("unset", args[0], 6))
-		return (fork_built_in(unset, args + 1, environ, data));
+		return (fork_built_in(unset, args + 1, environ, fdi, fdo));
 	if (!ft_strncmp("export", args[0], 7))
-		return (fork_built_in(export, args + 1, environ, data));
+		return (fork_built_in(export, args + 1, environ, fdi, fdo));
 	if (!ft_strncmp("exit", args[0], 5))
-		return (fork_built_in(exit_cmd, args + 1, environ, data));
+		return (fork_built_in(exit_cmd, args + 1, environ, fdi, fdo));
 	return (-1);
 }
 
@@ -146,8 +147,7 @@ int	search_exec(char *line, t_list **env, int fdi[2], int fdo[2])
 	args = ft_arg_split(line, env);
 	if (!args || !(*args))
 		return (0);
-//	ret = built_in(args, env, data);
-	ret = -1;
+	ret = built_in(args, env, fdi, fdo);
 	if (ret != -1)
 		return (free_list(args, ret));
 	path = get_env_content(env, "PATH");
