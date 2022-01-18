@@ -17,7 +17,7 @@
 #ifndef ERROR_H
 # define ERROR_H
 
-int	ft_perror(char *err_msg);
+int	minish_err(char *err_msg);
 
 int    syntax_error(char *err);
 

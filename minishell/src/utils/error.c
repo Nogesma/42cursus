@@ -17,8 +17,9 @@
 #include <stdio.h>
 #include <libft.h>
 
-int	ft_perror(char *err_msg)
+int	minish_err(char *err_msg)
 {
+	ft_printf(2, "minish: ");
 	perror(err_msg);
 	return (1);
 }

@@ -85,11 +85,11 @@ static int	pipe_manage(int set, t_pipe_data *data)
 	if (set == 0)
 		return (pipe_out(&(data->saved_fd_pipe[1]), data->p));
 	if (data->saved_fd_pipe[0] != -1 && dup2(data->saved_fd_pipe[0], 1) == -1)
-		return (ft_perror("minishell: pipe error"));
+		return (minish_err("pipe error"));
 	close(data->saved_fd_pipe[0]);
 	data->saved_fd_pipe[0] = -1;
 	if (data->saved_fd_pipe[1] != -1 && dup2(data->saved_fd_pipe[1], 0) == -1)
-		return (ft_perror("minishell: pipe error"));
+		return (minish_err("pipe error"));
 	close(data->saved_fd_pipe[1]);
 	data->saved_fd_pipe[0] = -1;
 	return (0);
@@ -99,11 +99,11 @@ static int	pipe_in(int *saved_fd, int p[2])
 {
 	*saved_fd = dup(1);
 	if (*saved_fd == -1)
-		return (ft_perror("minishell: pipe error"));
+		return (minish_err("pipe error"));
 	if (pipe(p) == -1)
-		return (ft_perror("minishell: pipe error"));
+		return (minish_err("pipe error"));
 	if (dup2(p[1], 1) == -1)
-		return (ft_perror("minishell: pipe error"));
+		return (minish_err("pipe error"));
 	close(p[1]);
 	return (0);
 }
@@ -112,9 +112,9 @@ static int	pipe_out(int *saved_fd2, int p[2])
 {
 	*saved_fd2 = dup(0);
 	if (*saved_fd2 == -1)
-		return (ft_perror("minishell: pipe error"));
+		return (minish_err("pipe error"));
 	if (dup2(p[0], 0) == -1)
-		return (ft_perror("minishell: pipe error"));
+		return (minish_err("pipe error"));
 	close(p[0]);
 	return (0);
 }
