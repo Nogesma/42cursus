@@ -1,24 +1,18 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   error.h                                            :+:      :+:    :+:   */
+/*   pipes.h                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: msegrans <msegrans@student.42lausan>       +#+  +:+       +#+        */
+/*   By: msegrans <msegrans@student.42lausanne      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2022/01/17 21:32:43 by msegrans          #+#    #+#             */
-/*   Updated: 2022/01/17 21:32:45 by msegrans         ###   ########.fr       */
+/*   Created: 2022/01/18 02:22:35 by msegrans          #+#    #+#             */
+/*   Updated: 2022/01/18 02:22:37 by msegrans         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-//
-// Created by Tadeusz Kondracki on 1/17/22.
-//
+#ifndef PIPES_H
+# define PIPES_H
 
-#ifndef ERROR_H
-# define ERROR_H
+int	check_pipes(char *line);
 
-int	ft_perror(char *err_msg);
-
-int    syntax_error(char *err);
-
-#endif //ERROR_H
+#endif //PIPES_H

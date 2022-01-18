@@ -1,29 +1,26 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   error.c                                            :+:      :+:    :+:   */
+/*   validator.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: msegrans <msegrans@student.42lausan>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2022/01/17 21:32:39 by msegrans          #+#    #+#             */
-/*   Updated: 2022/01/17 21:32:42 by msegrans         ###   ########.fr       */
+/*   Created: 2022/01/17 21:29:36 by msegrans          #+#    #+#             */
+/*   Updated: 2022/01/17 21:29:37 by msegrans         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-//
-// Created by Tadeusz Kondracki on 1/17/22.
-//
+#include "braces.h"
+#include "pipes.h"
+#include "quotes.h"
+#include "op.h"
+#include "redirection.h"
 
-#include <stdio.h>
-#include <libft.h>
-
-int	ft_perror(char *err_msg)
+int	check_line(char *line)
 {
-	perror(err_msg);
-	return (1);
-}
-
-int    syntax_error(char *err)
-{
-       return (ft_printf(2, "minish: syntax error near unexpected token `%s`\n", err));
+	return (check_quotes(line) || check_double(line, "&&")
+		|| check_double(line, "||") || check_pipes(line)
+		|| check_redir(line, ">>") || check_redir(line, "<<")
+		|| check_redir(line, "<") || check_redir(line, ">")
+		|| check_braces(line));
 }
