@@ -23,7 +23,8 @@ int	ft_perror(char *err_msg)
 	return (1);
 }
 
-int    syntax_error(char *err)
+int	syntax_error(char *err)
 {
-       return (ft_printf(2, "minish: syntax error near unexpected token `%s`\n", err));
+	return (ft_printf(2,
+			"minish: syntax error near unexpected token `%s`\n", err));
 }

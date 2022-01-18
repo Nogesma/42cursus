@@ -103,7 +103,7 @@ int	check_parenthesis(char **line)
 	return (1);
 }
 
-int	cmds_redirect(char *line, t_list **env, int fdi[2], int fdo[2])
+int	cmds_redirect(char *line, t_list **env, t_pipe *fd)
 {
 	int	ret;
 
@@ -114,7 +114,7 @@ int	cmds_redirect(char *line, t_list **env, int fdi[2], int fdo[2])
 		status_code(1, 1);
 		return (0);
 	}
-	ret = search_exec(line, env, fdi, fdo);
+	ret = search_exec(line, env, fd);
 	redirects(line, env, 0);
 	return (ret);
 }
@@ -141,74 +141,55 @@ void	close_pipes(int fd[2])
 	}
 }
 
-void	do_cmds(char *line, t_list **env, t_pipe_data *data, int *forks, int fdi[2])
+void	do_cmds(char *line, t_list **env, t_pipe *fd, int *forks)
 {
-	int fdo[2];
-
-	fdo[0] = STDOUT_FILENO;
-	fdo[1] = STDOUT_FILENO;
-	if (data->token == 2)
+	fd->out[0] = STDOUT_FILENO;
+	fd->out[1] = STDOUT_FILENO;
+	if (fd->token == 2)
 	{
-		pipe(fdo);
-
-		*forks += cmds_redirect(line, env, fdi, fdo);
-		close_pipes(fdi);
-		fdi[0] = fdo[0];
-		fdi[1] = fdo[1];
-		return ;
+		pipe(fd->out);
+		*forks += cmds_redirect(line, env, fd);
 	}
-	if (data->token == 0)
+	else
 	{
-		*forks += cmds_redirect(line, env, fdi, fdo);
+		*forks += cmds_redirect(line, env, fd);
 		wait_forks(forks);
 	}
-	if (data->token == 1)
-	{
-		*forks += cmds_redirect(line, env, fdi, fdo);
-		wait_forks(forks);
-	}
-	close_pipes(fdi);
-	fdi[0] = fdo[0];
-	fdi[1] = fdo[1];
+	close_pipes(fd->in);
+	fd->in[0] = fd->out[0];
+	fd->in[1] = fd->out[1];
 }
 
-static void	init_pipe_data(t_pipe_data *dat)
+static void	init_pipe_data(t_pipe *fd)
 {
-	dat->token = -1;
-	dat->p[1] = -1;
-	dat->p[1] = -1;
-	dat->saved_fd_pipe[1] = -1;
-	dat->saved_fd_pipe[0] = -1;
+	fd->token = -1;
+	fd->out[0] = STDOUT_FILENO;
+	fd->out[1] = STDOUT_FILENO;
+	fd->in[0] = STDIN_FILENO;
+	fd->in[1] = STDIN_FILENO;
 }
 
 int	cmds_loop(char *line, t_list **env)
 {
-	char		*cmd_two;
-	t_pipe_data	data;
-	int			forks;
-	int			fd[2];
-
-	int fdo[2];
-
-	fdo[0] = STDOUT_FILENO;
-	fdo[1] = STDOUT_FILENO;
-
-	fd[0] = STDIN_FILENO;
-	fd[1] = STDIN_FILENO;
+	char	*cmd_two;
+	t_pipe	fd;
+	int		forks;
 
 	forks = 0;
-	init_pipe_data(&data);
-	data.token = find_token(line, &cmd_two);
-	while (data.token >= 0)
+	init_pipe_data(&fd);
+	fd.token = find_token(line, &cmd_two);
+	while (fd.token >= 0)
 	{
-		do_cmds(line, env, &data, &forks, fd);
-		if ((status_code(0, 0) && data.token == 0)
-			|| (!status_code(0, 0) && data.token == 1))
+		do_cmds(line, env, &fd, &forks);
+		if ((status_code(0, 0) && fd.token == 0)
+			|| (!status_code(0, 0) && fd.token == 1))
 			return (forks);
 		line = cmd_two;
-		data.token = find_token(line, &cmd_two);
+		fd.token = find_token(line, &cmd_two);
 	}
-	forks += cmds_redirect(line, env, fd, fdo);
-	close_pipes(fd);
+	fd.out[0] = STDOUT_FILENO;
+	fd.out[1] = STDOUT_FILENO;
+	forks += cmds_redirect(line, env, &fd);
+	close_pipes(fd.in);
 	return (forks);
 }
