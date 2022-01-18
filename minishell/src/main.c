@@ -6,7 +6,7 @@
 /*   By: msegrans <msegrans@student.42lausanne      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/10 17:35:36 by msegrans          #+#    #+#             */
-/*   Updated: 2022/01/10 17:35:38 by msegrans         ###   ########.fr       */
+/*   Updated: 2022/01/18 17:12:40 by msegrans         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,7 @@
 #include "utils/global.h"
 #include "utils/list.h"
 #include "parser/rec_mult.h"
-#include "parser/validator.h"
+#include "parser/syntax/validator.h"
 
 void	sig(__attribute__ ((unused)) int sig)
 {

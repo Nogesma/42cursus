@@ -30,8 +30,25 @@
 #include "../utils/environ.h"
 
 #include "../parser/parser.h"
+#include "../parser/rec_mult.h"
+#include "pipes.h"
 
-int	exec_binary(char *path, char **args, t_list **env)
+void	mpipe(int fdi[2], int fdo[2])
+{
+//	ft_printf(2, "%d %d\n%d %d\n", fdi[0],fdi[1],fdo[0],fdo[1]);
+	if (fdo[0] != fdo[1])
+	{
+		close(fdo[0]);
+		dup2(fdo[1], STDOUT_FILENO);
+	}
+	if (fdi[0] != fdi[1])
+	{
+		close(fdi[1]);
+		dup2(fdi[0], STDIN_FILENO);
+	}
+}
+
+int	exec_binary(char *path, char **args, t_list **env, int fdi[2], int fdo[2])
 {
 	pid_t	child;
 	char	**environ;
@@ -48,6 +65,7 @@ int	exec_binary(char *path, char **args, t_list **env)
 	}
 	if (child == 0)
 	{
+		mpipe(fdi, fdo);
 		if (execve(path, args, environ) == -1)
 		{
 			perror(path);
@@ -60,14 +78,14 @@ int	exec_binary(char *path, char **args, t_list **env)
 }
 
 int	fork_built_in(int (*fn)(char **, t_list **),
-				char **a, t_list **b, int has_pipes)
+				char **a, t_list **b, t_pipe_data *data)
 {
 	pid_t	child;
 	int		ret;
 
 	ret = 0;
 	status_code(1, 0);
-	if (!has_pipes)
+	if (!data)
 	{
 		if (fn == exit_cmd)
 			ret = fn(a, NULL);
@@ -79,30 +97,30 @@ int	fork_built_in(int (*fn)(char **, t_list **),
 		return (0);
 	if (child == 0)
 	{
-		if (!has_pipes)
-			exit(ret);
-		exit(fn(a, b));
+		if (data)
+			exit(fn(a, b));
+		exit(ret);
 	}
 	is_fork(1, 1);
 	return (1);
 }
 
-int	built_in(char **args, t_list **environ, int has_pipes)
+int	built_in(char **args, t_list **environ, t_pipe_data *data)
 {
 	if (!ft_strncmp("cd", args[0], 3))
-		return (fork_built_in(cd, args + 1, environ, has_pipes));
+		return (fork_built_in(cd, args + 1, environ, data));
 	if (!ft_strncmp("echo", args[0], 5))
-		return (fork_built_in(echo, args + 1, environ, has_pipes));
+		return (fork_built_in(echo, args + 1, environ, data));
 	if (!ft_strncmp("pwd", args[0], 4))
-		return (fork_built_in(pwd, args + 1, environ, has_pipes));
+		return (fork_built_in(pwd, args + 1, environ, data));
 	if (!ft_strncmp("env", args[0], 4))
-		return (fork_built_in(env, args + 1, environ, has_pipes));
+		return (fork_built_in(env, args + 1, environ, data));
 	if (!ft_strncmp("unset", args[0], 6))
-		return (fork_built_in(unset, args + 1, environ, has_pipes));
+		return (fork_built_in(unset, args + 1, environ, data));
 	if (!ft_strncmp("export", args[0], 7))
-		return (fork_built_in(export, args + 1, environ, has_pipes));
+		return (fork_built_in(export, args + 1, environ, data));
 	if (!ft_strncmp("exit", args[0], 5))
-		return (fork_built_in(exit_cmd, args + 1, environ, has_pipes));
+		return (fork_built_in(exit_cmd, args + 1, environ, data));
 	return (-1);
 }
 
@@ -118,7 +136,7 @@ int	cmd_err(char *command)
 	return (0);
 }
 
-int	search_exec(char *line, t_list **env, int has_pipes)
+int	search_exec(char *line, t_list **env, int fdi[2], int fdo[2])
 {
 	char	**args;
 	char	*path;
@@ -128,7 +146,8 @@ int	search_exec(char *line, t_list **env, int has_pipes)
 	args = ft_arg_split(line, env);
 	if (!args || !(*args))
 		return (0);
-	ret = built_in(args, env, has_pipes);
+//	ret = built_in(args, env, data);
+	ret = -1;
 	if (ret != -1)
 		return (free_list(args, ret));
 	path = get_env_content(env, "PATH");
@@ -138,7 +157,7 @@ int	search_exec(char *line, t_list **env, int has_pipes)
 	if (!(line[0] == '.' || line[0] == '/'))
 		command = get_exec_path(args[0], path);
 	if (command)
-		ret = exec_binary(command, args, env);
+		ret = exec_binary(command, args, env, fdi, fdo);
 	else
 		ret = cmd_err(args[0]);
 	if (command && command != args[0])

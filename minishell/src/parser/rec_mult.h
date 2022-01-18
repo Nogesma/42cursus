@@ -20,6 +20,7 @@ typedef struct s_pipe_data
 	int	token;
 	int	saved_fd_pipe[2];
 	int	p[2];
+	int set;
 }	t_pipe_data;
 
 int		cmds_loop(char *line, t_list **env);
