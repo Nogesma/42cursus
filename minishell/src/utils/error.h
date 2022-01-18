@@ -21,4 +21,6 @@ int	ft_perror(char *err_msg);
 
 int	syntax_error(char *err);
 
+int	cmd_err(char *command);
+
 #endif //ERROR_H

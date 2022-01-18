@@ -1,21 +1,18 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   exec.h                                             :+:      :+:    :+:   */
+/*   pipes.h                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: msegrans <msegrans@student.42lausanne      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2022/01/10 17:47:47 by msegrans          #+#    #+#             */
-/*   Updated: 2022/01/10 17:47:48 by msegrans         ###   ########.fr       */
+/*   Created: 2022/01/19 00:43:26 by msegrans          #+#    #+#             */
+/*   Updated: 2022/01/19 00:43:27 by msegrans         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef EXEC_H
-# define EXEC_H
+#ifndef PIPES_H
+# define PIPES_H
 
-# include <libft.h>
-# include "../parser/rec_mult.h"
+void	mpipe(t_pipe *fd);
 
-int	search_exec(char *line, t_list **env, t_pipe *fd);
-
-#endif //EXEC_H
+#endif //PIPES_H

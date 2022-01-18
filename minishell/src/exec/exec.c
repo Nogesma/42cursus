@@ -28,24 +28,11 @@
 #include "../utils/list.h"
 #include "../utils/path.h"
 #include "../utils/environ.h"
+#include "../utils/error.h"
 
 #include "../parser/parser.h"
 #include "../parser/rec_mult.h"
-
-void	mpipe(t_pipe *fd)
-{
-//	ft_printf(2, "%d %d\n%d %d\n", fdi[0],fdi[1],fdo[0],fdo[1]);
-	if (fd->out[0] != fd->out[1])
-	{
-		close(fd->out[0]);
-		dup2(fd->out[1], STDOUT_FILENO);
-	}
-	if (fd->in[0] != fd->in[1])
-	{
-		close(fd->in[1]);
-		dup2(fd->in[0], STDIN_FILENO);
-	}
-}
+#include "pipes.h"
 
 int	exec_binary(char *path, char **args, t_list **env, t_pipe *fd)
 {
@@ -122,18 +109,6 @@ int	built_in(char **args, t_list **environ, t_pipe *fd)
 	if (!ft_strncmp("exit", args[0], 5))
 		return (fork_built_in(exit_cmd, args + 1, environ, fd));
 	return (-1);
-}
-
-int	cmd_err(char *command)
-{
-	if (!(command[0] == '.' || command[0] == '/'))
-		ft_printf(STDERR_FILENO,
-			"minishell: %s: command not found\n", command);
-	else
-		ft_printf(STDERR_FILENO,
-			"minishell: %s: No such file or directory\n", command);
-	status_code(1, 127);
-	return (0);
 }
 
 int	search_exec(char *line, t_list **env, t_pipe *fd)
