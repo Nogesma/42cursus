@@ -22,7 +22,7 @@
 #include "utils/global.h"
 #include "utils/list.h"
 #include "parser/rec_mult.h"
-#include "parser/validator.h"
+#include "parser/syntax/validator.h"
 
 void	sig(__attribute__ ((unused)) int sig)
 {
