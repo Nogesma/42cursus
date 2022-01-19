@@ -16,6 +16,8 @@
 #include "../utils/global.h"
 #include "../utils/environ.h"
 
+//returns size of certain "$*" env variable, useful for advancing
+//in line when parsing env variables
 int	get_env_name_size(const char *s)
 {
 	int	i;
@@ -26,6 +28,7 @@ int	get_env_name_size(const char *s)
 	return (i);
 }
 
+//returns strlen of env value (that is some ugly code for $? omg)
 void	get_env_size(char *s, t_list **env, int *size, int *i)
 {
 	unsigned char	status;
@@ -50,6 +53,7 @@ void	get_env_size(char *s, t_list **env, int *size, int *i)
 	}
 }
 
+//todo
 int	unpack_env(char *s, char *new, t_list **env, int *i)
 {
 	char	*env_val;

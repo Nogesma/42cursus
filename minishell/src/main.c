@@ -24,9 +24,10 @@
 #include "parser/cmd_loop.h"
 #include "parser/syntax/validator.h"
 
+//called when user presses Ctrl-c, clears and redisplays prompt
 void	sig(__attribute__ ((unused)) int sig)
 {
-	ft_putchar_fd(1, '\n');
+	ft_putchar_fd('\n', 1);
 	rl_replace_line("", 0);
 	status_code(1, 130);
 	if (!is_fork(0, 0))
@@ -34,6 +35,8 @@ void	sig(__attribute__ ((unused)) int sig)
 	rl_redisplay();
 }
 
+//main loop where each input by the user is received
+// using readline and then executed
 void	readline_loop(t_list **environ, char *prompt)
 {
 	char	*line;

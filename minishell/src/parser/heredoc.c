@@ -19,6 +19,8 @@
 
 #include "../utils/global.h"
 
+//called when << redirect is used, reads from stdin displaying prompt "> "
+//and awaiting the word string
 int	heredoc(char *word, int fd)
 {
 	char	*line;

@@ -28,6 +28,9 @@
 #include "../utils/pipes.h"
 #include "cmd_loop_utils.h"
 
+//sets any < > << >> redirects, while saving current fd and restoring
+//after it exec. If parenthesis are present, recursively calls cmd_loop
+//on the subset of commands
 int	cmds_redirect(char *line, t_list **env, t_pipe *fd)
 {
 	int	save_fdout[2];
@@ -50,6 +53,7 @@ int	cmds_redirect(char *line, t_list **env, t_pipe *fd)
 	return (forks);
 }
 
+//wait *forks times and updates status code if needed
 void	wait_forks(int *forks)
 {
 	int	status;
@@ -63,6 +67,7 @@ void	wait_forks(int *forks)
 		status_code(1, WEXITSTATUS(status));
 }
 
+//sets/resets pipe redirects if any and waits for forked cmd if needed
 int	do_cmds(t_cmdinput cmd, t_pipe *fd, int *forks, t_pipe *data)
 {
 	fd->out[0] = data->out[0];
@@ -87,6 +92,9 @@ int	do_cmds(t_cmdinput cmd, t_pipe *fd, int *forks, t_pipe *data)
 	return (0);
 }
 
+//creates new set of pipes from parent set. Then loops over cmds in
+//line, finding separating tokens | || &&, executing cmds
+//and finally closing pipe
 int	cmds_loop(char *line, t_list **env, t_pipe *data)
 {
 	char		*cmd_two;
