@@ -25,66 +25,9 @@
 #include "redirect.h"
 #include "heredoc.h"
 #include "../utils/parsing.h"
-#include "rec_mult.h"
+#include "cmd_loop.h"
 #include "../utils/pipes.h"
-
-static int	word_size_redirect(char *s, t_list **env)
-{
-	int	i;
-	int	is_special;
-	int	size;
-
-	i = 0;
-	is_special = 0;
-	size = 0;
-	while (ft_isspace(s[i]))
-		s++;
-	while (s[i] && ((!ft_isspace(s[i]) && s[i] != '<' && s[i] != '>') || is_special))
-	{
-		if (s[i] == '\'' && is_special != 1)
-			is_special = is_special ^ -1;
-		else if (s[i] == '"' && is_special != -1)
-			is_special = is_special ^ 1;
-		else if (s[i] == '$' && is_special != -1)
-			get_env_size(s, env, &size, &i);
-		else
-			size++;
-		i++;
-	}
-	return (size);
-}
-
-static char	*next_word_redirect(char *line, t_list **env)
-{
-	int		pos;
-	char	*new;
-	int		is_special;
-	int		i;
-
-	pos = 0;
-	new = (char *)ft_calloc((word_size_redirect(line, env) + 1), sizeof(char));
-	if (!new)
-		return (NULL);
-	is_special = 0;
-	i = 0;
-	while (line[pos] && ft_isspace(line[pos]))
-		pos++;
-	while (line[pos] && ((!ft_isspace(line[pos])
-				&& line[pos] != '<' && line[pos] != '>') || is_special))
-	{
-		if (line[pos] == '\'' && is_special != 1)
-			is_special = is_special ^ -1;
-		else if (line[pos] == '"' && is_special != -1)
-			is_special = is_special ^ 1;
-		else if (line[pos] == '$' && is_special != -1)
-			pos += unpack_env(line + pos, new, env, &i);
-		else
-			new[i++] = line[pos];
-		pos++;
-	}
-	new[i] = 0;
-	return (new);
-}
+#include "redirect_parse.h"
 
 static int	find_next_redirect(char *line, t_list **env, char **target)
 {
@@ -94,14 +37,7 @@ static int	find_next_redirect(char *line, t_list **env, char **target)
 	while (*line)
 	{
 		skip_till_valid(&line);
-		if (ft_strncmp(line, ">>", 2) == 0)
-			ret = 0;
-		else if (ft_strncmp(line, ">", 1) == 0)
-			ret = 1;
-		else if (ft_strncmp(line, "<<", 2) == 0)
-			ret = 2;
-		else if (ft_strncmp(line, "<", 1) == 0)
-			ret = 3;
+		ret = which_redirect(line);
 		if (ret == 0 || ret == 2)
 			line[1] = ' ';
 		if (ret >= 0)

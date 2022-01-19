@@ -1,7 +1,7 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   rec_mult.c                                         :+:      :+:    :+:   */
+/*   cmd_loop.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: msegrans <msegrans@student.42lausanne      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
@@ -20,88 +20,13 @@
 #include <stdio.h>
 
 #include "../exec/exec.h"
-#include "rec_mult.h"
+#include "cmd_loop.h"
 #include "../utils/global.h"
 #include "../utils/error.h"
 #include "../utils/parsing.h"
 #include "redirect.h"
 #include "../utils/pipes.h"
-
-static int	is_parenthesis(char c)
-{
-	if (c == '(')
-		return (1);
-	if (c == ')')
-		return (-1);
-	return (0);
-}
-
-static int	which_token(char *line)
-{
-	if (!ft_strncmp(line, "&&", 2))
-		return (0);
-	if (!ft_strncmp(line, "||", 2))
-		return (1);
-	if (!ft_strncmp(line, "|", 1))
-		return (2);
-	return (-1);
-}
-
-//finds next occurence of tokens &&, || or | in string, zeros their chars,
-// stores pointer to characters just
-// after in cmd_two and returns which one it found, -1 if none
-static int	find_token(char *line, char **cmd_two)
-{
-	int	p_count;
-	int	token;
-
-	p_count = 0;
-	while (*line)
-	{
-		skip_till_valid(&line);
-		if (!*line)
-			break ;
-		p_count += is_parenthesis(*line);
-		token = which_token(line);
-		if (!p_count && token != -1)
-		{
-			line[0] = 0;
-			*cmd_two = line + 1;
-			if (token == 2)
-				return (token);
-			line[1] = 0;
-			*cmd_two = line + 2;
-			return (token);
-		}
-		line++;
-	}
-	return (-1);
-}
-
-int	check_parenthesis(char **line)
-{
-	char	*pos;
-	int		count;
-
-	pos = *line;
-	while (ft_isspace(*pos))
-		pos++;
-	if (*pos != '(')
-		return (0);
-	count = 1;
-	pos++;
-	*line = pos;
-	while (count > 0 && *pos)
-	{
-		pos++;
-		skip_till_valid(&pos);
-		if (!*pos)
-			break ;
-		count += is_parenthesis(*pos);
-	}
-	*pos = 0;
-	return (1);
-}
+#include "cmd_loop_utils.h"
 
 int	cmds_redirect(char *line, t_list **env, t_pipe *fd)
 {
@@ -138,7 +63,7 @@ void	wait_forks(int *forks)
 		status_code(1, WEXITSTATUS(status));
 }
 
-int	do_cmds(char *line, t_list **env, t_pipe *fd, int *forks, t_pipe *data)
+int	do_cmds(t_cmdinput cmd, t_pipe *fd, int *forks, t_pipe *data)
 {
 	fd->out[0] = data->out[0];
 	fd->out[1] = data->out[1];
@@ -146,14 +71,14 @@ int	do_cmds(char *line, t_list **env, t_pipe *fd, int *forks, t_pipe *data)
 	{
 		if (pipe(fd->out) == -1)
 			return (minish_err("pipe error"));
-		*forks += cmds_redirect(line, env, fd);
+		*forks += cmds_redirect(cmd.line, cmd.env, fd);
 		close_pipes(fd->in);
 		fd->in[0] = fd->out[0];
 		fd->in[1] = fd->out[1];
 	}
 	else
 	{
-		*forks += cmds_redirect(line, env, fd);
+		*forks += cmds_redirect(cmd.line, cmd.env, fd);
 		wait_forks(forks);
 		close_pipes(fd->in);
 		fd->in[0] = data->in[0];
@@ -164,16 +89,19 @@ int	do_cmds(char *line, t_list **env, t_pipe *fd, int *forks, t_pipe *data)
 
 int	cmds_loop(char *line, t_list **env, t_pipe *data)
 {
-	char	*cmd_two;
-	t_pipe	fd;
-	int		forks;
+	char		*cmd_two;
+	t_pipe		fd;
+	int			forks;
+	t_cmdinput	cmd;
 
+	cmd.line = line;
+	cmd.env = env;
 	forks = 0;
 	init_pipe_data(&fd, data);
 	fd.token = find_token(line, &cmd_two);
 	while (fd.token >= 0)
 	{
-		do_cmds(line, env, &fd, &forks, data);
+		do_cmds(cmd, &fd, &forks, data);
 		if ((status_code(0, 0) && fd.token == 0)
 			|| (!status_code(0, 0) && fd.token == 1))
 			return (forks);

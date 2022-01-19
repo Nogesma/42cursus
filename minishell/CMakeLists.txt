@@ -32,7 +32,7 @@ add_executable(minishell
         src/utils/setup.c
         src/utils/error.c
         src/utils/parsing.c
-        src/parser/rec_mult.c
+        src/parser/cmd_loop.c
         src/parser/wildcard.c
         src/parser/parse_env.c
         src/parser/heredoc.c
@@ -42,7 +42,7 @@ add_executable(minishell
         src/parser/syntax/op.c
         src/parser/syntax/pipes.c
         src/parser/syntax/quotes.c
-        src/parser/syntax/redirection.c)
+        src/parser/syntax/redirection.c src/parser/redirect_parse.c src/parser/redirect_parse.h src/parser/cmd_loop_utils.c src/parser/cmd_loop_utils.h)
 
 TARGET_LINK_LIBRARIES(minishell readline)
 TARGET_LINK_LIBRARIES(minishell ft)

@@ -21,12 +21,12 @@
 #include "utils/setup.h"
 #include "utils/global.h"
 #include "utils/list.h"
-#include "parser/rec_mult.h"
+#include "parser/cmd_loop.h"
 #include "parser/syntax/validator.h"
 
 void	sig(__attribute__ ((unused)) int sig)
 {
-	write(1, "\n", 1);
+	ft_putchar_fd(1, '\n');
 	rl_replace_line("", 0);
 	status_code(1, 130);
 	if (!is_fork(0, 0))

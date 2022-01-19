@@ -1,7 +1,7 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   rec_mult.h                                         :+:      :+:    :+:   */
+/*   cmd_loop.h                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: msegrans <msegrans@student.42lausanne      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
@@ -10,19 +10,20 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef REC_MULT_H
-# define REC_MULT_H
+#ifndef CMD_LOOP_H
+# define CMD_LOOP_H
 
 # include <libft.h>
 
-typedef struct s_pipe
+# include "../utils/pipes.h"
+
+typedef struct s_cmdinput
 {
-	int	token;
-	int	in[2];
-	int	out[2];
-}	t_pipe;
+	char	*line;
+	t_list	**env;
+}	t_cmdinput;
 
 int		cmds_loop(char *line, t_list **env, t_pipe *data);
 void	wait_forks(int *forks);
 
-#endif //REC_MULT_H
+#endif //CMD_LOOP_H
