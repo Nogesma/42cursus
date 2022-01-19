@@ -26,7 +26,7 @@
 
 void	sig(__attribute__ ((unused)) int sig)
 {
-	ft_putchar_fd(1, '\n');
+	ft_putchar_fd('\n', 1);
 	rl_replace_line("", 0);
 	status_code(1, 130);
 	if (!is_fork(0, 0))
