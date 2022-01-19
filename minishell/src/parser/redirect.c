@@ -70,7 +70,7 @@ static char	*next_word_redirect(char *line, t_list **env)
 	while (line[pos] && ft_isspace(line[pos]))
 		pos++;
 	while (line[pos] && ((!ft_isspace(line[pos])
-			&& line[pos] != '<' && line[pos] != '>') || is_special))
+				&& line[pos] != '<' && line[pos] != '>') || is_special))
 	{
 		if (line[pos] == '\'' && is_special != 1)
 			is_special = is_special ^ -1;
@@ -125,9 +125,11 @@ static int	redirect_out(char *target, int token, t_pipe *fd)
 	close_pipes(fd->out);
 	fd->out[0] = 0;
 	if (token == 0)
-		fd->out[1] = open(target, O_WRONLY | O_APPEND | O_CREAT, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
+		fd->out[1] = open(target, O_WRONLY | O_APPEND | O_CREAT,
+				S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
 	if (token == 1)
-		fd->out[1] = open(target, O_WRONLY | O_TRUNC | O_CREAT, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
+		fd->out[1] = open(target, O_WRONLY | O_TRUNC | O_CREAT,
+				S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
 	if (fd->out[1] == -1)
 		return (minish_err(target));
 	return (0);

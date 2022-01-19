@@ -32,12 +32,13 @@ static int	ft_count(const char *str)
 			is_apostrophe = is_apostrophe ^ 1;
 		if (!is_apostrophe && str[i] == '"')
 			is_quote = is_quote ^ 1;
-		if (!is_quote && !is_apostrophe && ' ' == str[i] && ' ' != str[i + 1]) //todo isspace?
+		if (!is_quote && !is_apostrophe && ft_isspace(str[i])
+			&& !ft_isspace(str[i + 1]))
 			size += count_wildcard(str[i + 1] == '*'
-					&& (str[i + 2] == ' ' || str[i + 2] == 0));
+					&& (ft_isspace(str[i + 2]) || str[i + 2] == 0));
 		i++;
 	}
-	if (' ' == str[0])
+	if (ft_isspace(str[0]))
 		return (size);
 	return (size + 1);
 }

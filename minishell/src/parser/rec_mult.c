@@ -36,12 +36,24 @@ static int	is_parenthesis(char c)
 	return (0);
 }
 
+static int	which_token(char *line)
+{
+	if (!ft_strncmp(line, "&&", 2))
+		return (0);
+	if (!ft_strncmp(line, "||", 2))
+		return (1);
+	if (!ft_strncmp(line, "|", 1))
+		return (2);
+	return (-1);
+}
+
 //finds next occurence of tokens &&, || or | in string, zeros their chars,
 // stores pointer to characters just
 // after in cmd_two and returns which one it found, -1 if none
 static int	find_token(char *line, char **cmd_two)
 {
 	int	p_count;
+	int	token;
 
 	p_count = 0;
 	while (*line)
@@ -50,25 +62,16 @@ static int	find_token(char *line, char **cmd_two)
 		if (!*line)
 			break ;
 		p_count += is_parenthesis(*line);
-		if (!p_count && !ft_strncmp(line, "&&", 2))
-		{
-			line[0] = 0;
-			line[1] = 0;
-			*cmd_two = line + 2;
-			return (0);
-		}
-		else if (!p_count && !ft_strncmp(line, "||", 2))
-		{
-			line[0] = 0;
-			line[1] = 0;
-			*cmd_two = line + 2;
-			return (1);
-		}
-		else if (!p_count && !ft_strncmp(line, "|", 1))
+		token = which_token(line);
+		if (!p_count && token != -1)
 		{
 			line[0] = 0;
 			*cmd_two = line + 1;
-			return (2);
+			if (token == 2)
+				return (token);
+			line[1] = 0;
+			*cmd_two = line + 2;
+			return (token);
 		}
 		line++;
 	}
@@ -94,10 +97,7 @@ int	check_parenthesis(char **line)
 		skip_till_valid(&pos);
 		if (!*pos)
 			break ;
-		if (*pos == '(')
-			count++;
-		else if (*pos == ')')
-			count--;
+		count += is_parenthesis(*pos);
 	}
 	*pos = 0;
 	return (1);
@@ -146,8 +146,8 @@ int	do_cmds(char *line, t_list **env, t_pipe *fd, int *forks, t_pipe *data)
 		*forks += cmds_redirect(line, env, fd);
 		wait_forks(forks);
 		close_pipes(fd->in);
-		fd->in[0] =  data->in[0];
-		fd->in[1] =  data->in[1];
+		fd->in[0] = data->in[0];
+		fd->in[1] = data->in[1];
 	}
 	return (0);
 }
