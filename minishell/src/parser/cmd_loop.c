@@ -98,19 +98,19 @@ int	cmds_loop(char *line, t_list **env, t_pipe *data)
 	cmd.env = env;
 	forks = 0;
 	init_pipe_data(&fd, data);
-	fd.token = find_token(line, &cmd_two);
+	fd.token = find_token(cmd.line, &cmd_two);
 	while (fd.token >= 0)
 	{
 		do_cmds(cmd, &fd, &forks, data);
 		if ((status_code(0, 0) && fd.token == 0)
 			|| (!status_code(0, 0) && fd.token == 1))
 			return (forks);
-		line = cmd_two;
-		fd.token = find_token(line, &cmd_two);
+		cmd.line = cmd_two;
+		fd.token = find_token(cmd.line, &cmd_two);
 	}
 	fd.out[0] = data->out[0];
 	fd.out[1] = data->out[1];
-	forks += cmds_redirect(line, env, &fd);
+	forks += cmds_redirect(cmd.line, cmd.env, &fd);
 	close_pipes(fd.in);
 	close_pipes(fd.out);
 	return (forks);
