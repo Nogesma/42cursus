@@ -28,10 +28,13 @@
 #include "../utils/list.h"
 #include "../utils/path.h"
 #include "../utils/environ.h"
+#include "../utils/error.h"
 
 #include "../parser/parser.h"
+#include "../parser/rec_mult.h"
+#include "pipes.h"
 
-int	exec_binary(char *path, char **args, t_list **env)
+int	exec_binary(char *path, char **args, t_list **env, t_pipe *fd)
 {
 	pid_t	child;
 	char	**environ;
@@ -42,12 +45,14 @@ int	exec_binary(char *path, char **args, t_list **env)
 	status_code(1, 0);
 	child = fork();
 	if (child == -1)
-	{
 		free(environ);
+	if (child == -1)
 		return (0);
-	}
 	if (child == 0)
 	{
+		ft_printf(2, "%s\n", args[0]);
+		if (mpipe(fd))
+			exit(1);
 		if (execve(path, args, environ) == -1)
 		{
 			perror(path);
@@ -60,14 +65,14 @@ int	exec_binary(char *path, char **args, t_list **env)
 }
 
 int	fork_built_in(int (*fn)(char **, t_list **),
-				char **a, t_list **b, int has_pipes)
+				char **a, t_list **b, t_pipe *fd)
 {
 	pid_t	child;
 	int		ret;
 
 	ret = 0;
 	status_code(1, 0);
-	if (!has_pipes)
+	if (fd->out[0] == fd->out[1] && fd->in[0] == fd->in[1])
 	{
 		if (fn == exit_cmd)
 			ret = fn(a, NULL);
@@ -79,7 +84,9 @@ int	fork_built_in(int (*fn)(char **, t_list **),
 		return (0);
 	if (child == 0)
 	{
-		if (!has_pipes)
+		if (mpipe(fd))
+			exit(1);
+		if (fd->out[0] == fd->out[1] && fd->in[0] == fd->in[1])
 			exit(ret);
 		exit(fn(a, b));
 	}
@@ -87,38 +94,26 @@ int	fork_built_in(int (*fn)(char **, t_list **),
 	return (1);
 }
 
-int	built_in(char **args, t_list **environ, int has_pipes)
+int	built_in(char **args, t_list **environ, t_pipe *fd)
 {
 	if (!ft_strncmp("cd", args[0], 3))
-		return (fork_built_in(cd, args + 1, environ, has_pipes));
+		return (fork_built_in(cd, args + 1, environ, fd));
 	if (!ft_strncmp("echo", args[0], 5))
-		return (fork_built_in(echo, args + 1, environ, has_pipes));
+		return (fork_built_in(echo, args + 1, environ, fd));
 	if (!ft_strncmp("pwd", args[0], 4))
-		return (fork_built_in(pwd, args + 1, environ, has_pipes));
+		return (fork_built_in(pwd, args + 1, environ, fd));
 	if (!ft_strncmp("env", args[0], 4))
-		return (fork_built_in(env, args + 1, environ, has_pipes));
+		return (fork_built_in(env, args + 1, environ, fd));
 	if (!ft_strncmp("unset", args[0], 6))
-		return (fork_built_in(unset, args + 1, environ, has_pipes));
+		return (fork_built_in(unset, args + 1, environ, fd));
 	if (!ft_strncmp("export", args[0], 7))
-		return (fork_built_in(export, args + 1, environ, has_pipes));
+		return (fork_built_in(export, args + 1, environ, fd));
 	if (!ft_strncmp("exit", args[0], 5))
-		return (fork_built_in(exit_cmd, args + 1, environ, has_pipes));
+		return (fork_built_in(exit_cmd, args + 1, environ, fd));
 	return (-1);
 }
 
-int	cmd_err(char *command)
-{
-	if (!(command[0] == '.' || command[0] == '/'))
-		ft_printf(STDERR_FILENO,
-			"minishell: %s: command not found\n", command);
-	else
-		ft_printf(STDERR_FILENO,
-			"minishell: %s: No such file or directory\n", command);
-	status_code(1, 127);
-	return (0);
-}
-
-int	search_exec(char *line, t_list **env, int has_pipes)
+int	search_exec(char *line, t_list **env, t_pipe *fd)
 {
 	char	**args;
 	char	*path;
@@ -128,7 +123,7 @@ int	search_exec(char *line, t_list **env, int has_pipes)
 	args = ft_arg_split(line, env);
 	if (!args || !(*args))
 		return (0);
-	ret = built_in(args, env, has_pipes);
+	ret = built_in(args, env, fd);
 	if (ret != -1)
 		return (free_list(args, ret));
 	path = get_env_content(env, "PATH");
@@ -138,7 +133,7 @@ int	search_exec(char *line, t_list **env, int has_pipes)
 	if (!(line[0] == '.' || line[0] == '/'))
 		command = get_exec_path(args[0], path);
 	if (command)
-		ret = exec_binary(command, args, env);
+		ret = exec_binary(command, args, env, fd);
 	else
 		ret = cmd_err(args[0]);
 	if (command && command != args[0])

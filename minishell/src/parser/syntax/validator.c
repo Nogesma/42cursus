@@ -22,5 +22,5 @@ int	check_line(char *line)
 		|| check_double(line, "||") || check_pipes(line)
 		|| check_redir(line, ">>") || check_redir(line, "<<")
 		|| check_redir(line, "<") || check_redir(line, ">")
-		|| check_braces(line));
+		|| check_braces(line, line));
 }

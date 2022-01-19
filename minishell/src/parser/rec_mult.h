@@ -15,14 +15,15 @@
 
 # include <libft.h>
 
-typedef struct s_pipe_data
+typedef struct s_pipe
 {
 	int	token;
-	int	saved_fd_pipe[2];
-	int	p[2];
-}	t_pipe_data;
+	int saved_fd[2];
+	int	in[2];
+	int	out[2];
+}	t_pipe;
 
-int		cmds_loop(char *line, t_list **env);
+int		cmds_loop(char *line, t_list **env, t_pipe *data);
 void	wait_forks(int *forks);
 
 #endif //REC_MULT_H

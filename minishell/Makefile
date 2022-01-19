@@ -18,6 +18,7 @@ else
 endif
 
 MAKEFLAGS += --output-sync=target
+MAKEFLAGS += --no-print-directory
 
 NAME ?= minishell
 

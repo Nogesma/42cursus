@@ -22,6 +22,7 @@ add_executable(minishell
         src/built-in/pwd.c
         src/built-in/unset.c
         src/exec/exec.c
+        src/exec/pipes.c
         src/parser/parser.c
         src/utils/environ.c
         src/utils/sort.c
@@ -36,12 +37,12 @@ add_executable(minishell
         src/parser/parse_env.c
         src/parser/heredoc.c
         src/parser/redirect.c
+        src/parser/syntax/validator.c
         src/parser/syntax/braces.c
         src/parser/syntax/op.c
+        src/parser/syntax/pipes.c
         src/parser/syntax/quotes.c
-        src/parser/syntax/redirection.c
-        src/parser/syntax/validator.c
-        src/parser/syntax/pipes.c)
+        src/parser/syntax/redirection.c)
 
 TARGET_LINK_LIBRARIES(minishell readline)
 TARGET_LINK_LIBRARIES(minishell ft)

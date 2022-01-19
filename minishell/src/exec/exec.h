@@ -14,7 +14,8 @@
 # define EXEC_H
 
 # include <libft.h>
+# include "../parser/rec_mult.h"
 
-int	search_exec(char *line, t_list **env, int has_pipes);
+int	search_exec(char *line, t_list **env, t_pipe *fd);
 
 #endif //EXEC_H

@@ -27,9 +27,6 @@
 #include "../utils/parsing.h"
 #include "redirect.h"
 
-static int	pipe_in(int *saved_fd, int p[2]);
-static int	pipe_out(int *saved_fd, int p[2]);
-
 static int	is_parenthesis(char c)
 {
 	if (c == '(')
@@ -78,47 +75,6 @@ static int	find_token(char *line, char **cmd_two)
 	return (-1);
 }
 
-static int	pipe_manage(int set, t_pipe_data *data)
-{
-	if (set == 1)
-		return (pipe_in(&(data->saved_fd_pipe[0]), data->p));
-	if (set == 0)
-		return (pipe_out(&(data->saved_fd_pipe[1]), data->p));
-	if (data->saved_fd_pipe[0] != -1 && dup2(data->saved_fd_pipe[0], 1) == -1)
-		return (minish_err("pipe error"));
-	close(data->saved_fd_pipe[0]);
-	data->saved_fd_pipe[0] = -1;
-	if (data->saved_fd_pipe[1] != -1 && dup2(data->saved_fd_pipe[1], 0) == -1)
-		return (minish_err("pipe error"));
-	close(data->saved_fd_pipe[1]);
-	data->saved_fd_pipe[0] = -1;
-	return (0);
-}
-
-static int	pipe_in(int *saved_fd, int p[2])
-{
-	*saved_fd = dup(1);
-	if (*saved_fd == -1)
-		return (minish_err("pipe error"));
-	if (pipe(p) == -1)
-		return (minish_err("pipe error"));
-	if (dup2(p[1], 1) == -1)
-		return (minish_err("pipe error"));
-	close(p[1]);
-	return (0);
-}
-
-static int	pipe_out(int *saved_fd2, int p[2])
-{
-	*saved_fd2 = dup(0);
-	if (*saved_fd2 == -1)
-		return (minish_err("pipe error"));
-	if (dup2(p[0], 0) == -1)
-		return (minish_err("pipe error"));
-	close(p[0]);
-	return (0);
-}
-
 int	check_parenthesis(char **line)
 {
 	char	*pos;
@@ -147,18 +103,18 @@ int	check_parenthesis(char **line)
 	return (1);
 }
 
-int	cmds_redirect(char *line, t_list **env, int has_pipes)
+int	cmds_redirect(char *line, t_list **env, t_pipe *fd)
 {
 	int	ret;
 
 	if (check_parenthesis(&line))
-		return (cmds_loop(line, env));
+		return (cmds_loop(line, env, fd));
 	if (redirects(line, env, 1))
 	{
 		status_code(1, 1);
 		return (0);
 	}
-	ret = search_exec(line, env, has_pipes);
+	ret = search_exec(line, env, fd);
 	redirects(line, env, 0);
 	return (ret);
 }
@@ -176,59 +132,69 @@ void	wait_forks(int *forks)
 		status_code(1, WEXITSTATUS(status));
 }
 
-void	do_cmds(char *line, t_list **env, t_pipe_data *data, int *forks)
+void	close_pipes(int fd[2])
 {
-	if (data->token == 2)
+	if (fd[0] != fd[1])
 	{
-		if (pipe_manage(1, data))
-			return ;
-		*forks += cmds_redirect(line, env, 1);
-		if (pipe_manage(-1, data))
-			return ;
-		pipe_manage(0, data);
-		return ;
+		close(fd[0]);
+		close(fd[1]);
 	}
-	if (data->token == 0)
-	{
-		*forks += cmds_redirect(line, env, *forks);
-		wait_forks(forks);
-	}
-	if (data->token == 1)
-	{
-		*forks += cmds_redirect(line, env, *forks);
-		wait_forks(forks);
-	}
-	pipe_manage(-1, data);
 }
 
-static void	init_pipe_data(t_pipe_data *dat)
+int	do_cmds(char *line, t_list **env, t_pipe *fd, int *forks, t_pipe *data)
 {
-	dat->token = -1;
-	dat->p[1] = -1;
-	dat->p[1] = -1;
-	dat->saved_fd_pipe[1] = -1;
-	dat->saved_fd_pipe[0] = -1;
+	fd->out[0] = data->out[0];
+	fd->out[1] = data->out[1];
+	if (fd->token == 2)
+	{
+		if (pipe(fd->out) == -1)
+			return (minish_err("pipe error"));
+		*forks += cmds_redirect(line, env, fd);
+		close_pipes(fd->in);
+		fd->in[0] = fd->out[0];
+		fd->in[1] = fd->out[1];
+	}
+	else
+	{
+		*forks += cmds_redirect(line, env, fd);
+		wait_forks(forks);
+		close_pipes(fd->in);
+		fd->in[0] =  data->in[0];
+		fd->in[1] =  data->in[1];
+	}
+	return (0);
 }
 
-int	cmds_loop(char *line, t_list **env)
+static void	init_pipe_data(t_pipe *fd, t_pipe *data)
 {
-	char		*cmd_two;
-	t_pipe_data	data;
-	int			forks;
+	fd->token = -1;
+	fd->out[0] = data->out[0];
+	fd->out[1] = data->out[1];
+	fd->in[0] =  data->in[0];
+	fd->in[1] =  data->in[1];
+}
+
+int	cmds_loop(char *line, t_list **env, t_pipe *data)
+{
+	char	*cmd_two;
+	t_pipe	fd;
+	int		forks;
 
 	forks = 0;
-	init_pipe_data(&data);
-	data.token = find_token(line, &cmd_two);
-	while (data.token >= 0)
+	init_pipe_data(&fd, data);
+	fd.token = find_token(line, &cmd_two);
+	while (fd.token >= 0)
 	{
-		do_cmds(line, env, &data, &forks);
-		if ((status_code(0, 0) && data.token == 0)
-			|| (!status_code(0, 0) && data.token == 1))
+		do_cmds(line, env, &fd, &forks, data);
+		if ((status_code(0, 0) && fd.token == 0)
+			|| (!status_code(0, 0) && fd.token == 1))
 			return (forks);
 		line = cmd_two;
-		data.token = find_token(line, &cmd_two);
+		fd.token = find_token(line, &cmd_two);
 	}
-	forks += cmds_redirect(line, env, forks);
-	pipe_manage(-1, &data);
+	fd.out[0] = data->out[0];
+	fd.out[1] = data->out[1];
+	forks += cmds_redirect(line, env, &fd);
+	close_pipes(fd.in);
 	return (forks);
 }
