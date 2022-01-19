@@ -25,6 +25,8 @@
 #include "redirect.h"
 #include "heredoc.h"
 #include "../utils/parsing.h"
+#include "rec_mult.h"
+#include "../utils/pipes.h"
 
 static int	word_size_redirect(char *s, t_list **env)
 {
@@ -118,75 +120,48 @@ static int	find_next_redirect(char *line, t_list **env, char **target)
 	return (-1);
 }
 
-int	redirect_out(char *target, int token, int *sfd, int *of)
+static int	redirect_out(char *target, int token, t_pipe *fd)
 {
-	if (sfd[1] == -1)
-	{
-		sfd[1] = dup(1);
-		if (sfd[1] == -1)
-			return (minish_err("pipe error"));
-	}
-	else if (of[1] != -1)
-		close(of[1]);
+	close_pipes(fd->out);
+	fd->out[0] = 0;
 	if (token == 0)
-	{
-		of[1] = open(target, O_WRONLY | O_APPEND | O_CREAT, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
-		if (of[1] == -1 || dup2(of[1], 1) == -1)
-			return (minish_err(target));
-	}
+		fd->out[1] = open(target, O_WRONLY | O_APPEND | O_CREAT, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
 	if (token == 1)
-	{
-		of[1] = open(target, O_WRONLY | O_TRUNC | O_CREAT, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
-		if (of[1] == -1 || dup2(of[1], 1) == -1)
-			return (minish_err(target));
-	}
-	return (0);
-}
-
-static int	redirect_in(char *target, int *sfd, int *of)
-{
-	if (sfd[0] == -1)
-	{
-		sfd[0] = dup(0);
-		if (sfd[0] == -1)
-			return (minish_err("pipe error"));
-	}
-	else if (of[0] != -1)
-		close(of[0]);
-	of[0] = open(target, O_RDONLY);
-	if (of[0] == -1 || dup2(of[0], 0) == -1)
+		fd->out[1] = open(target, O_WRONLY | O_TRUNC | O_CREAT, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
+	if (fd->out[1] == -1)
 		return (minish_err(target));
 	return (0);
 }
 
-static int	heredoc_insert(char *target, int *sfd, int *of)
+static int	redirect_in(char *target, t_pipe *fd)
 {
-	int	p[2];
-	int	status;
+	close_pipes(fd->in);
+	fd->in[1] = 0;
+	fd->in[0] = open(target, O_RDONLY);
+	if (fd->in[0] == -1)
+		return (minish_err(target));
+	return (0);
+}
 
-	if (sfd[0] == -1)
-	{
-		sfd[0] = dup(0);
-		if (sfd[0] == -1)
-			return (minish_err("pipe error"));
-	}
-	else if (of[0] != -1)
-	{
-		close(of[0]);
-		of[0] = -1;
-		if (dup2(sfd[0], 0) == -1)
-			return (minish_err("pipe error"));
-	}
+static int	heredoc_insert(char *target, t_pipe *fd)
+{
+	int		p[2];
+	int		status;
+	pid_t	pid;
+
+	close_pipes(fd->in);
+	fd->in[1] = 0;
 	if (pipe(p))
 		return (minish_err("pipe error"));
-	if (heredoc(target, p[1]))
+	pid = heredoc(target, p[1]);
+	if (pid != -1)
 	{
-		wait(&status);
+		waitpid(pid, &status, 0);
 		if (WEXITSTATUS(status) != 2)
 		{
 			status_code(1, WEXITSTATUS(status));
-			of[0] = p[0];
-			if (of[0] == -1 || dup2(of[0], 0) == -1)
+			fd->in[0] = p[0];
+			if (fd->in[0] == -1)
 				return (minish_err("pipe error"));
 		}
 		else
@@ -196,21 +171,19 @@ static int	heredoc_insert(char *target, int *sfd, int *of)
 	return (0);
 }
 
-static int	set_redirects(char *line, t_list **env, int *sfd, int *of) // todo malloc secure/return codes
+int	set_redirects(char *line, t_list **env, t_pipe *fd)
 {
 	char	*target;
 	int		token;
 
-	(void)sfd;
-	(void)of;
 	token = find_next_redirect(line, env, &target);
 	while (token >= 0)
 	{
-		if ((token == 0 || token == 1) && redirect_out(target, token, sfd, of))
+		if ((token == 0 || token == 1) && redirect_out(target, token, fd))
 			return (1);
-		if (token == 3 && redirect_in(target, sfd, of))
+		if (token == 3 && redirect_in(target, fd))
 			return (1);
-		if (token == 2 && heredoc_insert(target, sfd, of))
+		if (token == 2 && heredoc_insert(target, fd))
 			return (1);
 		if (target != NULL)
 			free(target);
@@ -218,32 +191,5 @@ static int	set_redirects(char *line, t_list **env, int *sfd, int *of) // todo ma
 	}
 	if (target != NULL)
 		free(target);
-	return (0);
-}
-
-int	redirects(char *line, t_list **env, int set)
-{
-	static int	saved_fd[2] = {-1, -1};
-	static int	open_files[2];
-
-	if (set == 1)
-		return (set_redirects(line, env, saved_fd, open_files));
-	else
-	{
-		if (saved_fd[1] != -1
-			&& dup2(saved_fd[1], 1) == -1 && !close(saved_fd[1]))
-			return (minish_err("pipe error"));
-		if (saved_fd[0] != -1
-			&& dup2(saved_fd[0], 0) == -1 && !close(saved_fd[0]))
-			return (minish_err("pipe error"));
-		if (open_files[1] == -1)
-			close(open_files[1]);
-		if (open_files[0] == -1)
-			close(open_files[0]);
-		open_files[0] = -1;
-		open_files[1] = -1;
-		saved_fd[0] = -1;
-		saved_fd[1] = -1;
-	}
 	return (0);
 }

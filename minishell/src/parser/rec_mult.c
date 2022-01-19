@@ -18,7 +18,6 @@
 #include <unistd.h>
 #include <sys/wait.h>
 #include <stdio.h>
-#include <stdbool.h>
 
 #include "../exec/exec.h"
 #include "rec_mult.h"
@@ -26,6 +25,7 @@
 #include "../utils/error.h"
 #include "../utils/parsing.h"
 #include "redirect.h"
+#include "../utils/pipes.h"
 
 static int	is_parenthesis(char c)
 {
@@ -105,18 +105,14 @@ int	check_parenthesis(char **line)
 
 int	cmds_redirect(char *line, t_list **env, t_pipe *fd)
 {
-	int	ret;
-
 	if (check_parenthesis(&line))
 		return (cmds_loop(line, env, fd));
-	if (redirects(line, env, 1))
+	if (set_redirects(line, env, fd))
 	{
 		status_code(1, 1);
 		return (0);
 	}
-	ret = search_exec(line, env, fd);
-	redirects(line, env, 0);
-	return (ret);
+	return (search_exec(line, env, fd));
 }
 
 void	wait_forks(int *forks)
@@ -130,15 +126,6 @@ void	wait_forks(int *forks)
 	is_fork(1, 0);
 	if (status != -1 && status_code(0, 0) != 130 && WIFEXITED(status))
 		status_code(1, WEXITSTATUS(status));
-}
-
-void	close_pipes(int fd[2])
-{
-	if (fd[0] != fd[1])
-	{
-		close(fd[0]);
-		close(fd[1]);
-	}
 }
 
 int	do_cmds(char *line, t_list **env, t_pipe *fd, int *forks, t_pipe *data)
@@ -165,15 +152,6 @@ int	do_cmds(char *line, t_list **env, t_pipe *fd, int *forks, t_pipe *data)
 	return (0);
 }
 
-static void	init_pipe_data(t_pipe *fd, t_pipe *data)
-{
-	fd->token = -1;
-	fd->out[0] = data->out[0];
-	fd->out[1] = data->out[1];
-	fd->in[0] =  data->in[0];
-	fd->in[1] =  data->in[1];
-}
-
 int	cmds_loop(char *line, t_list **env, t_pipe *data)
 {
 	char	*cmd_two;
@@ -196,5 +174,6 @@ int	cmds_loop(char *line, t_list **env, t_pipe *data)
 	fd.out[1] = data->out[1];
 	forks += cmds_redirect(line, env, &fd);
 	close_pipes(fd.in);
+	close_pipes(fd.out);
 	return (forks);
 }

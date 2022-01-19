@@ -18,7 +18,7 @@
 int	closed_brace(char **line, int *braces, int has_char)
 {
 	if (!has_char)
-		return (syntax_error("a)"));
+		return (syntax_error(")"));
 	++(*line);
 	while (ft_isspace(**line))
 		++(*line);
@@ -26,7 +26,7 @@ int	closed_brace(char **line, int *braces, int has_char)
 		--(*line);
 	else if (**line && ft_strncmp(*line, "&&", 2) && ft_strncmp(*line, "||", 2)
 		&& ft_strncmp(*line, "|", 1))
-		return (syntax_error("b)"));
+		return (syntax_error(")"));
 	--(*braces);
 	return (0);
 }
@@ -70,7 +70,7 @@ int	check_braces(char *line, char	*line_head)
 	{
 		skip_till_valid(&line);
 		if (braces < 0)
-			return (syntax_error("c)"));
+			return (syntax_error(")"));
 		if (check_char(&line, &braces, &has_char, &has_token))
 			return (1);
 		if (is_token(line, line_head))

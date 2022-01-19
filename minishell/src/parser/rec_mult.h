@@ -18,7 +18,6 @@
 typedef struct s_pipe
 {
 	int	token;
-	int saved_fd[2];
 	int	in[2];
 	int	out[2];
 }	t_pipe;

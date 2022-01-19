@@ -22,7 +22,7 @@ add_executable(minishell
         src/built-in/pwd.c
         src/built-in/unset.c
         src/exec/exec.c
-        src/exec/pipes.c
+        src/utils/pipes.c
         src/parser/parser.c
         src/utils/environ.c
         src/utils/sort.c

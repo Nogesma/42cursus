@@ -38,7 +38,7 @@ void	readline_loop(t_list **environ, char *prompt)
 {
 	char	*line;
 	int		forks;
-	t_pipe fd;
+	t_pipe	fd;
 
 	line = readline(prompt);
 	while (line)

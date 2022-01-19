@@ -19,6 +19,8 @@
 
 # include <libft.h>
 
-int	redirects(char *line, t_list **env, int set);
+# include "rec_mult.h"
+
+int	set_redirects(char *line, t_list **env, t_pipe *fd);
 
 #endif //REDIRECT_H

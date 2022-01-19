@@ -27,7 +27,7 @@ int	heredoc(char *word, int fd)
 
 	child = fork();
 	if (child == -1)
-		return (0);
+		return (-1);
 	if (child == 0)
 	{
 		signal(SIGINT, exit);
@@ -44,5 +44,5 @@ int	heredoc(char *word, int fd)
 		exit(1);
 	}
 	is_fork(1, 1);
-	return (1);
+	return (child);
 }
