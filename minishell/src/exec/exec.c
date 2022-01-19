@@ -50,6 +50,7 @@ int	exec_binary(char *path, char **args, t_list **env, t_pipe *fd)
 		return (0);
 	if (child == 0)
 	{
+		ft_printf(2, "%s\n", args[0]);
 		if (mpipe(fd))
 			exit(1);
 		if (execve(path, args, environ) == -1)

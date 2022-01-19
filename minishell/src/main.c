@@ -38,6 +38,7 @@ void	readline_loop(t_list **environ, char *prompt)
 {
 	char	*line;
 	int		forks;
+	t_pipe fd;
 
 	line = readline(prompt);
 	while (line)
@@ -47,7 +48,11 @@ void	readline_loop(t_list **environ, char *prompt)
 			add_history(line);
 			if (!check_line(line))
 			{
-				forks = cmds_loop(line, environ);
+				fd.out[0] = STDOUT_FILENO;
+				fd.out[1] = STDOUT_FILENO;
+				fd.in[0] = STDIN_FILENO;
+				fd.in[1] = STDIN_FILENO;
+				forks = cmds_loop(line, environ, &fd);
 				wait_forks(&forks);
 			}
 		}

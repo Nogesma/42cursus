@@ -108,7 +108,7 @@ int	cmds_redirect(char *line, t_list **env, t_pipe *fd)
 	int	ret;
 
 	if (check_parenthesis(&line))
-		return (cmds_loop(line, env));
+		return (cmds_loop(line, env, fd));
 	if (redirects(line, env, 1))
 	{
 		status_code(1, 1);
@@ -141,56 +141,59 @@ void	close_pipes(int fd[2])
 	}
 }
 
-int	do_cmds(char *line, t_list **env, t_pipe *fd, int *forks)
+int	do_cmds(char *line, t_list **env, t_pipe *fd, int *forks, t_pipe *data)
 {
-	fd->out[0] = STDOUT_FILENO;
-	fd->out[1] = STDOUT_FILENO;
+	fd->out[0] = data->out[0];
+	fd->out[1] = data->out[1];
 	if (fd->token == 2)
 	{
 		if (pipe(fd->out) == -1)
 			return (minish_err("pipe error"));
 		*forks += cmds_redirect(line, env, fd);
+		close_pipes(fd->in);
+		fd->in[0] = fd->out[0];
+		fd->in[1] = fd->out[1];
 	}
 	else
 	{
 		*forks += cmds_redirect(line, env, fd);
 		wait_forks(forks);
+		close_pipes(fd->in);
+		fd->in[0] =  data->in[0];
+		fd->in[1] =  data->in[1];
 	}
-	close_pipes(fd->in);
-	fd->in[0] = fd->out[0];
-	fd->in[1] = fd->out[1];
 	return (0);
 }
 
-static void	init_pipe_data(t_pipe *fd)
+static void	init_pipe_data(t_pipe *fd, t_pipe *data)
 {
 	fd->token = -1;
-	fd->out[0] = STDOUT_FILENO;
-	fd->out[1] = STDOUT_FILENO;
-	fd->in[0] = STDIN_FILENO;
-	fd->in[1] = STDIN_FILENO;
+	fd->out[0] = data->out[0];
+	fd->out[1] = data->out[1];
+	fd->in[0] =  data->in[0];
+	fd->in[1] =  data->in[1];
 }
 
-int	cmds_loop(char *line, t_list **env)
+int	cmds_loop(char *line, t_list **env, t_pipe *data)
 {
 	char	*cmd_two;
 	t_pipe	fd;
 	int		forks;
 
 	forks = 0;
-	init_pipe_data(&fd);
+	init_pipe_data(&fd, data);
 	fd.token = find_token(line, &cmd_two);
 	while (fd.token >= 0)
 	{
-		do_cmds(line, env, &fd, &forks);
+		do_cmds(line, env, &fd, &forks, data);
 		if ((status_code(0, 0) && fd.token == 0)
 			|| (!status_code(0, 0) && fd.token == 1))
 			return (forks);
 		line = cmd_two;
 		fd.token = find_token(line, &cmd_two);
 	}
-	fd.out[0] = STDOUT_FILENO;
-	fd.out[1] = STDOUT_FILENO;
+	fd.out[0] = data->out[0];
+	fd.out[1] = data->out[1];
 	forks += cmds_redirect(line, env, &fd);
 	close_pipes(fd.in);
 	return (forks);
