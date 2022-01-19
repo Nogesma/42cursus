@@ -81,7 +81,7 @@ int	check_parenthesis(char **line)
 	int		count;
 
 	pos = *line;
-	while (*pos == ' ')
+	while (ft_isspace(*pos))
 		pos++;
 	if (*pos != '(')
 		return (0);

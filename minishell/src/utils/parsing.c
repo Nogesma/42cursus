@@ -14,6 +14,8 @@
 // Created by Tadeusz Kondracki on 1/17/22.
 //
 
+#include <libft.h>
+
 //skips all characters inhibited by " or ' in line
 int	skip_till_valid(char **line)
 {
@@ -45,9 +47,9 @@ int	erase_word(char *line)
 	int		pos;
 
 	pos = 0;
-	while (line[pos] && line[pos] == ' ')
+	while (line[pos] && ft_isspace(line[pos]))
 		pos++;
-	while (line[pos] && line[pos] != ' '
+	while (line[pos] && !ft_isspace(line[pos])
 		&& line[pos] != '<' && line[pos] != '>')
 	{
 		tmp = line + pos;

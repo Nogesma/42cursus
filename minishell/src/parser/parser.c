@@ -32,7 +32,7 @@ static int	ft_count(const char *str)
 			is_apostrophe = is_apostrophe ^ 1;
 		if (!is_apostrophe && str[i] == '"')
 			is_quote = is_quote ^ 1;
-		if (!is_quote && !is_apostrophe && ' ' == str[i] && ' ' != str[i + 1])
+		if (!is_quote && !is_apostrophe && ' ' == str[i] && ' ' != str[i + 1]) //todo isspace?
 			size += count_wildcard(str[i + 1] == '*'
 					&& (str[i + 2] == ' ' || str[i + 2] == 0));
 		i++;
@@ -51,9 +51,9 @@ static int	word_size(char *s, t_list **env)
 	i = 0;
 	is_special = 0;
 	size = 0;
-	while (s[i] == ' ')
+	while (ft_isspace(s[i]))
 		s++;
-	while (s[i] && (s[i] != ' ' || is_special))
+	while (s[i] && (!ft_isspace(s[i]) || is_special))
 	{
 		if (s[i] == '\'' && is_special != 1)
 			is_special = is_special ^ -1;
@@ -76,9 +76,9 @@ static int	special_word(char *s, t_list **env, int *pos, char **new)
 		*pos = 0;
 		return (1);
 	}
-	while (s[*pos] == ' ')
+	while (ft_isspace(s[*pos]))
 		(*pos)++;
-	if (s[*pos] == '*' && (s[(*pos) + 1] == ' ' || s[(*pos) + 1] == 0))
+	if (s[*pos] == '*' && (ft_isspace(s[(*pos) + 1]) || s[(*pos) + 1] == 0))
 	{
 		*new = wildcard(pos);
 		if (*new)
@@ -101,7 +101,7 @@ static char	*next_word(char *s, t_list **env)
 		return (new);
 	is_special = 0;
 	i = 0;
-	while (s[pos] && (s[pos] != ' ' || is_special))
+	while (s[pos] && (!ft_isspace(s[pos]) || is_special))
 	{
 		if (s[pos] == '\'' && is_special != 1)
 			is_special = is_special ^ -1;

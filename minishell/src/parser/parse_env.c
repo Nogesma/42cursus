@@ -40,7 +40,7 @@ void	get_env_size(char *s, t_list **env, int *size, int *i)
 			(*size) += 2;
 		else
 			(*size) += 3;
-		while (s[*i] && s[*i] != ' ')
+		while (s[*i] && !ft_isspace(s[*i]))
 			(*i)++;
 	}
 	else

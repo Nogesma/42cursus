@@ -26,7 +26,7 @@
 #include "heredoc.h"
 #include "../utils/parsing.h"
 
-static int	word_size_redirecct(char *s, t_list **env)
+static int	word_size_redirect(char *s, t_list **env)
 {
 	int	i;
 	int	is_special;
@@ -35,9 +35,9 @@ static int	word_size_redirecct(char *s, t_list **env)
 	i = 0;
 	is_special = 0;
 	size = 0;
-	while (s[i] == ' ')
+	while (ft_isspace(s[i]))
 		s++;
-	while (s[i] && ((s[i] != ' ' && s[i] != '<' && s[i] != '>') || is_special))
+	while (s[i] && ((!ft_isspace(s[i]) && s[i] != '<' && s[i] != '>') || is_special))
 	{
 		if (s[i] == '\'' && is_special != 1)
 			is_special = is_special ^ -1;
@@ -60,14 +60,15 @@ static char	*next_word_redirect(char *line, t_list **env)
 	int		i;
 
 	pos = 0;
-	new = (char *)ft_calloc((word_size_redirecct(line, env) + 1), sizeof(char));
+	new = (char *)ft_calloc((word_size_redirect(line, env) + 1), sizeof(char));
 	if (!new)
 		return (NULL);
 	is_special = 0;
 	i = 0;
-	while (line[pos] && line[pos] == ' ')
+	while (line[pos] && ft_isspace(line[pos]))
 		pos++;
-	while (line[pos] && ((line[pos] != ' ' && line[pos] != '<' && line[pos] != '>') || is_special))
+	while (line[pos] && ((!ft_isspace(line[pos])
+			&& line[pos] != '<' && line[pos] != '>') || is_special))
 	{
 		if (line[pos] == '\'' && is_special != 1)
 			is_special = is_special ^ -1;
@@ -123,7 +124,7 @@ int	redirect_out(char *target, int token, int *sfd, int *of)
 	{
 		sfd[1] = dup(1);
 		if (sfd[1] == -1)
-			return (ft_perror("minishell: pipe error"));
+			return (minish_err("pipe error"));
 	}
 	else if (of[1] != -1)
 		close(of[1]);
@@ -131,13 +132,13 @@ int	redirect_out(char *target, int token, int *sfd, int *of)
 	{
 		of[1] = open(target, O_WRONLY | O_APPEND | O_CREAT, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
 		if (of[1] == -1 || dup2(of[1], 1) == -1)
-			return (ft_perror("minishell: pipe error"));
+			return (minish_err(target));
 	}
 	if (token == 1)
 	{
 		of[1] = open(target, O_WRONLY | O_TRUNC | O_CREAT, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
 		if (of[1] == -1 || dup2(of[1], 1) == -1)
-			return (ft_perror("minishell: pipe error"));
+			return (minish_err(target));
 	}
 	return (0);
 }
@@ -148,13 +149,13 @@ static int	redirect_in(char *target, int *sfd, int *of)
 	{
 		sfd[0] = dup(0);
 		if (sfd[0] == -1)
-			return (ft_perror("minishell: pipe error"));
+			return (minish_err("pipe error"));
 	}
 	else if (of[0] != -1)
 		close(of[0]);
 	of[0] = open(target, O_RDONLY);
 	if (of[0] == -1 || dup2(of[0], 0) == -1)
-		return (ft_perror("minishell: pipe error"));
+		return (minish_err(target));
 	return (0);
 }
 
@@ -167,12 +168,17 @@ static int	heredoc_insert(char *target, int *sfd, int *of)
 	{
 		sfd[0] = dup(0);
 		if (sfd[0] == -1)
-			return (ft_perror("minishell: pipe error"));
+			return (minish_err("pipe error"));
 	}
 	else if (of[0] != -1)
+	{
 		close(of[0]);
+		of[0] = -1;
+		if (dup2(sfd[0], 0) == -1)
+			return (minish_err("pipe error"));
+	}
 	if (pipe(p))
-		return (ft_perror("minishell: pipe error"));
+		return (minish_err("pipe error"));
 	if (heredoc(target, p[1]))
 	{
 		wait(&status);
@@ -181,7 +187,7 @@ static int	heredoc_insert(char *target, int *sfd, int *of)
 			status_code(1, WEXITSTATUS(status));
 			of[0] = p[0];
 			if (of[0] == -1 || dup2(of[0], 0) == -1)
-				return (ft_perror("minishell: pipe error"));
+				return (minish_err("pipe error"));
 		}
 		else
 			return (status_code(1, 1));
@@ -224,12 +230,16 @@ int	redirects(char *line, t_list **env, int set)
 		return (set_redirects(line, env, saved_fd, open_files));
 	else
 	{
-		if (saved_fd[1] != -1 && !close(open_files[1])
+		if (saved_fd[1] != -1
 			&& dup2(saved_fd[1], 1) == -1 && !close(saved_fd[1]))
-			return (ft_perror("minishell: pipe error"));
-		if (saved_fd[0] != -1 && !close(open_files[0])
+			return (minish_err("pipe error"));
+		if (saved_fd[0] != -1
 			&& dup2(saved_fd[0], 0) == -1 && !close(saved_fd[0]))
-			return (ft_perror("minishell: pipe error"));
+			return (minish_err("pipe error"));
+		if (open_files[1] == -1)
+			close(open_files[1]);
+		if (open_files[0] == -1)
+			close(open_files[0]);
 		open_files[0] = -1;
 		open_files[1] = -1;
 		saved_fd[0] = -1;
