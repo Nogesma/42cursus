@@ -17,7 +17,6 @@
 
 int	mpipe(t_pipe *fd)
 {
-	ft_printf(2, "in: %d %d\nout: %d %d\n", fd->in[0],fd->in[1],fd->out[0],fd->out[1]);
 	if (fd->out[0] != fd->out[1])
 	{
 		close(fd->out[0]);
