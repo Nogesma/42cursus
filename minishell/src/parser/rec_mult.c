@@ -105,6 +105,11 @@ int	check_parenthesis(char **line)
 
 int	cmds_redirect(char *line, t_list **env, t_pipe *fd)
 {
+	int	save_fdout[2];
+	int	forks;
+
+	save_fdout[0] = fd->out[0];
+	save_fdout[1] = fd->out[1];
 	if (check_parenthesis(&line))
 		return (cmds_loop(line, env, fd));
 	if (set_redirects(line, env, fd))
@@ -112,7 +117,12 @@ int	cmds_redirect(char *line, t_list **env, t_pipe *fd)
 		status_code(1, 1);
 		return (0);
 	}
-	return (search_exec(line, env, fd));
+	forks = search_exec(line, env, fd);
+	if (fd->out[0] != save_fdout[0])
+		close(fd->out[0]);
+	fd->out[0] = save_fdout[0];
+	fd->out[1] = save_fdout[1];
+	return (forks);
 }
 
 void	wait_forks(int *forks)

@@ -122,26 +122,25 @@ static int	find_next_redirect(char *line, t_list **env, char **target)
 
 static int	redirect_out(char *target, int token, t_pipe *fd)
 {
-	close_pipes(fd->out);
-	fd->out[0] = 0;
 	if (token == 0)
 		fd->out[1] = open(target, O_WRONLY | O_APPEND | O_CREAT,
 				S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
-	if (token == 1)
+	else
 		fd->out[1] = open(target, O_WRONLY | O_TRUNC | O_CREAT,
 				S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
 	if (fd->out[1] == -1)
 		return (minish_err(target));
+	fd->out[0] = fd->out[1];
 	return (0);
 }
 
 static int	redirect_in(char *target, t_pipe *fd)
 {
 	close_pipes(fd->in);
-	fd->in[1] = 0;
 	fd->in[0] = open(target, O_RDONLY);
 	if (fd->in[0] == -1)
 		return (minish_err(target));
+	fd->in[1] = fd->in[0];
 	return (0);
 }
 
@@ -152,7 +151,6 @@ static int	heredoc_insert(char *target, t_pipe *fd)
 	pid_t	pid;
 
 	close_pipes(fd->in);
-	fd->in[1] = 0;
 	if (pipe(p))
 		return (minish_err("pipe error"));
 	pid = heredoc(target, p[1]);
@@ -165,6 +163,7 @@ static int	heredoc_insert(char *target, t_pipe *fd)
 			fd->in[0] = p[0];
 			if (fd->in[0] == -1)
 				return (minish_err("pipe error"));
+			fd->in[1] = fd->in[0];
 		}
 		else
 			return (status_code(1, 1));

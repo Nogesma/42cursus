@@ -18,19 +18,13 @@
 int	mpipe(t_pipe *fd)
 {
 	if (fd->out[0] != fd->out[1])
-	{
-		if (fd->out[0] > 2)
-			close(fd->out[0]);
-		if (dup2(fd->out[1], STDOUT_FILENO) == -1)
-			return (minish_err("pipe error"));
-	}
+		close(fd->out[0]);
+	if (dup2(fd->out[1], STDOUT_FILENO) == -1)
+		return (minish_err("pipe errorrrr"));
 	if (fd->in[0] != fd->in[1])
-	{
-		if (fd->in[1] > 2)
-			close(fd->in[1]);
-		if (dup2(fd->in[0], STDIN_FILENO) == -1)
-			return (minish_err("pipe error"));
-	}
+		close(fd->in[1]);
+	if (dup2(fd->in[0], STDIN_FILENO) == -1)
+		return (minish_err("pipe aaaaaa"));
 	return (0);
 }
 
