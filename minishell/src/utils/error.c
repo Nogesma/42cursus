@@ -43,3 +43,10 @@ int	cmd_err(char *command)
 	status_code(1, 127);
 	return (0);
 }
+
+int	minish_err(char *err_msg)
+{
+	ft_printf(2, "minish: ");
+	perror(err_msg);
+	return (1);
+}

@@ -13,6 +13,6 @@
 #ifndef PIPES_H
 # define PIPES_H
 
-void	mpipe(t_pipe *fd);
+int	mpipe(t_pipe *fd);
 
 #endif //PIPES_H

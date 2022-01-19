@@ -45,13 +45,13 @@ int	exec_binary(char *path, char **args, t_list **env, t_pipe *fd)
 	status_code(1, 0);
 	child = fork();
 	if (child == -1)
-	{
 		free(environ);
+	if (child == -1)
 		return (0);
-	}
 	if (child == 0)
 	{
-		mpipe(fd);
+		if (mpipe(fd))
+			exit(1);
 		if (execve(path, args, environ) == -1)
 		{
 			perror(path);
@@ -83,7 +83,8 @@ int	fork_built_in(int (*fn)(char **, t_list **),
 		return (0);
 	if (child == 0)
 	{
-		mpipe(fd);
+		if (mpipe(fd))
+			exit(1);
 		if (fd->out[0] == fd->out[1] && fd->in[0] == fd->in[1])
 			exit(ret);
 		exit(fn(a, b));

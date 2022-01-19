@@ -13,6 +13,6 @@
 #ifndef BRACES_H
 # define BRACES_H
 
-int	check_braces(char *line);
+int	check_braces(char *line, char	*line_head);
 
 #endif //BRACES_H

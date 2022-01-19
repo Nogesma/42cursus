@@ -13,17 +13,21 @@
 #include <unistd.h>
 
 #include "../parser/rec_mult.h"
+#include "../utils/error.h"
 
-void	mpipe(t_pipe *fd)
+int	mpipe(t_pipe *fd)
 {
 	if (fd->out[0] != fd->out[1])
 	{
 		close(fd->out[0]);
-		dup2(fd->out[1], STDOUT_FILENO);
+		if (dup2(fd->out[1], STDOUT_FILENO) == -1)
+			return (minish_err("pipe error"));
 	}
 	if (fd->in[0] != fd->in[1])
 	{
 		close(fd->in[1]);
-		dup2(fd->in[0], STDIN_FILENO);
+		if (dup2(fd->in[0], STDIN_FILENO) == -1)
+			return (minish_err("pipe error"));
 	}
+	return (0);
 }

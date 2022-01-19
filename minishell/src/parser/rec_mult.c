@@ -141,13 +141,14 @@ void	close_pipes(int fd[2])
 	}
 }
 
-void	do_cmds(char *line, t_list **env, t_pipe *fd, int *forks)
+int	do_cmds(char *line, t_list **env, t_pipe *fd, int *forks)
 {
 	fd->out[0] = STDOUT_FILENO;
 	fd->out[1] = STDOUT_FILENO;
 	if (fd->token == 2)
 	{
-		pipe(fd->out);
+		if (pipe(fd->out) == -1)
+			return (minish_err("pipe error"));
 		*forks += cmds_redirect(line, env, fd);
 	}
 	else
@@ -158,6 +159,7 @@ void	do_cmds(char *line, t_list **env, t_pipe *fd, int *forks)
 	close_pipes(fd->in);
 	fd->in[0] = fd->out[0];
 	fd->in[1] = fd->out[1];
+	return (0);
 }
 
 static void	init_pipe_data(t_pipe *fd)
