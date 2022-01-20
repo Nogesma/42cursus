@@ -34,8 +34,8 @@ INC_FLAGS += $(addprefix -I,$(INC_DIRS))
 LIB    := lib/libft/libft.a
 
 CFLAGS += -Wall -Wextra -Werror
-CFLAGS += -O2 -march=native
-CFLAGS += -g3
+#CFLAGS += -O2 -march=native
+#CFLAGS += -g3
 
 all:
 	@$(MAKE) -j$(NPROC) $(NAME)

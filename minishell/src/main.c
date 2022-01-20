@@ -73,7 +73,6 @@ int	main(__attribute__ ((unused)) int ac, __attribute__ ((unused)) char **av,
 	int		ret;
 	t_list	**environ;
 
-	// TODO: remove makefile march, O and g flags 
 	ret = termios_setup();
 	if (ret < 0)
 		return (-1);

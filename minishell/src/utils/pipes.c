@@ -32,7 +32,8 @@ int	mpipe(t_pipe *fd)
 }
 
 /**
- * Close fds if needed. We do not want to close fds if they are stdin, out or err.
+ * Close fds if needed. We do not want to close fds if they are
+ * stdin, out or err.
  * We also do not want to close it twice if it represent the same file.
  * **/
 void	close_pipes(int fd[2])
