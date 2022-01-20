@@ -73,6 +73,8 @@ char	*wildcard(int *pos)
 	if (!lst)
 	{
 		lst = (t_list **)malloc(sizeof(t_list *));
+		if (!lst)
+			return (NULL);
 		*lst = NULL;
 		get_dir_content(lst);
 	}

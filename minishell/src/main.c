@@ -61,7 +61,6 @@ void	readline_loop(t_list **environ, char *prompt)
 	}
 }
 
-// TODO: Put both our name in all headers if possible
 int	main(__attribute__ ((unused)) int ac, __attribute__ ((unused)) char **av,
 			char **env)
 {
@@ -69,6 +68,7 @@ int	main(__attribute__ ((unused)) int ac, __attribute__ ((unused)) char **av,
 	int		ret;
 	t_list	**environ;
 
+	// TODO: remove makefile march, O and g flags 
 	ret = termios_setup();
 	if (ret < 0)
 		return (-1);
