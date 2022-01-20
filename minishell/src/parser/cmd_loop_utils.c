@@ -19,6 +19,7 @@
 
 #include "cmd_loop_utils.h"
 
+//returns -1 for ) and 1 for ( otherwise 0
 static int	is_parenthesis(char c)
 {
 	if (c == '(')
@@ -28,6 +29,7 @@ static int	is_parenthesis(char c)
 	return (0);
 }
 
+//returns which token: &&, ||, | it is
 static int	which_token(char *line)
 {
 	if (!ft_strncmp(line, "&&", 2))
@@ -39,7 +41,7 @@ static int	which_token(char *line)
 	return (-1);
 }
 
-//finds next occurence of tokens &&, || or | in string, zeros their chars,
+// finds next occurence of tokens &&, || or | in string, zeros their chars,
 // stores pointer to characters just
 // after in cmd_two and returns which one it found, -1 if none
 int	find_token(char *line, char **cmd_two)
@@ -70,6 +72,8 @@ int	find_token(char *line, char **cmd_two)
 	return (-1);
 }
 
+//checks if parenthesis present and if true, advances to char after first
+//parenthesis. Zeros first and last parenthesis
 int	check_parenthesis(char **line)
 {
 	char	*pos;

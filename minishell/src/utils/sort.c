@@ -21,6 +21,9 @@ static void	ft_swap(char **a, char **b)
 	*b = c;
 }
 
+/**
+ * Does a bubble sort of the char array lst.
+ * **/
 void	bubble_sort(char **lst)
 {
 	int	i;
@@ -57,6 +60,9 @@ static int	strncmp_insensitive(const char *s1, const char *s2, size_t n)
 		- (unsigned char)ft_tolower(s2[i]));
 }
 
+/**
+ * Does a bubble sort of the t_list lst. This function is used to sort
+ * **/
 void	bubble_sort_lst(t_list **lst, int size)
 {
 	int		i;

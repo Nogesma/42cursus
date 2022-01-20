@@ -15,6 +15,9 @@
 #include "../parser/cmd_loop.h"
 #include "error.h"
 
+/**
+ * Executes pipes and redirect if needed
+ * **/
 int	mpipe(t_pipe *fd)
 {
 	if (fd->out[0] != fd->out[1])
@@ -28,15 +31,16 @@ int	mpipe(t_pipe *fd)
 	return (0);
 }
 
+/**
+ * Close fds if needed. We do not want to close fds if they are stdin, out or err.
+ * We also do not want to close it twice if it represent the same file.
+ * **/
 void	close_pipes(int fd[2])
 {
-	if (fd[0] != fd[1])
-	{
-		if (fd[0] > 2)
-			close(fd[0]);
-		if (fd[1] > 2)
-			close(fd[1]);
-	}
+	if (fd[0] > 2)
+		close(fd[0]);
+	if (fd[1] > 2 && fd[1] != fd[0])
+		close(fd[1]);
 }
 
 void	init_pipe_data(t_pipe *fd, t_pipe *data)
