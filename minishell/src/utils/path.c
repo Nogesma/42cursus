@@ -17,6 +17,9 @@
 
 #include "list.h"
 
+/**
+ * Same function as ft_strjoin, but appends a '/' char between the two strings.
+ * **/
 static char	*ft_strjoin_path(char *s1, char *s2)
 {
 	size_t	s1l;
@@ -36,6 +39,9 @@ static char	*ft_strjoin_path(char *s1, char *s2)
 	return (str);
 }
 
+/**
+ * Search the dir pointed by path for the executable exec.
+ * **/
 static char	*search_path(DIR *dir, char *path, char *exec)
 {
 	struct dirent	*dp;
@@ -58,6 +64,9 @@ static char	*search_path(DIR *dir, char *path, char *exec)
 	return (NULL);
 }
 
+/**
+ * Search each dir pointed by PATH for the exec.
+ * **/
 char	*get_exec_path(char *exec, char *PATH)
 {
 	DIR		*dir;

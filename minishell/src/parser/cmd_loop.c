@@ -120,6 +120,5 @@ int	cmds_loop(char *line, t_list **env, t_pipe *data)
 	fd.out[1] = data->out[1];
 	forks += cmds_redirect(cmd.line, cmd.env, &fd);
 	close_pipes(fd.in);
-	close_pipes(fd.out);
 	return (forks);
 }

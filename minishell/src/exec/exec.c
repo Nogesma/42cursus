@@ -34,6 +34,10 @@
 #include "../parser/cmd_loop.h"
 #include "../utils/pipes.h"
 
+/**
+ * Forks the main process and execute fd redirection if needed
+ * then execute the command path with args.
+ * **/
 int	exec_binary(char *path, char **args, t_list **env, t_pipe *fd)
 {
 	pid_t	child;
@@ -63,6 +67,10 @@ int	exec_binary(char *path, char **args, t_list **env, t_pipe *fd)
 	return (1);
 }
 
+/**
+ * Forks the main process and execute fd redirection if needed
+ * then execute the built-in command with args.
+ * **/
 int	fork_built_in(int (*fn)(char **, t_list **),
 				char **a, t_list **b, t_pipe *fd)
 {
@@ -93,6 +101,9 @@ int	fork_built_in(int (*fn)(char **, t_list **),
 	return (1);
 }
 
+/**
+ * Checks if the command is a built-in, if it is, executes it.
+ * **/
 int	built_in(char **args, t_list **environ, t_pipe *fd)
 {
 	if (!ft_strncmp("cd", args[0], 3))
@@ -112,6 +123,9 @@ int	built_in(char **args, t_list **environ, t_pipe *fd)
 	return (-1);
 }
 
+/**
+ * Checks if a command exists and execute it.
+ * **/
 int	search_exec(char *line, t_list **env, t_pipe *fd)
 {
 	char	**args;
