@@ -84,8 +84,8 @@ int	do_cmds(t_cmdinput cmd, t_pipe *fd, int *forks, t_pipe *data)
 	else
 	{
 		*forks += cmds_redirect(cmd.line, cmd.env, fd);
-		wait_forks(forks);
 		close_pipes(fd->in);
+		wait_forks(forks);
 		fd->in[0] = data->in[0];
 		fd->in[1] = data->in[1];
 	}
