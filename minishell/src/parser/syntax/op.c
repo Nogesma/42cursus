@@ -19,9 +19,11 @@ int	check_double(char *line, char *token)
 {
 	char	*line_head;
 	char	has_char;
+	char	has_token;
 
 	line_head = line;
 	has_char = 0;
+	has_token = 0;
 	while (*line)
 	{
 		skip_till_valid(&line);
@@ -30,6 +32,7 @@ int	check_double(char *line, char *token)
 			if (!has_char)
 				return (syntax_error(token));
 			has_char = 0;
+			has_token = 1;
 		}
 		else if (line > line_head && !ft_strncmp(token, line - 1, 2))
 			has_char = 0;
@@ -37,7 +40,7 @@ int	check_double(char *line, char *token)
 			has_char = 1;
 		++line;
 	}
-	if (!has_char)
+	if (has_token && !has_char)
 		return (syntax_error(token));
 	return (0);
 }

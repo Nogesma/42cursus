@@ -19,9 +19,11 @@ int	check_pipes(char *line)
 {
 	char	*line_head;
 	char	has_char;
+	char	has_token;
 
 	line_head = line;
 	has_char = 0;
+	has_token = 0;
 	while (*line)
 	{
 		skip_till_valid(&line);
@@ -31,13 +33,14 @@ int	check_pipes(char *line)
 				has_char = 1;
 			if (!has_char)
 				return (syntax_error("|"));
+			has_token = 1;
 			has_char = 0;
 		}
 		else if (!ft_isspace(*line))
 			has_char = 1;
 		++line;
 	}
-	if (!has_char)
+	if (has_token && !has_char)
 		return (syntax_error("|"));
 	return (0);
 }
