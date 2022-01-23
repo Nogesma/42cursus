@@ -28,6 +28,8 @@ static t_list	**free_env(t_list **head, char *name)
 			&& ((char *)elem->content)[len] == '=')
 		{
 			prev->next = elem->next;
+			if (elem == *head)
+				*head = elem->next;
 			ft_lstdelone(elem, free);
 			return (head);
 		}
