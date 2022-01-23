@@ -28,7 +28,7 @@ int	get_env_name_size(const char *s)
 	return (i);
 }
 
-//returns strlen of env value (that is some ugly code for $? omg)
+//returns strlen of env value
 void	get_env_size(char *s, t_list **env, int *size, int *i)
 {
 	unsigned char	status;
@@ -36,15 +36,13 @@ void	get_env_size(char *s, t_list **env, int *size, int *i)
 	if (s[*i + 1] == '?')
 	{
 		status = status_code(0, 0);
-		(*i)++;
-		if (status < 10)
+		(*size)++;
+		while (status / 10 != 0)
+		{
+			status = status / 10;
 			(*size)++;
-		else if (status < 100)
-			(*size) += 2;
-		else
-			(*size) += 3;
-		while (s[*i] && !ft_isspace(s[*i]))
-			(*i)++;
+		}
+		(*i)++;
 	}
 	else
 	{
@@ -64,7 +62,7 @@ int	unpack_env(char *s, char *new, t_list **env, int *i)
 		status = ft_itoa(status_code(0, 0));
 		if (!status)
 			return (1);
-		*i += (int)ft_strlcpy(new, status, 4);
+		*i += (int)ft_strlcpy(new + *i, status, ft_strlen(status) + 1);
 		free(status);
 		return (1);
 	}
