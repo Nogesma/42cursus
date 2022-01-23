@@ -38,7 +38,7 @@
  * Forks the main process and execute fd redirection if needed
  * then execute the command path with args.
  * **/
-int	exec_binary(char *path, char **args, t_list **env, t_pipe *fd)
+static int	exec_binary(char *path, char **args, t_list **env, t_pipe *fd)
 {
 	pid_t	child;
 	char	**environ;
@@ -71,7 +71,7 @@ int	exec_binary(char *path, char **args, t_list **env, t_pipe *fd)
  * Forks the main process and execute fd redirection if needed
  * then execute the built-in command with args.
  * **/
-int	fork_built_in(int (*fn)(char **, t_list **),
+static int	fork_built_in(int (*fn)(char **, t_list **),
 				char **a, t_list **b, t_pipe *fd)
 {
 	pid_t	child;
@@ -104,7 +104,7 @@ int	fork_built_in(int (*fn)(char **, t_list **),
 /**
  * Checks if the command is a built-in, if it is, executes it.
  * **/
-int	built_in(char **args, t_list **environ, t_pipe *fd)
+static int	built_in(char **args, t_list **environ, t_pipe *fd)
 {
 	if (!ft_strncmp("cd", args[0], 3))
 		return (fork_built_in(cd, args + 1, environ, fd));
@@ -140,8 +140,6 @@ int	search_exec(char *line, t_list **env, t_pipe *fd)
 	if (ret != -1)
 		return (free_list(args, ret));
 	path = get_env_content(env, "PATH");
-	if (!path)
-		return (free_list(args, 0));
 	command = args[0];
 	if (!(line[0] == '.' || line[0] == '/'))
 		command = get_exec_path(args[0], path);

@@ -29,9 +29,7 @@ int	check_pipes(char *line)
 		skip_till_valid(&line);
 		if (*line == '|')
 		{
-			if (line > line_head && *(line - 1) == '|')
-				has_char = 1;
-			if (!has_char)
+			if (!has_char && !(line > line_head && *(line - 1) == '|'))
 				return (syntax_error("|"));
 			has_token = 1;
 			has_char = 0;

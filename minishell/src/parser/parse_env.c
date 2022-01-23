@@ -53,7 +53,6 @@ void	get_env_size(char *s, t_list **env, int *size, int *i)
 	}
 }
 
-//todo
 int	unpack_env(char *s, char *new, t_list **env, int *i)
 {
 	char	*env_val;

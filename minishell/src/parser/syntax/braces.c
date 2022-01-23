@@ -15,7 +15,7 @@
 #include "../../utils/parsing.h"
 #include "../../utils/error.h"
 
-int	closed_brace(char **line, int *braces, int has_char)
+static int	closed_brace(char **line, int *braces, int has_char)
 {
 	if (!has_char)
 		return (syntax_error(")"));
@@ -31,7 +31,7 @@ int	closed_brace(char **line, int *braces, int has_char)
 	return (0);
 }
 
-int	check_char(char **line, int *braces, char *has_char, char *has_token)
+static int	check_char(char **line, int *braces, char *has_char, char *has_token)
 {
 	if (**line == ')')
 		return (closed_brace(line, braces, *has_char));
@@ -50,7 +50,7 @@ int	check_char(char **line, int *braces, char *has_char, char *has_token)
 	return (0);
 }
 
-int	is_token(char *line, const char *line_head)
+static int	is_token(char *line, const char *line_head)
 {
 	return (!ft_strncmp(line, "|", 1)
 		|| (line > line_head && (!ft_strncmp(line - 1, "&&", 2)

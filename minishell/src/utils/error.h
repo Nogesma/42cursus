@@ -23,6 +23,4 @@ int	syntax_error(char *err);
 
 int	cmd_err(char *command);
 
-int	minish_err(char *err_msg);
-
 #endif //ERROR_H

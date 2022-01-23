@@ -23,15 +23,13 @@
 #include "cmd_loop.h"
 #include "../utils/global.h"
 #include "../utils/error.h"
-#include "../utils/parsing.h"
 #include "redirect.h"
-#include "../utils/pipes.h"
 #include "cmd_loop_utils.h"
 
 //sets any < > << >> redirects, while saving current fd and restoring
 //after it exec. If parenthesis are present, recursively calls cmd_loop
 //on the subset of commands
-int	cmds_redirect(char *line, t_list **env, t_pipe *fd)
+static int	cmds_redirect(char *line, t_list **env, t_pipe *fd)
 {
 	int	save_fdout[2];
 	int	forks;
@@ -68,7 +66,7 @@ void	wait_forks(int *forks)
 }
 
 //sets/resets pipe redirects if any and waits for forked cmd if needed
-int	do_cmds(t_cmdinput cmd, t_pipe *fd, int *forks, t_pipe *data)
+static int	do_cmds(t_cmdinput cmd, t_pipe *fd, int *forks, t_pipe *data)
 {
 	fd->out[0] = data->out[0];
 	fd->out[1] = data->out[1];

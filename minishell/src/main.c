@@ -23,6 +23,7 @@
 #include "utils/list.h"
 #include "parser/cmd_loop.h"
 #include "parser/syntax/validator.h"
+#include "built-in/exit.h"
 
 /** Called when user presses Ctrl-c, clears and redisplays prompt **/
 void	sig(__attribute__ ((unused)) int sig)
@@ -66,6 +67,24 @@ void	readline_loop(t_list **environ, char *prompt)
 	}
 }
 
+void	cleanup_on_exit(t_list **environ)
+{
+	char	**exit_args;
+	char	exit_code[2];
+
+	rl_clear_history();
+	ft_lstclear(environ, free);
+	free(environ);
+	ft_strlcpy(exit_code, "1", 2);
+	exit_args = malloc(sizeof(char *) * 2);
+	if (!exit_args)
+		return ;
+	exit_args[0] = exit_code;
+	exit_args[1] = NULL;
+	exit_cmd(exit_args, NULL);
+	free(exit_args);
+}
+
 int	main(__attribute__ ((unused)) int ac, __attribute__ ((unused)) char **av,
 			char **env)
 {
@@ -86,8 +105,6 @@ int	main(__attribute__ ((unused)) int ac, __attribute__ ((unused)) char **av,
 	signal(SIGINT, sig);
 	signal(SIGQUIT, SIG_IGN);
 	readline_loop(environ, prompt);
-	rl_clear_history();
-	ft_lstclear(environ, free);
-	free(environ);
+	cleanup_on_exit(environ);
 	return (1);
 }

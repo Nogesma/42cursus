@@ -10,8 +10,6 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <libft.h>
-
 #include "../../utils/error.h"
 
 int	check_quotes(char *line)

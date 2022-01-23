@@ -16,7 +16,7 @@
 
 /*
  * If stdin is not a tty, we need to set the prompt to an empty string and set
- * term attributes to not echo stdin (<--TODO).
+ * term attributes to not echo stdin.
  * Otherwise we just set the termcaps to not display ^\
  * */
 int	termios_setup(void)

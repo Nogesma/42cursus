@@ -69,7 +69,7 @@ static void	mem_error(void *arg1)
 	ft_printf(STDERR_FILENO, "mem alloc error: couldnt complete task");
 }
 
-void	add_env(t_list **env, char *content)
+static void	add_env(t_list **env, char *content)
 {
 	t_list	*new;
 

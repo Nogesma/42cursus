@@ -24,15 +24,6 @@ int	free_list(char **lst, int ret)
 	return (ret);
 }
 
-void	print_list_fd(int fd, char *prefix, t_list *lst)
-{
-	while (lst)
-	{
-		ft_printf(fd, "%s%s\n", prefix, lst->content);
-		lst = lst->next;
-	}
-}
-
 int	new_lst(t_list **head, void *content)
 {
 	t_list	*elem;

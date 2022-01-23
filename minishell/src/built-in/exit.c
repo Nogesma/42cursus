@@ -20,7 +20,7 @@ int	exit_cmd(char **args, t_list **print)
 
 	if (print == NULL)
 		ft_printf(STDERR_FILENO, "exit\n");
-	if (*args == NULL)
+	if (args == NULL || *args == NULL)
 		exit(0);
 	i = -1;
 	while (args[0][++i])

@@ -17,7 +17,7 @@
 
 int		free_list(char **lst, int ret);
 
-t_list	*new_lst(t_list **head, void *content);
+int		new_lst(t_list **head, void *content);
 
 t_list	**char_to_lst(char **args);
 
