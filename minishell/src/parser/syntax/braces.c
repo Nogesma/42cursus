@@ -31,7 +31,8 @@ static int	closed_brace(char **line, int *braces, int has_char)
 	return (0);
 }
 
-static int	check_char(char **line, int *braces, char *has_char, char *has_token)
+static int	check_char(char **line, int *braces, char *has_char,
+						char *has_token)
 {
 	if (**line == ')')
 		return (closed_brace(line, braces, *has_char));

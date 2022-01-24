@@ -23,5 +23,6 @@ typedef struct s_pipe
 int		mpipe(t_pipe *fd);
 void	close_pipes(int fd[2]);
 void	init_pipe_data(t_pipe *fd, t_pipe *data);
+void	restore_fd(t_pipe *fd, int saved_fd[2]);
 
 #endif //PIPES_H

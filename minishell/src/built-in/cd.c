@@ -65,6 +65,9 @@ int	cd(char **args, t_list **env)
 			"minish: cd: %s: %s\n", args[0], strerror(errno));
 		return (1);
 	}
+	//todo: memory leak if args[1] exist
+	free(args[0]);
+	args[0] = NULL;
 	pwd = getcwd(NULL, 0);
 	if (!pwd)
 		return (free_all(old_pwd, NULL, NULL, NULL));

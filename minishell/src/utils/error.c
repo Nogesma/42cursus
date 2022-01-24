@@ -37,10 +37,10 @@ int	cmd_err(char *command)
 {
 	if (!(command[0] == '.' || command[0] == '/'))
 		ft_printf(STDERR_FILENO,
-			"minishell: %s: command not found\n", command);
+			"minish: %s: command not found\n", command);
 	else
 		ft_printf(STDERR_FILENO,
-			"minishell: %s: No such file or directory\n", command);
+			"minish: %s: No such file or directory\n", command);
 	status_code(1, 127);
 	return (0);
 }

@@ -25,7 +25,7 @@ static int	is_valid_env(char *str)
 	if (!ft_isalpha(*str) && *str != '_')
 	{
 		ft_printf(STDERR_FILENO,
-			"minishell: export: `%s': not a valid identifier\n", str);
+			"minish: export: `%s': not a valid identifier\n", str);
 		return (0);
 	}
 	i = 0;
@@ -34,7 +34,7 @@ static int	is_valid_env(char *str)
 		if (!ft_isalnum(str[i]) && str[i] != '_')
 		{
 			ft_printf(STDERR_FILENO,
-				"minishell: export: `%s': not a valid identifier\n", str);
+				"minish: export: `%s': not a valid identifier\n", str);
 			return (0);
 		}
 		i++;

@@ -8,9 +8,9 @@ add_compile_options(-Wall -Werror -Wextra -Ilib/libft)
 add_link_options(-Llib/libft -lft -lreadline)
 
 include_directories(lib/libft)
-include_directories(~/.brew/Cellar/readline/8.1.1/include)
+include_directories(~/.brew/opt/readline/include)
 link_directories(lib/libft)
-link_directories(~/.brew/Cellar/readline/8.1.1/lib)
+link_directories(~/.brew/opt/readline/lib)
 
 add_executable(minishell
         src/main.c

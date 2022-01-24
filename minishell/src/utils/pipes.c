@@ -52,3 +52,15 @@ void	init_pipe_data(t_pipe *fd, t_pipe *data)
 	fd->in[0] = data->in[0];
 	fd->in[1] = data->in[1];
 }
+
+void	restore_fd(t_pipe *fd, int saved_fd[2])
+{
+	close_pipes(fd->in);
+	close_pipes(fd->out);
+	fd->in[0] = STDIN_FILENO;
+	fd->in[1] = STDIN_FILENO;
+	fd->out[0] = STDOUT_FILENO;
+	fd->out[1] = STDOUT_FILENO;
+	dup2(saved_fd[0], STDIN_FILENO);
+	dup2(saved_fd[1], STDOUT_FILENO);
+}

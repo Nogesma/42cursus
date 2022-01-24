@@ -13,8 +13,8 @@ ifeq ($(UNAME), Linux)
 	NPROC := $(shell nproc)
 else
 	NPROC := $(shell sysctl -n hw.ncpu)
-	INC_FLAGS += -I$(HOME)/.brew/Cellar/readline/8.1.1/include
-    LIBS += -L$(HOME)/.brew/Cellar/readline/8.1.1/lib
+	INC_FLAGS += -I$(HOME)/.brew/opt/readline/include
+    LIBS += -L$(HOME)/.brew/opt/readline/lib
 endif
 
 MAKEFLAGS += --output-sync=target

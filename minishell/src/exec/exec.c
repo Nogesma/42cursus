@@ -67,6 +67,24 @@ static int	exec_binary(char *path, char **args, t_list **env, t_pipe *fd)
 	return (1);
 }
 
+static int	exec_built_in(int (*fn)(char **, t_list **),
+				char **a, t_list **b, t_pipe *fd)
+{
+	int	saved_fd[2];
+	int	ret;
+
+	saved_fd[0] = dup(STDIN_FILENO);
+	saved_fd[1] = dup(STDOUT_FILENO);
+	if (mpipe(fd))
+		return (1);
+	if (fn == exit_cmd)
+		ret = fn(a, NULL);
+	else
+		ret = fn(a, b);
+	restore_fd(fd, saved_fd);
+	return (ret);
+}
+
 /**
  * Forks the main process and execute fd redirection if needed
  * then execute the built-in command with args.
@@ -80,21 +98,16 @@ static int	fork_built_in(int (*fn)(char **, t_list **),
 	ret = 0;
 	status_code(1, 0);
 	if (fd->out[0] == fd->out[1] && fd->in[0] == fd->in[1])
-	{
-		if (fn == exit_cmd)
-			ret = fn(a, NULL);
-		else
-			ret = fn(a, b);
-	}
+		ret = exec_built_in(fn, a, b, fd);
 	child = fork();
 	if (child == -1)
 		return (0);
 	if (child == 0)
 	{
-		if (mpipe(fd))
-			exit(1);
 		if (fd->out[0] == fd->out[1] && fd->in[0] == fd->in[1])
 			exit(ret);
+		if (mpipe(fd))
+			exit(1);
 		exit(fn(a, b));
 	}
 	is_fork(1, 1);
