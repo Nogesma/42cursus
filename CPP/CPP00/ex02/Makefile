@@ -10,7 +10,7 @@
 #                                                                              #
 # **************************************************************************** #
 
-CFLAGS = -Wall -Wextra -Werror
+CFLAGS = -Wall -Wextra -Werror -std=c++98 -pedantic
 CC     = c++ $(CFLAGS)
 OBJ    = Account.o tests.o
 NAME   = account
