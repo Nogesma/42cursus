@@ -38,6 +38,8 @@ static int	cmds_redirect(char *line, t_list **env, t_pipe *fd)
 	save_fdout[1] = fd->out[1];
 	if (check_parenthesis(&line))
 		return (cmds_loop(line, env, fd));
+	if (fd->out[0] != fd->out[1] || fd->in[0] != fd->in[1])
+		fd->token = 2;
 	if (set_redirects(line, env, fd))
 	{
 		status_code(1, 1);

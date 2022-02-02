@@ -97,14 +97,14 @@ static int	fork_built_in(int (*fn)(char **, t_list **),
 
 	ret = 0;
 	status_code(1, 0);
-	if (fd->out[0] == fd->out[1] && fd->in[0] == fd->in[1])
+	if (fd->token != 2)
 		ret = exec_built_in(fn, a, b, fd);
 	child = fork();
 	if (child == -1)
 		return (0);
 	if (child == 0)
 	{
-		if (fd->out[0] == fd->out[1] && fd->in[0] == fd->in[1])
+		if (fd->token != 2)
 			exit(ret);
 		if (mpipe(fd))
 			exit(1);
