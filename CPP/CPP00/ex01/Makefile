@@ -10,9 +10,9 @@
 #                                                                              #
 # **************************************************************************** #
 
-CFLAGS = -Wall -Wextra -Werror
+CFLAGS = -Wall -Wextra -Werror -std=c++98 -pedantic
 CC     = c++ $(CFLAGS)
-OBJ    = phonebook.o
+OBJ    = Phonebook.o Contact.o main.o
 NAME   = phonebook
 LIB = -ledit
 
