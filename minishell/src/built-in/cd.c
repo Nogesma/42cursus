@@ -56,18 +56,20 @@ int	cd(char **args, t_list **env)
 	old_pwd = getcwd(NULL, 0);
 	if (!old_pwd)
 		return (-1);
-	if (args[0] == NULL)
-		args[0] = ft_strdup(get_env_content(env, "HOME"));
-	if (chdir(args[0]) == -1)
+	pwd = args[0];
+	if (pwd == NULL)
+		pwd = ft_strdup(get_env_content(env, "HOME"));
+	if (chdir(pwd) == -1)
 	{
+		if (args[0] == NULL)
+			free(pwd);
 		free(old_pwd);
 		ft_printf(STDERR_FILENO,
 			"minish: cd: %s: %s\n", args[0], strerror(errno));
 		return (1);
 	}
-	//todo: memory leak if args[1] exist
-	free(args[0]);
-	args[0] = NULL;
+	if (args[0] == NULL)
+		free(pwd);
 	pwd = getcwd(NULL, 0);
 	if (!pwd)
 		return (free_all(old_pwd, NULL, NULL, NULL));
