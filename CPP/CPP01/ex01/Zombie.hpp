@@ -30,6 +30,7 @@ public:
 	~Zombie( void );
 
 	void 	announce ( void );
+	void 	set_name ( std::string name );
 
 
 private:

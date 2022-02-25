@@ -10,7 +10,7 @@ std::string *cpy(std::string *s1, std::string s2, size_t n, size_t j)
 	return (s1);
 }
 
-std::string* replacestr(std::string *buffer, std::string s1, std::string s2)
+std::string* replace_str(std::string *buffer, std::string s1, std::string s2)
 {
 	size_t j;
 	size_t start;
@@ -41,9 +41,6 @@ int		main( int ac, char **av )
 	std::string s1 = av[2];
 	std::string s2 = av[3];
 
-	size_t numberOfNewlines = std::count(s1.begin(), s1.end(), '\n');
-	std::cout << numberOfNewlines << std::endl;
-
 	std::string buffer;
 	std::string line;
 
@@ -53,28 +50,14 @@ int		main( int ac, char **av )
 	if ( file.is_open() )
 	{
 		buffer = "";
-		while ( --numberOfNewlines > 1 )
-		{
-			std::getline(file, line);
-			if( file.eof() ) break;
-			buffer += line;
-			buffer += '\n';
-		}
 		while ( true )
 		{
 			std::getline(file, line);
-			if( file.eof() ) break;
 			buffer += line;
+			if( file.eof() ) break;
 			buffer += '\n';
-			replacestr(&buffer, s1, s2);
-//			std::cout << line << std::endl;
-//			std::cout << buffer << std::endl << std::endl;
-			size_t nl = buffer.find('\n');
-			if (nl == std::string::npos)
-				nl = buffer.length();
-			replace << buffer.substr(0, nl + 1);
-			buffer.erase(0, nl + 1);
 		}
+		replace_str(&buffer, s1, s2);
 		replace << buffer;
 		file.close();
 		replace.close();
