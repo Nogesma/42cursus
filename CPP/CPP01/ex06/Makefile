@@ -12,8 +12,8 @@
 
 CFLAGS = -Wall -Wextra -Werror
 CC     = c++ $(CFLAGS)
-OBJ    = main.o
-NAME   = replace
+OBJ    = main.o Karen.o
+NAME   = karenFilter
 
 .cpp.o:
 	$(CC) -c $< -o $@

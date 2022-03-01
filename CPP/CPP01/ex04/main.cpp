@@ -1,34 +1,16 @@
 #include <iostream>
 #include <fstream>
-#include <algorithm>
-
-std::string *cpy(std::string *s1, std::string s2, size_t n, size_t j)
-{
-	s1->erase(n, j);
-	s1->insert(n, s2);
-
-	return (s1);
-}
 
 std::string* replace_str(std::string *buffer, std::string s1, std::string s2)
 {
-	size_t j;
-	size_t start;
+	size_t i;
 
-	for (size_t i = 0; i < buffer->length(); i++)
+	i = buffer->find(s1);
+	while (i != std::string::npos)
 	{
-		j = 0;
-		start = i;
-		while ((*buffer)[i] == s1[j] && j < s1.length())
-		{
-			i++;
-			j++;
-			if (j == s1.length())
-			{
-				cpy(buffer, s2, start, j);
-				i = start + s2.length();
-			}
-		}
+		buffer->erase(i, s1.length());
+		buffer->insert(i, s2);
+		i = buffer->find(s1);
 	}
 	return (buffer);
 }
