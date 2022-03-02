@@ -12,7 +12,7 @@
 
 CFLAGS = -Wall -Wextra -Werror
 CC     = c++ $(CFLAGS)
-OBJ    = Fixed.o main.o
+OBJ    = Fixed.o main.o Point.o bsp.o
 NAME   = fixed
 
 .cpp.o:
