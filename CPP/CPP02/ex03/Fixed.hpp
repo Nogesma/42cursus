@@ -12,9 +12,9 @@ public:
 
   typedef Fixed t;
 
-  Fixed(void): _val(0) {};
+  Fixed(void);
 
-  ~Fixed(void) {};
+  ~Fixed(void);
 
   Fixed(const Fixed &obj);
 
@@ -52,25 +52,14 @@ public:
   Fixed operator++(int);
 
 
-  static Fixed &min(Fixed &a, Fixed &b)
-  {
-	  return ((a < b) ? a : b);
-  };
+  static Fixed &min(Fixed &a, Fixed &b);
 
-  static const Fixed &min(const Fixed &a, const Fixed &b)
-  {
-	  return ((a < b) ? a : b);
-  };
+  static const Fixed &min(const Fixed &a, const Fixed &b);
 
-  static Fixed &max(Fixed &a, Fixed &b)
-  {
-	  return ((a > b) ? a : b);
-  };
+  static Fixed &max(Fixed &a, Fixed &b);
 
-  static const Fixed &max(const Fixed &a, const Fixed &b)
-  {
-	  return ((a > b) ? a : b);
-  };
+  static const Fixed &max(const Fixed &a, const Fixed &b);
+
 
   int getRawBits(void) const;
 

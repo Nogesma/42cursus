@@ -1,5 +1,11 @@
 #include "Fixed.hpp"
 
+Fixed::Fixed(void) : _val(0)
+{}
+
+Fixed::~Fixed(void)
+{}
+
 Fixed::Fixed(const Fixed &obj)
 {
 	*this = obj;
@@ -123,4 +129,24 @@ std::ostream &operator<<(std::ostream &os, const Fixed &obj)
 {
 	os << obj.toFloat();
 	return (os);
+}
+
+Fixed &Fixed::min(Fixed &a, Fixed &b)
+{
+	return ((a < b) ? a : b);
+}
+
+const Fixed &Fixed::min(const Fixed &a, const Fixed &b)
+{
+	return ((a < b) ? a : b);
+}
+
+Fixed &Fixed::max(Fixed &a, Fixed &b)
+{
+	return ((a > b) ? a : b);
+}
+
+const Fixed &Fixed::max(const Fixed &a, const Fixed &b)
+{
+	return ((a > b) ? a : b);
 }
