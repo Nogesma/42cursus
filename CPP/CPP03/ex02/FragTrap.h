@@ -17,6 +17,10 @@ public:
 
   void highFivesGuys(void);
 
+  FragTrap(const FragTrap &c);
+
+  FragTrap &operator=(const FragTrap &a);
+
 };
 
 

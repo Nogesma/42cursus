@@ -32,3 +32,18 @@ void ScavTrap::guardGate()
 	std::cout << "ScavTrap " << name << " is now in gate keeper mode."
 			  << std::endl;
 }
+
+ScavTrap::ScavTrap(const ScavTrap &a): ClapTrap(a)
+{
+	*this = a;
+}
+
+ScavTrap &ScavTrap::operator=(const ScavTrap &a)
+{
+	this->hp = a.hp;
+	this->ep = a.ep;
+	this->dmg = a.dmg;
+	this->name = a.name;
+
+	return (*this);
+}

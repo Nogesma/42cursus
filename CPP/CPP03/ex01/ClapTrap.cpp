@@ -3,36 +3,35 @@
 //
 
 #include "ClapTrap.hpp"
-#include <iostream>
 
-ClapTrap::ClapTrap(std::string name):name(name), hp(10), ep(10), dmg(0)
+ClapTrap::ClapTrap(std::string name) : name(name), hp(10), ep(10), dmg(0)
 {
-	std::cout << "ClapTrap " << this->name <<" : created" << std::endl;
+	std::cout << this->name <<" : created" << std::endl;
 }
 
 ClapTrap::~ClapTrap()
 {
-	std::cout << "ClapTrap " << this->name <<" : destroyed" << std::endl;
+	std::cout << name <<" : destroyed" << std::endl;
 }
 
 void ClapTrap::attack(const std::string &target)
 {
 	if (ep <= 0 || hp <= 0)
 		return ;
-	this->ep--;
+	ep--;
 	std::cout
-		<< "ClapTrap " << this->name << " attacks " << target << ", causing "
-		<< this->dmg << " points of damage!"
+		<< "ClapTrap " << name << " attacks " << target << ", causing "
+		<< dmg << " points of damage!"
 		<< std::endl;
 }
 
 
 void ClapTrap::takeDamage(unsigned int amount)
 {
-	this->hp -= amount;
+	hp -= amount;
 	std::cout
-		<< "ClapTrap " << this->name << " takes " << amount << " damage. "
-		<< this->hp << " HP left!"
+		<< "ClapTrap " << name << " takes " << amount << " damage. "
+		<< hp << " HP left!"
 		<< std::endl;
 }
 
@@ -40,10 +39,25 @@ void ClapTrap::beRepaired(unsigned int amount)
 {
 	if (ep <= 0 || hp <= 0)
 		return ;
-	this->ep--;
-	this->hp += amount;
+	ep--;
+	hp += amount;
 	std::cout
-		<< "ClapTrap " << this->name << " repaired " << amount << ". "
-		<< this->hp << " HP left!"
+		<< "ClapTrap " << name << " repaired " << amount << ". "
+		<< hp << " HP left!"
 		<< std::endl;
+}
+
+ClapTrap::ClapTrap(const ClapTrap &a)
+{
+	*this = a;
+}
+
+ClapTrap &ClapTrap::operator=(const ClapTrap &a)
+{
+	this->hp = a.hp;
+	this->ep = a.ep;
+	this->dmg = a.dmg;
+	this->name = a.name;
+
+	return (*this);
 }

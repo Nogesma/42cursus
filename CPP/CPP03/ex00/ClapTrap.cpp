@@ -40,9 +40,24 @@ void ClapTrap::beRepaired(unsigned int amount)
 	if (ep <= 0 || hp <= 0)
 		return ;
 	ep--;
-	hp += amount;å
+	hp += amount;
 	std::cout
 		<< "ClapTrap " << name << " repaired " << amount << ". "
 		<< hp << " HP left!"
 		<< std::endl;
+}
+
+ClapTrap::ClapTrap(const ClapTrap &a)
+{
+	*this = a;
+}
+
+ClapTrap &ClapTrap::operator=(const ClapTrap &a)
+{
+	this->hp = a.hp;
+	this->ep = a.ep;
+	this->dmg = a.dmg;
+	this->name = a.name;
+
+	return (*this);
 }

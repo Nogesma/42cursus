@@ -25,3 +25,18 @@ void FragTrap::highFivesGuys()
 			  << std::endl;
 	std::getline(std::cin, high_five);
 }
+
+FragTrap::FragTrap(const FragTrap &a): ClapTrap(a)
+{
+	*this = a;
+}
+
+FragTrap &FragTrap::operator=(const FragTrap &a)
+{
+	this->hp = a.hp;
+	this->ep = a.ep;
+	this->dmg = a.dmg;
+	this->name = a.name;
+
+	return (*this);
+}

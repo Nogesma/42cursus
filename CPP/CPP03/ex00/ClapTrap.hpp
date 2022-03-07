@@ -17,6 +17,10 @@ public:
 
   ~ClapTrap();
 
+  ClapTrap(const ClapTrap &c);
+
+  ClapTrap &operator=(const ClapTrap &a);
+
   void attack(const std::string &target);
 
   void takeDamage(unsigned int amount);

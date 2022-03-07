@@ -7,13 +7,17 @@
 
 #include "ClapTrap.hpp"
 
-class ScavTrap : public virtual ClapTrap
+class ScavTrap : virtual public ClapTrap
 {
 
 public:
   ScavTrap(std::string name);
 
   ~ScavTrap();
+
+  ScavTrap(const ScavTrap &c);
+
+  ScavTrap &operator=(const ScavTrap &a);
 
   void attack(const std::string &target);
 
