@@ -2,6 +2,7 @@
 #define CPP04_IMATERIASOURCE_H
 
 #include <iostream>
+#include "AMateria.h"
 
 class IMateriaSource {
 public:

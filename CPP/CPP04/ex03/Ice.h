@@ -6,10 +6,15 @@
 #define CPP04_ICE_H
 
 #include "AMateria.h"
+#include "ICharacter.h"
 
 class Ice : public AMateria {
-  virtual Ice *clone() const = 0;
-  virtual void use(ICharacter &target);
+public:
+  Ice();
+  Ice(const Ice &);
+
+  AMateria *clone() const;
+  void use(ICharacter &target);
 };
 
 #endif // CPP04_ICE_H

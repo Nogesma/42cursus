@@ -12,8 +12,8 @@
 
 CFLAGS = -Wall -Wextra -Werror -std=c++98 -pedantic
 CC     = c++ $(CFLAGS)
-OBJ    = main.o AMateria.o Ice.o
-NAME   = animal
+OBJ    = main.o AMateria.o Ice.o Cure.o MateriaSource.o Character.o
+NAME   = materia
 
 .cpp.o:
 	$(CC) -c $< -o $@

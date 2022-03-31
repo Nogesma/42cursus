@@ -2,8 +2,10 @@
 // Created by Mano Segransan on 3/3/22.
 //
 #include "AMateria.h"
-#include "ICharacter.h"
-#include "IMateriaSource.h"
+#include "Cure.h"
+#include "Character.h"
+#include "Ice.h"
+#include "MateriaSource.h"
 
 int main() {
   IMateriaSource *src = new MateriaSource();

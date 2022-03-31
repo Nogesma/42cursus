@@ -4,12 +4,13 @@
 
 #include "Ice.h"
 
-virtual Ice *Ice::clone() const = 0
-{
-  return (new Ice(this));
-}
+Ice::Ice() : AMateria("ice") {}
 
-virtual void Ice::use(ICharacter &target) {
+Ice::Ice(const Ice &i): AMateria(i.type) {}
+
+AMateria *Ice::clone() const { return (new Ice(*this)); }
+
+void Ice::use(ICharacter &target) {
   std::cout << "* shoots an ice bolt at " << target.getName() << " *"
             << std::endl;
 }
