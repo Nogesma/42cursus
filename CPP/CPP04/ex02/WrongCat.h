@@ -7,8 +7,7 @@
 
 #include "WrongAnimal.h"
 
-class WrongCat: public WrongAnimal
-{
+class WrongCat : public WrongAnimal {
 public:
   WrongCat();
 
@@ -19,5 +18,4 @@ public:
   WrongCat &operator=(const WrongCat &w);
 };
 
-
-#endif //CPP04_WRONGCAT_H
+#endif // CPP04_WRONGCAT_H

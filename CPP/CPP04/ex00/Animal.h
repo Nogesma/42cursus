@@ -7,8 +7,7 @@
 
 #include <iostream>
 
-class Animal
-{
+class Animal {
 public:
   Animal();
 
@@ -20,13 +19,12 @@ public:
 
   std::string getType() const;
 
-  void	setType(std::string type);
+  void setType(std::string type);
 
-  virtual void	makeSound() const;
+  virtual void makeSound() const;
 
 protected:
   std::string type;
 };
 
-
-#endif //CPP04_ANIMAL_H
+#endif // CPP04_ANIMAL_H

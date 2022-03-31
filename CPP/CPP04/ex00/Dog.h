@@ -7,8 +7,7 @@
 
 #include "Animal.h"
 
-class Dog : public Animal
-{
+class Dog : public Animal {
 public:
   Dog();
 
@@ -19,8 +18,6 @@ public:
   ~Dog();
 
   void makeSound() const;
-
 };
 
-
-#endif //CPP04_DOG_H
+#endif // CPP04_DOG_H

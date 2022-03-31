@@ -8,8 +8,7 @@
 #include "Animal.h"
 #include "Brain.h"
 
-class Cat : public Animal
-{
+class Cat : public Animal {
 public:
   Cat();
 
@@ -25,5 +24,4 @@ private:
   Brain *brain;
 };
 
-
-#endif //CPP04_CAT_H
+#endif // CPP04_CAT_H

@@ -7,8 +7,7 @@
 
 #include <iostream>
 
-class Animal
-{
+class Animal {
 public:
   virtual ~Animal();
 
@@ -28,5 +27,4 @@ protected:
   std::string type;
 };
 
-
-#endif //CPP04_ANIMAL_H
+#endif // CPP04_ANIMAL_H

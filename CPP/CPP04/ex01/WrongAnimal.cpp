@@ -4,40 +4,22 @@
 
 #include "WrongAnimal.h"
 
+WrongAnimal::WrongAnimal() { std::cout << "WrongAnimal: created" << std::endl; }
 
-WrongAnimal::WrongAnimal()
-{
-	std::cout << "WrongAnimal: created" << std::endl;
+WrongAnimal::~WrongAnimal() {
+  std::cout << "WrongAnimal: destroyed" << std::endl;
 }
 
-WrongAnimal::~WrongAnimal()
-{
-	std::cout << "WrongAnimal: destroyed" << std::endl;
+WrongAnimal &WrongAnimal::operator=(const WrongAnimal &w) {
+  this->type = w.type;
+
+  return (*this);
 }
 
-WrongAnimal::WrongAnimal(const WrongAnimal &w)
-{
-	*this = w;
-}
+std::string WrongAnimal::getType() const { return (type); }
 
-WrongAnimal &WrongAnimal::operator=(const WrongAnimal &w)
-{
-	this->type = w.type;
+void WrongAnimal::setType(std::string type) { this->type = type; }
 
-	return (*this);
-}
-
-std::string WrongAnimal::getType() const
-{
-	return (type);
-}
-
-void WrongAnimal::setType(std::string type)
-{
-	this->type = type;
-}
-
-void WrongAnimal::makeSound() const
-{
-	std::cout << "Wrong sound!" << std::endl;
+void WrongAnimal::makeSound() const {
+  std::cout << "Wrong sound!" << std::endl;
 }

@@ -8,8 +8,7 @@
 #include "Animal.h"
 #include "Brain.h"
 
-class Dog : public Animal
-{
+class Dog : public Animal {
 public:
   Dog();
 
@@ -20,9 +19,9 @@ public:
   Dog(const Dog &a);
 
   Dog &operator=(const Dog &a);
+
 private:
   Brain *brain;
 };
 
-
-#endif //CPP04_DOG_H
+#endif // CPP04_DOG_H

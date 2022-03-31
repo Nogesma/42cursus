@@ -7,8 +7,7 @@
 
 #include <iostream>
 
-class Brain
-{
+class Brain {
 public:
   Brain();
 
@@ -22,5 +21,4 @@ private:
   std::string ideas[100];
 };
 
-
-#endif //CPP04_BRAIN_H
+#endif // CPP04_BRAIN_H

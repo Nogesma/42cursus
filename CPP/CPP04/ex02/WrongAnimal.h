@@ -7,8 +7,7 @@
 
 #include <iostream>
 
-class WrongAnimal
-{
+class WrongAnimal {
 public:
   WrongAnimal();
 
@@ -28,5 +27,4 @@ protected:
   std::string type;
 };
 
-
-#endif //CPP04_WRONGANIMAL_H
+#endif // CPP04_WRONGANIMAL_H

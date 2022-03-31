@@ -4,37 +4,20 @@
 
 #include "Animal.h"
 
-Animal::Animal()
-{
-	std::cout << "Animal: created" << std::endl;
+Animal::Animal() { std::cout << "Animal: created" << std::endl; }
+
+Animal::Animal(const Animal &a) { *this = a; }
+
+Animal &Animal::operator=(const Animal &a) {
+  this->type = a.type;
+
+  return (*this);
 }
 
-Animal::Animal(const Animal &a)
-{
-	*this = a;
-}
+Animal::~Animal() { std::cout << "Animal: destroyed" << std::endl; }
 
-Animal &Animal::operator=(const Animal &a)
-{
-	this->type = a.type;
+std::string Animal::getType() const { return (type); }
 
-	return (*this);
-}
+void Animal::setType(std::string type) { this->type = type; }
 
-Animal::~Animal()
-{
-	std::cout << "Animal: destroyed" << std::endl;
-}
-
-std::string Animal::getType() const
-{
-	return (type);
-}
-
-void Animal::setType(std::string type)
-{
-	this->type = type;
-}
-
-void Animal::makeSound() const
-{}
+void Animal::makeSound() const {}
