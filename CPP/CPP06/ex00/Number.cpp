@@ -116,7 +116,7 @@ std::ostream &operator<<(std::ostream &os, const Number &n)
 	else
 	{
 		if (static_cast<int>(n.getValue()) ==
-			static_cast<double>(n.getValue())) // todo: fix precision
+			static_cast<double>(n.getValue()))
 			os << std::fixed << std::setprecision(1);
 		os << static_cast<double>(n.getValue()) << 'f' << '\n';
 	}
@@ -127,7 +127,7 @@ std::ostream &operator<<(std::ostream &os, const Number &n)
 	else
 	{
 		if (static_cast<int>(n.getValue()) ==
-			static_cast<double>(n.getValue())) // todo: fix precision
+			static_cast<double>(n.getValue()))
 			os << std::fixed << std::setprecision(1);
 		os << n.getValue() << '\n';
 	}
