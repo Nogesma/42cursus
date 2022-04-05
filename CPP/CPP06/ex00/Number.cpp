@@ -7,55 +7,56 @@
 #include <iomanip>
 #include <cmath>
 
-Number::Number(std::string str)
+Number::Number(char *s)
 {
-	if (str.back() == 'f')
+	std::string str(s);
+
+	if (str.length() == 1 && std::isprint(str[0]) && !std::isdigit(str[0]))
+	{
+		this->type = 'c';
+		this->val = str[0];
+		this->isValid = 1;
+	} else if ((str.back() == 'f' && str.find("inf") == std::string::npos) ||
+			   str.find("inff") != std::string::npos)
+	{
 		str.pop_back();
+		this->type = 'f';
+	} else if (str.find('.') != std::string::npos ||
+			   str == "nan" ||
+			   str.find("inf") != std::string::npos)
+		this->type = 'd';
+	else
+		this->type = 'i';
 
-	this->c = this->stoc(str);
-	this->i = this->stoi(str);
-	this->f = this->stof(str);
-	this->d = this->stod(str);
-
-	if (str == "nan")
+	if (this->type != 'c')
 	{
-		this->f = NAN;
-		this->isValid |= 4;
-		this->d = NAN;
-		this->isValid |= 8;
-	}
-	else if (str == "+inf" || str == "inf")
-	{
-		this->f = INFINITY;
-		this->isValid |= 4;
-		this->d = INFINITY;
-		this->isValid |= 8;
-	}	else if (str == "-inf")
-	{
-		this->f = INFINITY;
-		this->isValid |= 4;
-		this->d = INFINITY;
-		this->isValid |= 8;
-
+		this->stod(str);
+		if (str == "nan")
+		{
+			this->val = NAN;
+			this->isValid = 1;
+		} else if (str == "+inf" || str == "inf")
+		{
+			this->val = INFINITY;
+			this->isValid = 1;
+		} else if (str == "-inf")
+		{
+			this->val = -INFINITY;
+			this->isValid = 1;
+		}
 	}
 }
 
 Number::Number(const Number &a)
 {
-	this->c = a.getChar();
-	this->i = a.getInt();
-	this->f = a.getFloat();
-	this->d = a.getDouble();
-	this->isValid = a.getValid();
+	this->type = a.type;
+	this->val = a.val;
 }
 
 Number &Number::operator=(const Number &a)
 {
-	this->c = a.getChar();
-	this->i = a.getInt();
-	this->f = a.getFloat();
-	this->d = a.getDouble();
-	this->isValid = a.getValid();
+	this->type = a.type;
+	this->val = a.val;
 	return (*this);
 }
 
@@ -63,24 +64,14 @@ Number::~Number()
 {
 }
 
-char Number::getChar() const
+double Number::getValue() const
 {
-	return (this->c);
+	return (this->val);
 }
 
-int Number::getInt() const
+char Number::getType() const
 {
-	return (this->i);
-}
-
-float Number::getFloat() const
-{
-	return (this->f);
-}
-
-double Number::getDouble() const
-{
-	return (this->d);
+	return (this->type);
 }
 
 int Number::getValid() const
@@ -88,80 +79,57 @@ int Number::getValid() const
 	return (this->isValid);
 }
 
-char Number::stoc(const std::string &s)
-{
-	int i;
-
-	if (std::istringstream(s) >> i)
-		this->isValid |= 1;
-	if (i > CHAR_MAX || i < CHAR_MIN)
-		this->isValid &= 14; // 0b1110
-	return (i);
-
-}
-
-int Number::stoi(const std::string &s)
-{
-	int i;
-
-	if (std::istringstream(s) >> i)
-		this->isValid |= 2;
-	return (i);
-}
-
-float Number::stof(const std::string &s)
-{
-	float i;
-
-	if (std::istringstream(s) >> i)
-		this->isValid |= 4;
-	return (i);
-}
-
-double Number::stod(const std::string &s)
+void Number::stod(const std::string &s)
 {
 	double i;
 
 	if (std::istringstream(s) >> i)
-		this->isValid |= 8;
-	return (i);
+	{
+		this->val = i;
+		this->isValid = 1;
+	}
 }
-
 
 std::ostream &operator<<(std::ostream &os, const Number &n)
 {
 	os << "char: ";
-	if (!(n.getValid() & 1))
+	if (!n.getValid() ||
+		static_cast<char>(n.getValue()) != std::round(n.getValue()))
 		os << "impossible\n";
-	else if (std::isprint(n.getChar()))
-		os << '\'' << n.getChar() << '\'' << '\n';
+	else if (std::isprint(static_cast<char>(n.getValue())))
+		os << '\'' << static_cast<char>(n.getValue()) << '\'' << '\n';
 	else
 		os << "Non displayable\n";
 
 	os << "int: ";
-	if (!(n.getValid() & 2))
+	if (!n.getValid() ||
+		static_cast<int>(n.getValue()) != std::round(n.getValue()))
 		os << "impossible\n";
 	else
-		os << n.getInt() << '\n';
+		os << static_cast<int>(n.getValue()) << '\n';
 
 	os << "float: ";
-	if (!(n.getValid() & 4))
+	if (!n.getValid() || (std::round(static_cast<float>(n.getValue())) !=
+						  std::round(n.getValue()) &&
+						  n.getValue() == n.getValue()))
 		os << "impossible\n";
 	else
 	{
-		if (n.getInt() == n.getFloat())
+		if (static_cast<int>(n.getValue()) ==
+			static_cast<double>(n.getValue())) // todo: fix precision
 			os << std::fixed << std::setprecision(1);
-		os << n.getFloat() << 'f' << '\n';
+		os << static_cast<double>(n.getValue()) << 'f' << '\n';
 	}
 
 	os << "double: ";
-	if (!(n.getValid() & 8))
-		os << "impossible";
+	if (!n.getValid())
+		os << "impossible\n";
 	else
 	{
-		if (n.getInt() == n.getDouble())
+		if (static_cast<int>(n.getValue()) ==
+			static_cast<double>(n.getValue())) // todo: fix precision
 			os << std::fixed << std::setprecision(1);
-		os << n.getDouble() << std::endl;
+		os << n.getValue() << '\n';
 	}
 
 	return (os);

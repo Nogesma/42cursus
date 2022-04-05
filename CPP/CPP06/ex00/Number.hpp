@@ -10,7 +10,7 @@
 class Number
 {
 public:
-  Number(std::string str);
+  Number(char *s);
 
   Number(const Number &n);
 
@@ -18,39 +18,18 @@ public:
 
   Number &operator=(const Number &n);
 
-  char getChar() const;
+  double getValue() const;
 
-  int getInt() const;
-
-  float getFloat() const;
-
-  double getDouble() const;
+  char getType() const;
 
   int getValid() const;
 
 private:
-  char stoc(const std::string &s);
+  void stod(const std::string &s);
 
-  int stoi(const std::string &s);
-
-  float stof(const std::string &s);
-
-  double stod(const std::string &s);
-
-  class InvalidConversionException : public std::exception
-  {
-  public:
-	const char *what() const throw()
-	{
-		return "Could not convert number.";
-	}
-  };
-
-  char c;
-  int i;
-  float f;
-  double d;
   int isValid;
+  double val;
+  char type;
 };
 
 std::ostream &operator<<(std::ostream &os, const Number &n);

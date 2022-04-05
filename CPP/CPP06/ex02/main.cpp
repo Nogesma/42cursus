@@ -11,6 +11,8 @@ void identify(Base *p);
 
 void identify(Base &p);
 
+Base::~Base() {}
+
 int main()
 {
 	for (int i = 0; i < 10; ++i)

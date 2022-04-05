@@ -61,26 +61,35 @@ void identify(Base *p)
 
 void identify(Base &p)
 {
-	A *a = dynamic_cast<A *>(&p);
-	if (a)
+	try
 	{
+		A &a = dynamic_cast<A &>(p);
+		(void)a;
 		std::cout << 'A';
-		return;
+		return ;
 	}
+	catch (std::exception &e)
+	{}
 
-	B *b = dynamic_cast<B *>(&p);
-	if (b)
+	try
 	{
+		B &b = dynamic_cast<B &>(p);
+		(void)b;
 		std::cout << 'B';
-		return;
+		return ;
 	}
+	catch (std::exception &e)
+	{}
 
-	C *c = dynamic_cast<C *>(&p);
-	if (c)
+	try
 	{
+		C &c = dynamic_cast<C &>(p);
+		(void)c;
 		std::cout << 'C';
-		return;
+		return ;
 	}
+	catch (std::exception &e)
+	{}
 
 	std::cerr << "Could not identify Base" << std::endl;
 }
