@@ -1,0 +1,33 @@
+version: '3.9'
+
+services:
+  nginx:
+    container_name: nginx
+    restart: always
+    build: nginx
+    tty: true
+    ports:
+      - "443:443"
+      - "80:80"
+#  mongod:
+#    container_name: mongod
+#    restart: always
+#    image: mongo:5.0
+#    volumes:
+#      - mongodb:/data/db
+#    ports:
+#      - 27017:27017
+#  scrambler:
+#    container_name: scrambler
+#    restart: always
+#    image: ghcr.io/nogesma/scrambler:latest
+#  web:
+#    container_name: web
+#    restart: always
+#    image: ghcr.io/nogesma/cube-bot-web:latest
+#    volumes:
+#      - caddy_data:/data
+#      - caddy_config:/config
+#    ports:
+#      - 80:80
+#      - 443:443
