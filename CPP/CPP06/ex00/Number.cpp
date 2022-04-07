@@ -13,23 +13,13 @@ Number::Number(char *s)
 
 	if (str.length() == 1 && std::isprint(str[0]) && !std::isdigit(str[0]))
 	{
-		this->type = 'c';
 		this->val = str[0];
 		this->isValid = 1;
-	} else if ((str.back() == 'f' && str.find("inf") == std::string::npos) ||
-			   str.find("inff") != std::string::npos)
+	} else
 	{
-		str.pop_back();
-		this->type = 'f';
-	} else if (str.find('.') != std::string::npos ||
-			   str == "nan" ||
-			   str.find("inf") != std::string::npos)
-		this->type = 'd';
-	else
-		this->type = 'i';
-
-	if (this->type != 'c')
-	{
+		if ((str[str.length() - 1] == 'f' && str.find("inf") == std::string::npos) ||
+			str.find("inff") != std::string::npos)
+			str.erase(str.length() - 1);
 		this->stod(str);
 		if (str == "nan")
 		{
@@ -49,13 +39,13 @@ Number::Number(char *s)
 
 Number::Number(const Number &a)
 {
-	this->type = a.type;
+	this->isValid = a.isValid;
 	this->val = a.val;
 }
 
 Number &Number::operator=(const Number &a)
 {
-	this->type = a.type;
+	this->isValid = a.isValid;
 	this->val = a.val;
 	return (*this);
 }
@@ -67,11 +57,6 @@ Number::~Number()
 double Number::getValue() const
 {
 	return (this->val);
-}
-
-char Number::getType() const
-{
-	return (this->type);
 }
 
 int Number::getValid() const
@@ -94,7 +79,7 @@ std::ostream &operator<<(std::ostream &os, const Number &n)
 {
 	os << "char: ";
 	if (!n.getValid() ||
-		static_cast<char>(n.getValue()) != std::round(n.getValue()))
+		static_cast<char>(n.getValue()) != std::floor(n.getValue()))
 		os << "impossible\n";
 	else if (std::isprint(static_cast<char>(n.getValue())))
 		os << '\'' << static_cast<char>(n.getValue()) << '\'' << '\n';
@@ -103,22 +88,22 @@ std::ostream &operator<<(std::ostream &os, const Number &n)
 
 	os << "int: ";
 	if (!n.getValid() ||
-		static_cast<int>(n.getValue()) != std::round(n.getValue()))
+		static_cast<int>(n.getValue()) != std::floor(n.getValue()))
 		os << "impossible\n";
 	else
 		os << static_cast<int>(n.getValue()) << '\n';
 
 	os << "float: ";
-	if (!n.getValid() || (std::round(static_cast<float>(n.getValue())) !=
-						  std::round(n.getValue()) &&
+	if (!n.getValid() || (std::floor(static_cast<float>(n.getValue())) !=
+						  std::floor(n.getValue()) &&
 						  n.getValue() == n.getValue()))
 		os << "impossible\n";
 	else
 	{
 		if (static_cast<int>(n.getValue()) ==
-			static_cast<double>(n.getValue()))
+			static_cast<float>(n.getValue()))
 			os << std::fixed << std::setprecision(1);
-		os << static_cast<double>(n.getValue()) << 'f' << '\n';
+		os << static_cast<float>(n.getValue()) << 'f' << '\n';
 	}
 
 	os << "double: ";
