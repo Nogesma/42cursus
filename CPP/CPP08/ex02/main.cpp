@@ -2,33 +2,56 @@
 // Created by Mano Segransan on 3/3/22.
 //
 
-#include "Span.hpp"
+#include "MutantStack.hpp"
 #include <iostream>
 #include <algorithm>
+#include <list>
 
 int main() {
-  {
-    Span sp = Span(5);
-
-    sp.addNumber(6);
-    sp.addNumber(3);
-    sp.addNumber(17);
-    sp.addNumber(9);
-    sp.addNumber(11);
-
-    sp.print();
-    std::cout << sp.shortestSpan() << '\n';
-    std::cout << sp.longestSpan() << '\n';
-  }
-  {
-    std::vector<int> vect(1000000);
-    Span sp = Span(1000000);
-
-    std::generate(vect.begin(), vect.end(), std::rand);
-
-    sp.fill(vect.begin(), vect.end());
-
-    std::cout << sp.shortestSpan() << '\n';
-    std::cout << sp.longestSpan() << '\n';
-  }
+	{
+		MutantStack<int> mstack;
+		mstack.push(5);
+		mstack.push(17);
+		std::cout << mstack.top() << std::endl;
+		mstack.pop();
+		std::cout << mstack.size() << std::endl;
+		mstack.push(3);
+		mstack.push(5);
+		mstack.push(737);
+//[...]
+		mstack.push(0);
+		MutantStack<int>::iterator it = mstack.begin();
+		MutantStack<int>::iterator ite = mstack.end();
+		++it;
+		--it;
+		while (it != ite)
+		{
+			std::cout << *it << std::endl;
+			++it;
+		}
+		std::stack<int> s(mstack);
+	}
+	std::cout << "\n\n";
+	{
+		std::list<int> mstack;
+		mstack.push_back(5);
+		mstack.push_back(17);
+		std::cout << mstack.back() << std::endl;
+		mstack.pop_back();
+		std::cout << mstack.size() << std::endl;
+		mstack.push_back(3);
+		mstack.push_back(5);
+		mstack.push_back(737);
+//[...]
+		mstack.push_back(0);
+		std::list<int>::iterator it = mstack.begin();
+		std::list<int>::iterator ite = mstack.end();
+		++it;
+		--it;
+		while (it != ite)
+		{
+			std::cout << *it << std::endl;
+			++it;
+		}
+	}
 }

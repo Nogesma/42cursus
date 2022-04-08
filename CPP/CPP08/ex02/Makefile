@@ -12,7 +12,7 @@
 
 CFLAGS = -Wall -Wextra -Werror -std=c++98 -pedantic
 CC     = c++ $(CFLAGS)
-OBJ    = main.o Span.o
+OBJ    = main.o
 NAME   = mutant
 
 .cpp.o:
