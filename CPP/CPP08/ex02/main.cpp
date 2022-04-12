@@ -29,6 +29,25 @@ int main() {
 			std::cout << *it << std::endl;
 			++it;
 		}
+
+		std::cout << "\n";
+
+		MutantStack<int> clone = mstack;
+		clone.pop();
+		clone.push(-42);
+		it = mstack.begin();
+		ite = mstack.end();
+		MutantStack<int>::iterator cit = clone.begin();
+		MutantStack<int>::iterator cite = clone.end();
+		++it;
+		--it;
+		while (it != ite && cit != cite)
+		{
+			std::cout << *it << " " << *cit << std::endl;
+			++it;
+			++cit;
+		}
+
 		std::stack<int> s(mstack);
 	}
 	std::cout << "\n\n";

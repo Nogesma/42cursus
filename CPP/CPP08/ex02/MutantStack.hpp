@@ -50,7 +50,7 @@ template<typename T>
 MutantStack<T> &
 MutantStack<T>::operator=(const MutantStack<T> &ms)
 {
-	this->c = std::move(ms.c);
+	this->c = ms.c;
 	return (*this);
 }
 

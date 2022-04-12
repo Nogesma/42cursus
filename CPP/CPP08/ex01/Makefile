@@ -6,12 +6,12 @@
 #    By: msegrans <msegrans@student.42lausan>       +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2021/10/12 12:07:41 by msegrans          #+#    #+#              #
-#    Updated: 2021/10/12 12:07:45 by msegrans         ###   ########.fr        #
+#    Updated: 2022/04/12 17:58:02 by msegrans         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 CFLAGS = -Wall -Wextra -Werror -std=c++98 -pedantic
-CC     = c++ $(CFLAGS)
+CC     = c++-11 $(CFLAGS)
 OBJ    = main.o Span.o
 NAME   = span
 

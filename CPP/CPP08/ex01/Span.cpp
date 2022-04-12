@@ -3,8 +3,9 @@
 //
 
 #include "Span.hpp"
-#include <bits/stdc++.h>
 #include <iostream>
+#include <climits>
+#include <algorithm>
 
 Span::Span(unsigned int N) {
   this->vect = std::vector<int>(N);
@@ -26,8 +27,8 @@ void Span::addNumber(int num) {
   this->vect.push_back(num);
 }
 
-void Span::print() {
-  for (std::vector<int>::iterator i = this->vect.begin(); i != this->vect.end();
+void Span::print() const {
+  for (std::vector<int>::const_iterator i = this->vect.begin(); i != this->vect.end();
        ++i)
     std::cout << *i << ' ';
 
@@ -41,22 +42,24 @@ void Span::fill(const std::vector<int>::iterator &first,
   this->vect.insert(this->vect.end(), first, last);
 }
 
-int Span::shortestSpanSorted(std::vector<int>::iterator first,
-                             std::vector<int>::iterator last) {
+int Span::shortestSpanSorted(const std::vector<int>::const_iterator &first,
+                             const std::vector<int>::const_iterator &last) const {
   int shortest = INT_MAX;
   int tmp;
-
-  while (first + 1 != last) {
-    tmp = std::abs(*first - *(first + 1));
+  int i = 0;
+  
+  
+  while (first + i + 1 != last) {
+    tmp = std::abs(*(first + i) - *(first + i + 1));
     if (tmp < shortest)
       shortest = tmp;
-    ++first;
+	++i;
   }
 
   return (shortest);
 }
 
-int Span::shortestSpan() {
+int Span::shortestSpan() const {
   if (this->vect.size() < 2)
     throw std::exception();
   std::vector<int> tmp = this->vect;

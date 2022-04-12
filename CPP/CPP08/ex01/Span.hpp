@@ -21,14 +21,14 @@ public:
   void fill(const std::vector<int>::iterator &,
             const std::vector<int>::iterator &);
 
-  int shortestSpan();
+  int shortestSpan() const;
   int longestSpan() const;
 
-  void print();
+  void print() const;
 
 private:
-  int shortestSpanSorted(std::vector<int>::iterator,
-                         std::vector<int>::iterator);
+  int shortestSpanSorted(const std::vector<int>::const_iterator &,
+						 const std::vector<int>::const_iterator &) const;
 
   std::vector<int> vect;
 };
