@@ -14,9 +14,9 @@ SHELL = /bin/sh
 
 CXXFLAGS := ${CFLAGS}
 
-CXX ?= g++-11
+CXX ?= g++
 
-INC_FLAGS :=
+INC_FLAGS := -Isrc
 LDFLAGS :=
 
 UNAME = $(shell uname -s)
@@ -51,12 +51,12 @@ all:
 
 $(NAME): $(OBJS)
 	@echo Linking $@
-	@$(CXX) $(CXXFLAGS) $(OBJS) $(LDFLAGS) -o $(NAME)
+	@$(CXX) $(CXXFLAGS) $(INC_FLAGS) $(OBJS) $(LDFLAGS) -o $(NAME)
 
 $(BUILD_DIR)/%.cpp.o: %.cpp
 	@echo Compiling $@
 	@mkdir -p $(dir $@)
-	@$(CXX) -c  $(CXXFLAGS) $< -o $@
+	@$(CXX) -c  $(CXXFLAGS) $(INC_FLAGS) $< -o $@
 
 clean:
 	@rm -rf $(BUILD_DIR)
