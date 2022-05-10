@@ -5,19 +5,20 @@
 #ifndef FT_CONTAINERS_REDBLACKTREE_HPP
 #define FT_CONTAINERS_REDBLACKTREE_HPP
 
+#include <cstddef>
 #include <memory>
 
 namespace ft
 {
 
-	template<typename T, typename Compare, typename Alloc>
+	template< typename T, typename Compare >
 	class RedBlackTree
 	{
-
+	public:
 		typedef Compare compare;
-		typedef Alloc allocator_type;
+		typedef T value_type;
 
-		RedBlackTree(const compare &comp, const allocator_type &alloc);
+		explicit RedBlackTree(compare comp);
 
 		void insert(T &);
 
@@ -33,10 +34,9 @@ namespace ft
 			node *right;
 			bool colour;
 
-			node(T &v, allocator_type &alloc)
+			explicit node(T &v)
 			{
-				val = alloc.allocate(1, 0);
-				alloc.construct(val, v);
+				val = v;
 				left = NULL;
 				right = NULL;
 				colour = false;
@@ -45,25 +45,23 @@ namespace ft
 
 		node *_root;
 		compare _comparator;
-		allocator_type _allocator;
+		std::allocator< node > _allocator;
 	};
 
-	template<typename T, typename Compare, typename Alloc>
-	RedBlackTree<T, Compare, Alloc>::RedBlackTree(const compare &comp,
-												  const allocator_type &alloc)
-		: _root(NULL), _comparator(comp), _allocator(alloc)
-	{}
+	template< typename T, typename Compare >
+	RedBlackTree< T, Compare >::RedBlackTree(compare comp) : _root(NULL), _comparator(comp)
+	{
+		_allocator = std::allocator< node >();
+	}
 
-	template<typename T, typename Compare, typename Alloc>
-	T &RedBlackTree<T, Compare, Alloc>::find(T &v)
+	template< typename T, typename Compare >
+	T &RedBlackTree< T, Compare >::find(T &v)
 	{
 		node *elem = _root;
-		int r;
 
 		while (elem != NULL)
 		{
-			if (_comparator(v, elem->val))
-				elem = elem->left;
+			if (_comparator(v, elem->val)) elem = elem->left;
 			else if (_comparator(elem->val, v))
 				elem = elem->right;
 			else
@@ -72,11 +70,12 @@ namespace ft
 		return (NULL);
 	}
 
-	template<typename T, typename Compare, typename Alloc>
-	void RedBlackTree<T, Compare, Alloc>::insert(T &v)
+	template< typename T, typename Compare >
+	void RedBlackTree< T, Compare >::insert(T &v)
 	{
 		node *elem = _root;
-		node *new_elem = node(v, _allocator);
+		node *new_elem = _allocator.allocate(1, 0);
+		_allocator.construct(new_elem, v);
 
 		if (elem == NULL)
 		{
