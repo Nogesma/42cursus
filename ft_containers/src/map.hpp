@@ -11,6 +11,7 @@
 #include <functional>
 #include <memory>
 #include <string>
+
 namespace ft
 {
 	template< typename Key, typename T, typename Compare = std::less< Key >,
@@ -40,38 +41,50 @@ namespace ft
 
 		explicit map(const key_compare &comp = key_compare(),
 					 const allocator_type &alloc = allocator_type())
-			: _value(comp), _allocator(alloc)
+			: _value(alloc), _comparator(value_compare(comp)), _allocator(alloc)
+		{}
+
+		template< class InputIterator >
+		map(InputIterator first, InputIterator last, const key_compare &comp = key_compare(),
+			const allocator_type &alloc = allocator_type());
+
+		map(const map &x);
+
+		~map(){};
+
+		bool empty() const { return (_value.empty()); }
+		size_type size() const { return (_value.size()); }
+
+		size_type max_size() const { return (std::min(_allocator.max_size(), _value.max_size())); }
+
+		mapped_type &operator[](const key_type &k)
 		{
-			value_type *v = _allocator.allocate(1, 0);
-			const key_type a = "Hello 42!";
-			_allocator.construct(v, ft::make_pair(a, 2));
-//			_value.insert(v);
+			value_type obj = value_type(k, 0);
+
+			return (_value.insert_no_overwrite(_comparator, obj).second);
 		}
 
-
-		//		template< class InputIterator >
-		//		map(InputIterator first, InputIterator last, const key_compare &comp = key_compare(),
-		//			const allocator_type &alloc = allocator_type());
-
-
-		//		map(const map &x);
-
-
 	private:
-		// Overload pair comparison operator to only compare first element
-		//		template< class T1, class T2 >
-		//		bool operator<(const pair< T1, T2 > &lhs, const pair< T1, T2 > &rhs)
-		//		{
-		//			return (lhs.first < rhs.first);
-		//		}
-		//		typedef bool comparator_type(value_type, value_type) const;
-		//
-		//		bool apply_comparator(value_type a, value_type b) const
-		//		{
-		//			return (_comparator(a.first, b.first));
-		//		}
+		class value_compare : std::binary_function< value_type, value_type, bool >
+		{
+			friend class map;
 
-		RedBlackTree< T, key_compare > _value;
+		protected:
+			Compare comp;
+			explicit value_compare(Compare c) : comp(c) {}
+
+		public:
+			typedef bool result_type;
+			typedef value_type first_argument_type;
+			typedef value_type second_argument_type;
+			bool operator()(const value_type &x, const value_type &y) const
+			{
+				return comp(x.first, y.first);
+			}
+		};
+
+		RedBlackTree< value_type, allocator_type > _value;
+		const value_compare _comparator;
 		allocator_type _allocator;
 	};
 }// namespace ft

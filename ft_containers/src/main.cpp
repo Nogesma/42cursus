@@ -65,12 +65,12 @@ int main()
 		//			std::cout << *i << '\n';
 		//		}
 
-//		std::cout << (ft::is_integral< int >::value) << "\n";
-//		ft::vector< int > fc(f.begin(), f.end());
-//		for (int i = 0; i < 3; ++i)
-//		{
-//			std::cout << fc[i] << '\n';
-//		}
+		//		std::cout << (ft::is_integral< int >::value) << "\n";
+		//		ft::vector< int > fc(f.begin(), f.end());
+		//		for (int i = 0; i < 3; ++i)
+		//		{
+		//			std::cout << fc[i] << '\n';
+		//		}
 	}
 	// is_integral
 	{
@@ -83,8 +83,15 @@ int main()
 	}
 	// map
 	{
-		ft::map<std::string, int> mp;
+		ft::map< std::string, int > mp;
 
+		std::cout << "map:\n";
+		std::cout << "empty: " << mp.empty() << '\n';
 
+		std::cout << mp["a"] << '\n';
+
+		mp["a"] = 42;
+
+		std::cout << mp["a"] << '\n';
 	}
 }
