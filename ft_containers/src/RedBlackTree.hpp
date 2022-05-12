@@ -5,7 +5,9 @@
 #ifndef FT_CONTAINERS_REDBLACKTREE_HPP
 #define FT_CONTAINERS_REDBLACKTREE_HPP
 
+#include <cassert>
 #include <cstddef>
+#include <iostream>
 #include <memory>
 
 namespace ft
@@ -19,60 +21,6 @@ namespace ft
 
 		typedef Alloc allocator_type;
 		typedef std::size_t size_type;
-
-
-		explicit RedBlackTree(allocator_type alloc) : _root(NULL), _allocator(alloc)
-		{
-			_node_allocator = std::allocator< node >();
-		}
-
-		~RedBlackTree()
-		{
-			//			for (auto i = begin(); i != end(); ++i)
-			//			{
-			//				_allocator.destroy(i.val);
-			//				_allocator.deallocate(i.val, 1);
-			//				_node_allocator.destroy(*i);
-			//				_node_allocator.deallocate(*i, 1);
-			//			}
-		}
-
-		void del(value_type &);
-
-		template< typename T1 >
-		value_type &insert_no_overwrite(T1 f, value_type &v)
-		{
-			node *elem = _root;
-
-			if (elem == NULL)
-			{
-				_root = create_new_elem(v);
-				_root->colour = BLACK;
-				return (*_root->val);
-			}
-
-			while (true)
-			{
-				if (f(v, *elem->val))
-				{
-					if (elem->left == NULL) return (*insert_elem(elem, v, LEFT)->val);
-					elem = elem->left;
-				}
-				else if (f(*elem->val, v))
-				{
-					if (elem->right == NULL) return (*insert_elem(elem, v, RIGHT)->val);
-					elem = elem->right;
-				}
-				else
-					return (*elem->val);
-			}
-		}
-
-		bool empty() const { return (_size == 0); }
-
-		size_type size() const { return (_size); }
-
-		size_type max_size() const { return (_node_allocator.max_size()); }
 
 	private:
 		enum color_t
@@ -104,6 +52,141 @@ namespace ft
 			}
 		};
 
+		struct tree
+		{
+			node *root;
+		};
+
+	public:
+		explicit RedBlackTree(allocator_type alloc) : _allocator(alloc)
+		{
+			_node_allocator = std::allocator< node >();
+			std::allocator< tree > _tree_allocator = std::allocator< tree >();
+
+			_root = _tree_allocator.allocate(1, 0);
+			_tree_allocator.construct(_root, tree());
+		}
+
+		~RedBlackTree()
+		{
+			//			for (auto i = begin(); i != end(); ++i)
+			//			{
+			//				_allocator.destroy(i.val);
+			//				_allocator.deallocate(i.val, 1);
+			//				_node_allocator.destroy(*i);
+			//				_node_allocator.deallocate(*i, 1);
+			//			}
+		}
+
+		void del(value_type &);
+
+		template< typename T1 >
+		value_type &insert_no_overwrite(T1 f, value_type &v)
+		{
+			node *elem = _root->root;
+
+			if (elem == NULL)
+			{
+				_root->root = create_new_elem(v);
+				_root->root->colour = BLACK;
+				return (*_root->root->val);
+			}
+
+			while (true)
+			{
+				if (f(v, *elem->val))
+				{
+					if (elem->left == NULL) return (*insert_elem(elem, v, LEFT)->val);
+					elem = elem->left;
+				}
+				else if (f(*elem->val, v))
+				{
+					if (elem->right == NULL) return (*insert_elem(elem, v, RIGHT)->val);
+					elem = elem->right;
+				}
+				else
+					return (*elem->val);
+			}
+		}
+
+		bool empty() const { return (_size == 0); }
+
+		size_type size() const { return (_size); }
+
+		size_type max_size() const { return (_node_allocator.max_size()); }
+
+		void print() { std::cout << traversePreOrder() << std::endl; }
+
+		void clear() { clear_rec(_root->root); }
+
+		void clear_rec(node *N)
+		{
+			if (N == NULL) return;
+
+			clear_rec(N->left);
+			clear_rec(N->right);
+
+			_allocator.destroy(N->val);
+			_allocator.deallocate(N->val, 1);
+			_node_allocator.destroy(N);
+			_node_allocator.deallocate(N, 1);
+		}
+
+
+	private:
+		std::string traversePreOrder()
+		{
+
+			if (_root->root == NULL) { return ""; }
+
+			std::string sb;
+			sb.append(_root->root->val->first);
+
+			std::string pointerRight = "└──";
+			std::string pointerLeft = (_root->root->right != NULL) ? "├──" : "└──";
+
+			traverseNodes(sb, "", pointerLeft, _root->root->left, _root->root->right != NULL);
+			traverseNodes(sb, "", pointerRight, _root->root->right, false);
+
+			return sb;
+		}
+
+		void traverseNodes(std::string &sb, const std::string &padding, const std::string &pointer,
+						   node *N, bool hasRightSibling)
+		{
+
+#define RESET "\033[0m"
+#define R "\033[31m"
+			if (N != NULL)
+			{
+				sb.append("\n");
+				sb.append(padding);
+				sb.append(pointer);
+				if (N->colour == RED)
+				{
+					sb.append(R);
+					sb.append(N->val->first);
+					sb.append(RESET);
+				}
+				else
+					sb.append(N->val->first);
+
+				std::string paddingBuilder = std::string(padding);
+				if (hasRightSibling) { paddingBuilder.append("│  "); }
+				else
+				{
+					paddingBuilder.append("   ");
+				}
+
+				std::string paddingForBoth = paddingBuilder;
+				std::string pointerRight = "└──";
+				std::string pointerLeft = (N->right != NULL) ? "├──" : "└──";
+
+				traverseNodes(sb, paddingForBoth, pointerLeft, N->left, N->right != NULL);
+				traverseNodes(sb, paddingForBoth, pointerRight, N->right, false);
+			}
+		}
+
 		node *create_new_elem(value_type &v, node *P = NULL)
 		{
 			value_type *vptr = _allocator.allocate(1, 0);
@@ -116,12 +199,54 @@ namespace ft
 			return (new_elem);
 		}
 
-		node *rotate_tree(node *tree, bool dir)
+		node *rotate_tree(node *P, bool dir)
 		{
-			node *parent = tree->parent;
+			node *G = P->parent;
+			node *S;
 
+			if (dir == LEFT) S = P->right;
+			else
+				S = P->left;
+			node *C;
+
+			assert(S != NULL);// pointer to true node required
+			if (dir == LEFT)
+			{
+				C = S->left;
+				P->right = C;
+			}
+			else
+			{
+				C = S->right;
+				P->left = C;
+			}
+
+			if (C != NULL) C->parent = P;
+			if (dir == LEFT) { S->left = P; }
+			else
+			{
+				S->right = P;
+			}
+			P->parent = S;
+			S->parent = G;
+
+			if (G != NULL)
+			{
+				dir = P == G->right ? RIGHT : LEFT;
+				if (dir == LEFT) { G->left = S; }
+				else
+				{
+					G->right = S;
+				}
+			}
+			else
+				_root->root = S;
+			return S;// new root of subtree
+
+			/*
 			// todo:
-			if (parent == NULL) { return (tree); }
+			if (parent == NULL) { parent = _root; }
+
 
 			if (dir == LEFT)
 			{
@@ -146,10 +271,10 @@ namespace ft
 				l->right = tree;
 			}
 
-			return tree;
+			return tree; */
 		}
 
-		direction_t get_child_dir(node *n) { return (n == n->parent->right ? LEFT : RIGHT); }
+		direction_t get_child_dir(node *n) { return (n == n->parent->left ? LEFT : RIGHT); }
 
 		node *insert_elem(node *P, value_type &v, bool dir)
 		{
@@ -189,7 +314,7 @@ namespace ft
 			return (new_elem);
 
 		case1:
-			if ((dir == LEFT && N == P->left) || (dir == RIGHT && N == P->right))
+			if (get_child_dir(N) != dir)
 			{
 				rotate_tree(P, dir);
 				N = P;
@@ -198,13 +323,13 @@ namespace ft
 					P = G->right;
 			}
 
-			// Case_I6 (P red && U black && N outer grandchild of G):
-			rotate_tree(G, 1 - dir);// G may be the root
+			rotate_tree(G, 1 - dir);
 			P->colour = BLACK;
 			G->colour = RED;
 			return (new_elem);
 		}
-		node *_root;
+
+		tree *_root;
 		size_type _size;
 		std::allocator< node > _node_allocator;
 		allocator_type _allocator;

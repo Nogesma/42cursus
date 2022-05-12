@@ -93,5 +93,14 @@ int main()
 		mp["a"] = 42;
 
 		std::cout << mp["a"] << '\n';
+		std::cout << (mp["b"] = 3) << '\n';
+		mp.print();
+		std::cout << (mp["c"] = 3) << '\n';
+		std::cout << (mp["ef"] = 3) << '\n';
+		std::cout << (mp["e"] = 3) << '\n';
+		std::cout << (mp["f"] = 3) << '\n';
+		std::cout << (mp["w"] = 3) << '\n';
+		std::cout << (mp["y"] = 3) << '\n';
+		mp.print();
 	}
 }

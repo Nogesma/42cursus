@@ -64,6 +64,9 @@ namespace ft
 			return (_value.insert_no_overwrite(_comparator, obj).second);
 		}
 
+		void print() { _value.print(); }
+		void clear() { _value.clear(); }
+
 	private:
 		class value_compare : std::binary_function< value_type, value_type, bool >
 		{
