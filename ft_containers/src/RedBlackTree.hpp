@@ -69,17 +69,50 @@ namespace ft
 
 		~RedBlackTree()
 		{
-			//			for (auto i = begin(); i != end(); ++i)
-			//			{
-			//				_allocator.destroy(i.val);
-			//				_allocator.deallocate(i.val, 1);
-			//				_node_allocator.destroy(*i);
-			//				_node_allocator.deallocate(*i, 1);
-			//			}
+			std::allocator< tree > _tree_allocator = std::allocator< tree >();
+
+			clear();
+
+			_root = _tree_allocator.destroy(_root);
+			_tree_allocator.deallocate(_root, 1);
+		}
+		template< typename T1 >
+		size_t find_and_delete(T1 f, value_type &v)
+		{
+			node *elem = _root->root;
+
+			if (elem == NULL) return (0);
+
+			while (true)
+			{
+				if (f(v, *elem->val))
+				{
+					if (elem->left == NULL) return (0);
+					elem = elem->left;
+				}
+				else if (f(*elem->val, v))
+				{
+					if (elem->right == NULL) return (0);
+					elem = elem->right;
+				}
+				else
+				{
+					del_elem(elem);
+					return (1);
+				}
+			}
 		}
 
-		void del(value_type &);
+		void del_elem(node *N)
+		{
+			_allocator.destroy(N->val);
+			_allocator.deallocate(N->val, 1);
 
+			// todo: rebalance tree before deleting node
+
+			_node_allocator.destroy(N);
+			_node_allocator.deallocate(N, 1);
+		}
 		template< typename T1 >
 		value_type &insert_no_overwrite(T1 f, value_type &v)
 		{
@@ -119,6 +152,7 @@ namespace ft
 
 		void clear() { clear_rec(_root->root); }
 
+	private:
 		void clear_rec(node *N)
 		{
 			if (N == NULL) return;
@@ -132,8 +166,6 @@ namespace ft
 			_node_allocator.deallocate(N, 1);
 		}
 
-
-	private:
 		std::string traversePreOrder()
 		{
 
@@ -173,10 +205,7 @@ namespace ft
 
 				std::string paddingBuilder = std::string(padding);
 				if (hasRightSibling) { paddingBuilder.append("│  "); }
-				else
-				{
-					paddingBuilder.append("   ");
-				}
+				else { paddingBuilder.append("   "); }
 
 				std::string paddingForBoth = paddingBuilder;
 				std::string pointerRight = "└──";
@@ -223,10 +252,7 @@ namespace ft
 
 			if (C != NULL) C->parent = P;
 			if (dir == LEFT) { S->left = P; }
-			else
-			{
-				S->right = P;
-			}
+			else { S->right = P; }
 			P->parent = S;
 			S->parent = G;
 
@@ -234,10 +260,7 @@ namespace ft
 			{
 				dir = P == G->right ? RIGHT : LEFT;
 				if (dir == LEFT) { G->left = S; }
-				else
-				{
-					G->right = S;
-				}
+				else { G->right = S; }
 			}
 			else
 				_root->root = S;
