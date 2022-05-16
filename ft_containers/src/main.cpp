@@ -101,6 +101,11 @@ int main()
 		std::cout << (mp["f"] = 3) << '\n';
 		std::cout << (mp["w"] = 3) << '\n';
 		std::cout << (mp["y"] = 3) << '\n';
+
+		mp.print();
+		mp.erase("v");
+		mp.erase("a");
+		mp.erase("ef");
 		mp.print();
 	}
 }

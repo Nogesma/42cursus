@@ -1,15 +1,3 @@
-# **************************************************************************** #
-#                                                                              #
-#                                                         :::      ::::::::    #
-#    Makefile                                           :+:      :+:    :+:    #
-#                                                     +:+ +:+         +:+      #
-#    By: hsabir <marvin@42.fr>                      +#+  +:+       +#+         #
-#                                                 +#+#+#+#+#+   +#+            #
-#    Created: 2022/01/22 13:45:33 by hsabir            #+#    #+#              #
-#   Updated: 2022/02/23 15:50:01 by                  ###   ########.fr       # #
-#                                                                              #
-# **************************************************************************** #
-
 SHELL = /bin/sh
 
 CXXFLAGS := ${CFLAGS}
@@ -18,17 +6,6 @@ CXX ?= g++
 
 INC_FLAGS := -Isrc
 LDFLAGS :=
-
-UNAME = $(shell uname -s)
-ifeq ($(UNAME), Linux)
-	NPROC := $(shell nproc)
-else
-	NPROC := $(shell sysctl -n hw.ncpu)
-endif
-
-MAKEFLAGS += --output-sync=target
-MAKEFLAGS += --no-print-directory
-MAKEFLAGS += -D_DAR-WIN_UNLIMITED_SELECT
 
 NAME ?= containers
 
@@ -47,8 +24,6 @@ CXXFLAGS += -g3
 CXXFLAGS += -fdiagnostics-color
 CXXFLAGS += -fsanitize=address
 
-all:
-	@$(MAKE) -j$(NPROC) $(NAME)
 
 $(NAME): $(OBJS)
 	@echo Linking $@
@@ -59,6 +34,8 @@ $(BUILD_DIR)/%.cpp.o: %.cpp
 	@mkdir -p $(dir $@)
 	@$(CXX) -c  $(CXXFLAGS) $(INC_FLAGS) $< -o $@
 
+all: $(NAME)
+
 clean:
 	@rm -rf $(BUILD_DIR)
 	@echo Clean done
@@ -68,7 +45,7 @@ fclean:
 	@rm -f $(NAME)
 	@echo Fclean done
 
-re: fclean
-	@$(MAKE)
+re: fclean all
+
 
 .PHONY: all clean fclean re

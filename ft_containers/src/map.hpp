@@ -23,7 +23,7 @@ namespace ft
 		typedef T mapped_type;
 		typedef ft::pair< const key_type, mapped_type > value_type;
 		typedef Compare key_compare;
-//		typedef value_comp value_compare;
+		//		typedef value_comp value_compare;
 
 		typedef Alloc allocator_type;
 		typedef typename allocator_type::reference reference;
@@ -66,6 +66,12 @@ namespace ft
 
 		void print() { _value.print(); }
 		void clear() { _value.clear(); }
+
+		size_type erase(const key_type &k)
+		{
+			value_type obj = value_type(k, 0);
+			return (_value.find_and_delete(_comparator, obj));
+		}
 
 	private:
 		class value_compare : std::binary_function< value_type, value_type, bool >
