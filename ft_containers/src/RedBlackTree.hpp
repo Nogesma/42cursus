@@ -26,7 +26,7 @@ namespace ft
 		enum color_t
 		{
 			RED,
-			BLACK,
+			BLACK
 		};
 
 		enum direction_t

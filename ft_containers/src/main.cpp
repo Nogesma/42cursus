@@ -26,6 +26,10 @@ namespace ft = std;
 
 #include <iostream>
 
+#include <iterator>
+#include <map>
+#include <vector>
+
 int main()
 {
 	// vector
@@ -54,27 +58,20 @@ int main()
 		std::cout << "a should be equal to b: " << (a == b) << '\n';
 
 		std::cout << "and should be empty (0, 1): (" << a.size() << ", " << a.capacity() << ")\n";
-		//		for (int i = 0; i < 100; ++i)
-		//		{
-		//			a.push_back(i);
-		//			std::cout << a.size() << ' ' << a.capacity() << '\n';
-		//		}
+		for (int i = 0; i < 100; i += 5) a.push_back(i);
 
-		//		for (ft::vector<int>::iterator i = a.begin(); i < a.end(); ++i)
-		//		{
-		//			std::cout << *i << '\n';
-		//		}
+		for (ft::vector< int >::iterator i = a.begin(); i < a.end(); ++i) std::cout << *i << ' ';
+		std::cout << '\n';
 
-		//		std::cout << (ft::is_integral< int >::value) << "\n";
-		//		ft::vector< int > fc(f.begin(), f.end());
-		//		for (int i = 0; i < 3; ++i)
-		//		{
-		//			std::cout << fc[i] << '\n';
-		//		}
+		ft::vector< int > fc(a.begin(), a.end());
+
+		std::cout << "fc.size " << fc.size() << ' ' << fc.max_size() << '\n';
+		fc.resize(3);
+		for (int i = 0; i < 3; ++i) { std::cout << fc[i] << ' '; }
+		std::cout << '\n';
 	}
 	// is_integral
 	{
-
 		std::cout << std::boolalpha;
 		std::cout << "is_integral:\n";
 		std::cout << "char: " << ft::is_integral< char >::value << '\n';
@@ -108,4 +105,6 @@ int main()
 		mp.erase("ef");
 		mp.print();
 	}
+
+	{}
 }

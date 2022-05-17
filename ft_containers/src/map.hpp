@@ -59,7 +59,7 @@ namespace ft
 
 		mapped_type &operator[](const key_type &k)
 		{
-			value_type obj = value_type(k, 0);
+			value_type obj = value_type(k, mapped_type());
 
 			return (_value.insert_no_overwrite(_comparator, obj).second);
 		}
@@ -69,7 +69,7 @@ namespace ft
 
 		size_type erase(const key_type &k)
 		{
-			value_type obj = value_type(k, 0);
+			value_type obj = value_type(k, mapped_type());
 			return (_value.find_and_delete(_comparator, obj));
 		}
 

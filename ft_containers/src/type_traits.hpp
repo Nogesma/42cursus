@@ -84,17 +84,6 @@ namespace ft
 	template< class T >
 	struct is_integral : public ft::is_integral_helper< T >
 	{};
-
-	template< typename T, typename = void >
-	struct is_iterator
-	{
-		static const bool value = false;
-	};
-
-	template< class From, class To >
-	struct is_convertible : public ft::false_type
-	{};
-
 }// namespace ft
 
 #endif//FT_CONTAINERS_TYPE_TRAITS_HPP
