@@ -16,7 +16,7 @@ SRCS := $(shell find $(SRC_DIRS) -name '*.cpp')
 OBJS := $(SRCS:%=$(BUILD_DIR)/%.o)
 
 CXXFLAGS += -Wall -Wextra -Wshadow
-CXXFLAGS += -Werror
+#CXXFLAGS += -Werror
 CXXFLAGS += -std=c++98 -pedantic
 #CXXFLAGS += -march=native
 #CXXFLAGS += -O2

@@ -106,5 +106,41 @@ int main()
 		mp.print();
 	}
 
-	{}
+
+	{
+		ft::vector< int > a;
+
+		a.push_back(42);
+		a.push_back(43);
+		a.push_back(44);
+
+
+		for (ft::vector< int >::iterator i = a.begin(); i < a.end(); ++i) std::cout << *i << ' ';
+		std::cout << '\n';
+		a.insert(a.end() - 1, 3, -1);
+		for (ft::vector< int >::iterator i = a.begin(); i < a.end(); ++i) std::cout << *i << ' ';
+		std::cout << '\n';
+	}
+
+	{
+		int a[4] = {0, 1, 2, 3};
+		int c[4] = {42, 43, 44, 45};
+		ft::vector< int > b(a, a + 4);
+
+
+		for (ft::vector< int >::iterator i = b.begin(); i < b.end(); ++i) std::cout << *i << ' ';
+		std::cout << '\n';
+
+		b.insert(b.end() - 1, c, c + 4);
+		for (ft::vector< int >::iterator i = b.begin(); i < b.end(); ++i) std::cout << *i << ' ';
+		std::cout << '\n';
+
+		b.erase(b.begin());
+		for (ft::vector< int >::iterator i = b.begin(); i < b.end(); ++i) std::cout << *i << ' ';
+		std::cout << '\n';
+
+		b.erase(b.begin() + 1, b.begin() + 3);
+		for (ft::vector< int >::iterator i = b.begin(); i < b.end(); ++i) std::cout << *i << ' ';
+		std::cout << '\n';
+	}
 }

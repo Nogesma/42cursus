@@ -8,10 +8,11 @@
 #include "iterator.hpp"
 #include "type_traits.hpp"
 #include <cstddef>
+#include <iostream>
 #include <memory>
+#include <sstream>
 #include <stdexcept>
 
-#include <iostream>
 namespace ft
 {
 	template< typename T, typename Alloc = std::allocator< T > >
@@ -58,7 +59,7 @@ namespace ft
 			: _allocator(alloc)
 		{
 			const size_type n = last - first;
-			std::cout << "it: " << n << '\n';
+
 			if (n > max_size())
 				throw std::length_error("cannot create ft::vector larger than max_size()");
 			_capacity = n;
@@ -114,7 +115,6 @@ namespace ft
 
 		void resize(size_type n, value_type val = value_type())
 		{
-			// todo: test
 			if (n > max_size()) throw std::length_error("vector::resize");
 
 			size_type old_size = _size;
@@ -164,13 +164,9 @@ namespace ft
 
 		void reserve(size_type n)
 		{
-			// todo: test
 			if (n > max_size()) throw std::length_error("vector::reserve");
 
-			size_type old_capacity = _capacity;
-			_capacity = n;
-
-			if (n > old_capacity)
+			if (n > _capacity)
 			{
 				value_type *tmp = _value;
 
@@ -181,6 +177,7 @@ namespace ft
 					_allocator.destroy(tmp + i);
 				}
 				_allocator.deallocate(tmp, _capacity);
+				_capacity = n;
 			}
 		}
 
@@ -192,13 +189,30 @@ namespace ft
 
 		reference at(size_type n)
 		{
-			if (n < 0 || n >= _size) throw std::out_of_range("out of range");// todo: add real error
+			if (n >= _size)
+			{
+				std::ostringstream s;
+
+				s << "vector::at: n (which is " << n << ") >= this->size() (which is " << _size
+				  << ')';
+
+				throw std::out_of_range(s.str());
+			}
 			return (_value[n]);
 		}
 
 		const_reference at(size_type n) const
 		{
-			if (n < 0 || n >= _size) throw std::out_of_range("out of range");// todo: add real error
+			if (n >= _size)
+			{
+				std::ostringstream s;
+
+				s << "vector::at: n (which is " << n << ") >= this->size() (which is " << _size
+				  << ')';
+
+				throw std::out_of_range(s.str());
+			}
+
 			return (_value[n]);
 		}
 
@@ -210,8 +224,102 @@ namespace ft
 
 		const_reference back() const { return (_value[_size - 1]); }
 
-		// todo: constructor, destructors, operator =, modifiers, allocator, non-member function overload
+		// todo: swap overload
 		/* Modifiers */
+
+		template< class InputIterator >
+		void assign(InputIterator first, InputIterator last)
+		{
+
+			const size_type n =
+				last -
+				first;
+
+			if (n > max_size()) throw std::length_error("vector::assign");
+
+			if (n < _capacity)
+			{
+				if (n < _size)
+				{
+					for (size_type i = 0; i < n; ++i, ++first)
+					{
+						_allocator.destroy(_value + i);
+						_allocator.construct(_value + i, *first);
+						++first;
+					}
+					for (size_type i = n; i < _size; ++i) _allocator.destroy(_value + i);
+				}
+				else
+				{
+					for (size_type i = 0; i < _size; ++i, ++first)
+					{
+						_allocator.destroy(_value + i);
+						_allocator.construct(_value + i, *first);
+					}
+					for (size_type i = _size; i < n; ++i, ++first)
+						_allocator.construct(_value + i, *first);
+				}
+			}
+			else
+			{
+				value_type *tmp = _value;
+
+				_value = _allocator.allocate(n, _value);
+				for (size_type i = 0; i < _size; ++i, ++first)
+				{
+					_allocator.construct(_value + i, *first);
+					_allocator.destroy(tmp + i);
+				}
+				for (size_type i = _size; i < n; ++i, ++first)
+					_allocator.construct(_value + i, *first);
+				_allocator.deallocate(tmp, _capacity);
+				_capacity = n;
+			}
+			_size = n;
+		}
+
+		void assign(size_type n, const value_type &val)
+		{
+			if (n > max_size()) throw std::length_error("vector::assign");
+
+			if (n < _capacity)
+			{
+				if (n < _size)
+				{
+					for (size_type i = 0; i < n; ++i)
+					{
+						_allocator.destroy(_value + i);
+						_allocator.construct(_value + i, val);
+					}
+					for (size_type i = n; i < _size; ++i) _allocator.destroy(_value + i);
+				}
+				else
+				{
+					for (size_type i = 0; i < _size; ++i)
+					{
+						_allocator.destroy(_value + i);
+						_allocator.construct(_value + i, val);
+					}
+					for (size_type i = _size; i < n; ++i) _allocator.construct(_value + i, val);
+				}
+			}
+			else
+			{
+				value_type *tmp = _value;
+
+				_value = _allocator.allocate(n, _value);
+				for (size_type i = 0; i < _size; ++i)
+				{
+					_allocator.construct(_value + i, val);
+					_allocator.destroy(tmp + i);
+				}
+				for (size_type i = _size; i < n; ++i) _allocator.construct(_value + i, val);
+				_allocator.deallocate(tmp, _capacity);
+				_capacity = n;
+			}
+			_size = n;
+		}
+
 		void push_back(const value_type &val)
 		{
 			if (_size == _capacity)
@@ -223,12 +331,90 @@ namespace ft
 			_allocator.construct(_value + _size++, val);
 		}
 
-		// todo: assign
-
 		void pop_back() { _allocator.destroy(_value + --_size); }
 
-		// todo: erase
-		// todo: insert
+		iterator insert(iterator position, const value_type &val)
+		{
+			if (empty())
+			{
+				push_back(val);
+				return (begin());
+			}
+
+			size_type idx = position - begin();
+			value_type b = back();
+
+			push_back(b);
+
+			for (size_type i = _size - 2; i > idx; i--) _value[i] = _value[i - 1];
+
+			_value[idx] = val;
+			return (begin() + idx);
+		}
+
+		void insert(iterator position, size_type n, const value_type &val)
+		{
+			size_type idx = position - begin();
+
+			if (_size + n > _capacity) reserve(_size + n);
+
+			size_type i;
+			for (i = 0; i < n; ++i, ++_size)
+			{
+				if (n <= _size && _size - n >= idx)
+					_allocator.construct(_value + _size, _value[_size - n]);
+				else
+					_allocator.construct(_value + _size, val);
+			}
+
+			for (i = _size - n; i >= idx + n; i--) _value[i] = _value[i - n];
+			for (i = 0; i < _size - n; i++) _value[idx + i] = val;
+		}
+
+		template< class InputIterator >
+		void
+		insert(iterator position, InputIterator first, InputIterator last,
+			   typename ft::enable_if< !ft::is_integral< InputIterator >::value, int >::type = 0)
+		{
+			size_type idx = position - begin();
+			size_type n = last - first;
+
+			if (_size + n > _capacity) reserve(_size + n);
+
+			size_type i;
+			for (i = 0; i < n; ++i, ++_size)
+			{
+				if (n <= _size && _size - n >= idx)
+					_allocator.construct(_value + _size, _value[_size - n]);
+				else
+					_allocator.construct(_value + _size, *(first + i));
+			}
+
+			for (i = _size - n; i >= idx + n; i--) _value[i] = _value[i - n];
+			for (i = 0; i < _size - n; i++) _value[idx + i] = *(first + i);
+		}
+
+		iterator erase(iterator position)
+		{
+			size_type idx = position - begin();
+
+			for (size_type i = idx; i < _size - 1; i++) _value[i] = _value[i + 1];
+
+			pop_back();
+
+			return (position);
+		}
+		iterator erase(iterator first, iterator last)
+		{
+			size_type idx = first - begin();
+			size_type n = last - first;
+
+			for (size_type i = idx; i < _size - n; i++) _value[i] = _value[i + n];
+
+			for (size_type i = 0; i < n; ++i) pop_back();
+
+			return (first);
+		}
 
 		void swap(vector &x)
 		{
@@ -284,8 +470,17 @@ namespace ft
 	template< typename T, typename Alloc >
 	bool operator<(const vector< T, Alloc > &lhs, const vector< T, Alloc > &rhs)
 	{
-		// todo with iterators
-		return (true);
+		typename vector<T, Alloc>::iterator lit = lhs.begin();
+		typename vector<T, Alloc>::iterator rit = rhs.begin();
+
+		for (; lit < lhs.end() && rit < rhs.end(); ++lit, ++rit)
+		{
+			if (*(lit) < *(rit))
+				return (true);
+			if (*(rit) < *(lit))
+				return (false);
+		}
+		return (false);
 	}
 
 	template< typename T, typename Alloc >
