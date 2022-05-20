@@ -3,7 +3,7 @@
 //
 
 #ifndef USE_STD_NAMESPACE
-#define USE_STD_NAMESPACE 0
+#define USE_STD_NAMESPACE 1
 #endif
 
 #if USE_STD_NAMESPACE
@@ -26,13 +26,10 @@ namespace ft = std;
 
 #include <iostream>
 
-#include <iterator>
-#include <map>
-#include <vector>
-#include <stack>
-
 int main()
 {
+	std::cout << "USING STD NAMESPACE: " << USE_STD_NAMESPACE << '\n';
+
 	// vector
 	{
 		std::cout << "Starting Vector tests: \n";
@@ -104,7 +101,6 @@ int main()
 		std::cout << (mp["cc"] = 3) << '\n';
 		std::cout << (mp["ccc"] = 3) << '\n';
 
-		mp.print();
 		for (ft::map< std::string, int >::iterator it = mp.begin(); it != mp.end(); ++it)
 			std::cout << (*it).first << ' ';
 		std::cout << '\n';
@@ -150,10 +146,5 @@ int main()
 		b.erase(b.begin() + 1, b.begin() + 3);
 		for (ft::vector< int >::iterator i = b.begin(); i < b.end(); ++i) std::cout << *i << ' ';
 		std::cout << '\n';
-	}
-
-	{
-		std::map<int, int> s;
-		std::make_pair(1, 2);
 	}
 }

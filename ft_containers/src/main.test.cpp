@@ -1,7 +1,12 @@
 #include <deque>
 #include <iostream>
 #include <string>
-#if 0//CREATE A REAL STL EXAMPLE
+
+
+#ifndef USE_STD_NAMESPACE
+#define USE_STD_NAMESPACE 0
+#endif
+#if USE_STD_NAMESPACE//CREATE A REAL STL EXAMPLE
 #include <map>
 #include <stack>
 #include <vector>

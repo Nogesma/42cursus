@@ -5,9 +5,11 @@
 #ifndef FT_CONTAINERS_VECTOR_HPP
 #define FT_CONTAINERS_VECTOR_HPP
 
-#include "algorithm.hpp"
-#include "iterator.hpp"
-#include "type_traits.hpp"
+#include <algorithm.hpp>
+#include <iterator.hpp>
+#include <type_traits.hpp>
+
+#include <algorithm>
 #include <cstddef>
 #include <iostream>
 #include <memory>
@@ -320,12 +322,7 @@ namespace ft
 
 		void push_back(const value_type &val)
 		{
-			if (_size == _capacity)
-			{
-				if (_size == 0) reserve(1);
-				else
-					reserve(_size * 2);
-			}
+			if (_size == _capacity) { reserve(_size + std::max(_size, (unsigned long) 1)); }
 			_allocator.construct(_value + _size++, val);
 		}
 

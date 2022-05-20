@@ -5,8 +5,9 @@
 #ifndef FT_CONTAINERS_REDBLACKTREE_HPP
 #define FT_CONTAINERS_REDBLACKTREE_HPP
 
-#include "iterator.hpp"
-#include "utility.hpp"
+#include <iterator.hpp>
+#include <utility.hpp>
+
 #include <cassert>
 #include <cstddef>
 #include <iostream>
@@ -385,8 +386,6 @@ namespace ft
 
 		size_type max_size() const { return (_node_allocator.max_size()); }
 
-		void print() { std::cout << traversePreOrder() << std::endl; }
-
 		void clear() { clear_rec(*_root); }
 
 	private:
@@ -424,8 +423,8 @@ namespace ft
 				// Case_D1 (P+C+S+D black):
 				S->colour = RED;
 				N = P;// new current node (maybe the root)
-					  // iterate 1 black level
-					  //   (= 1 tree level) higher
+					// iterate 1 black level
+					//   (= 1 tree level) higher
 			} while ((P = N->parent) != NULL);
 			// end of the (do while)-loop
 
@@ -501,63 +500,6 @@ namespace ft
 			_allocator.deallocate(N->val, 1);
 			_node_allocator.destroy(N);
 			_node_allocator.deallocate(N, 1);
-		}
-
-		std::string ft_itos(size_t i)
-		{
-			std::stringstream s;
-
-			s << i;
-			return (std::string(s.str()));
-		}
-		std::string traversePreOrder()
-		{
-
-			if (*_root == NULL) { return ""; }
-
-			std::string sb;
-			sb.append(ft_itos((*_root)->val->first));
-
-			std::string pointerRight = "└──";
-			std::string pointerLeft = ((*_root)->right != NULL) ? "├──" : "└──";
-
-			traverseNodes(sb, "", pointerLeft, (*_root)->left, (*_root)->right != NULL);
-			traverseNodes(sb, "", pointerRight, (*_root)->right, false);
-
-			return sb;
-		}
-
-		void traverseNodes(std::string &sb, const std::string &padding, const std::string &ptr,
-						   node *N, bool hasRightSibling)
-		{
-
-#define RESET "\033[0m"
-#define R "\033[31m"
-			if (N != NULL)
-			{
-				sb.append("\n");
-				sb.append(padding);
-				sb.append(ptr);
-				if (N->colour == RED)
-				{
-					sb.append(R);
-					sb.append(ft_itos(N->val->first));
-					sb.append(RESET);
-				}
-				else
-					sb.append(ft_itos(N->val->first));
-
-				std::string paddingBuilder = std::string(padding);
-				if (hasRightSibling) { paddingBuilder.append("│  "); }
-				else { paddingBuilder.append("   "); }
-
-				std::string paddingForBoth = paddingBuilder;
-				std::string pointerRight = "└──";
-				std::string pointerLeft = (N->right != NULL) ? "├──" : "└──";
-
-				traverseNodes(sb, paddingForBoth, pointerLeft, N->left, N->right != NULL);
-				traverseNodes(sb, paddingForBoth, pointerRight, N->right, false);
-			}
 		}
 
 		node *create_new_elem(const value_type &v, node *P = NULL)
@@ -674,21 +616,6 @@ namespace ft
 			return (new_elem);
 		}
 	};
-	//
-	//	template< typename T, typename Alloc >
-	//	bool operator==(const typename ft::RedBlackTree< T, Alloc >::iterator &x,
-	//					const typename ft::RedBlackTree< T, Alloc >::iterator &y)
-	//	{
-	//		return x._node_it == y._node_it;
-	//	}
-	//
-	//	template< typename T, typename Alloc >
-	//	bool operator!=(const typename ft::RedBlackTree< T, Alloc >::iterator &x,
-	//					const typename ft::RedBlackTree< T, Alloc >::iterator &y)
-	//	{
-	//		return x._node_it != y._node_it;
-	//	}
-
 }// namespace ft
 
 #endif// FT_CONTAINERS_REDBLACKTREE_HPP

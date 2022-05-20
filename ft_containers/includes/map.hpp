@@ -5,9 +5,10 @@
 #ifndef FT_CONTAINERS_MAP_HPP
 #define FT_CONTAINERS_MAP_HPP
 
-#include "RedBlackTree.hpp"
-#include "iterator.hpp"
-#include "utility.hpp"
+#include <RedBlackTree.hpp>
+#include <iterator.hpp>
+#include <utility.hpp>
+
 #include <cstddef>
 #include <functional>
 #include <memory>
@@ -204,7 +205,6 @@ namespace ft
 		}
 
 		//todo: lower/upper bound, equal range
-		void print() { _value.print(); }
 
 		/* Allocator */
 		allocator_type get_allocator() const { return _allocator; }
