@@ -6,10 +6,12 @@
 #define FT_CONTAINERS_REDBLACKTREE_HPP
 
 #include "iterator.hpp"
+#include "utility.hpp"
 #include <cassert>
 #include <cstddef>
 #include <iostream>
 #include <memory>
+#include <sstream>
 
 namespace ft
 {
@@ -28,12 +30,6 @@ namespace ft
 		typedef typename allocator_type::pointer pointer;
 		typedef typename allocator_type::const_pointer const_pointer;
 
-		typedef typename ft::random_access_iterator< pointer, RedBlackTree > iterator;
-		typedef typename ft::random_access_iterator< const_pointer, RedBlackTree > const_iterator;
-		typedef typename ft::reverse_iterator< iterator > reverse_iterator;
-		typedef typename ft::reverse_iterator< const_iterator > const_reverse_iterator;
-
-		typedef ft::iterator_traits< iterator > difference_type;
 
 	private:
 		enum color_t
@@ -44,6 +40,7 @@ namespace ft
 
 		enum direction_t
 		{
+			NULL_DIR = -1,
 			LEFT,
 			RIGHT
 		};
@@ -54,7 +51,7 @@ namespace ft
 			node *parent;
 			node *left;
 			node *right;
-			char colour;
+			int colour;
 
 			node(value_type *v, node *P)
 			{
@@ -66,33 +63,137 @@ namespace ft
 			}
 		};
 
-		struct tree
+		struct rbtree_iterator
 		{
-			node *root;
+			typedef T value_type;
+			typedef T &reference;
+			typedef T *pointer;
+
+			typedef ft::bidirectional_iterator_tag iterator_category;
+			typedef ptrdiff_t difference_type;
+
+			typedef typename std::allocator< node >::pointer _node_ptr;
+
+			rbtree_iterator() : _node_it() {}
+
+			explicit rbtree_iterator(_node_ptr x) : _node_it(x) {}
+
+			_node_ptr increment_rbtree(_node_ptr n)
+			{
+
+				if (n->right != NULL)
+				{
+					node *elem = n->right;
+					while (elem->left) { elem = elem->left; }
+					return elem;
+				}
+				while (get_child_dir(n) == RIGHT)
+				{
+					n = n->parent;
+					if (n->parent == NULL) return NULL;
+				}
+				return (n->parent);
+			}
+
+			_node_ptr decrement_rbtree(_node_ptr n)
+			{
+				if (n->left != NULL)
+				{
+					node *elem = n->left;
+					while (elem->right) { elem = elem->right; }
+					return elem;
+				}
+				while (get_child_dir(n) == LEFT)
+				{
+					n = n->parent;
+					if (n->parent == NULL) return NULL;
+				}
+				return (n->parent);
+			}
+
+			reference operator*() const { return *(_node_it)->val; }
+
+			pointer operator->() const { return (_node_it)->val; }
+
+			rbtree_iterator &operator++()
+			{
+				_node_it = increment_rbtree(_node_it);
+				return *this;
+			}
+
+			rbtree_iterator operator++(int)
+			{
+				rbtree_iterator tmp = *this;
+				_node_it = increment_rbtree(_node_it);
+				return tmp;
+			}
+
+			rbtree_iterator &operator--()
+			{
+				_node_it = decrement_rbtree(_node_it);
+				return *this;
+			}
+
+			rbtree_iterator operator--(int)
+			{
+				rbtree_iterator tmp = *this;
+				_node_it = decrement_rbtree(_node_it);
+				return tmp;
+			}
+
+			bool operator==(const rbtree_iterator &x) { return _node_it == x._node_it; }
+
+			bool operator!=(const rbtree_iterator &x) { return _node_it != x._node_it; }
+
+			_node_ptr _node_it;
 		};
 
-		tree *_root;
+		node **_root;
 		size_type _size;
 		std::allocator< node > _node_allocator;
 		allocator_type _allocator;
-		value_type *_begin;
-		value_type *_end;
+		node *_begin;
+		node *_end;
 
 	public:
+		typedef rbtree_iterator iterator;
+		typedef rbtree_iterator const_iterator;
+		typedef typename ft::reverse_iterator< iterator > reverse_iterator;
+		typedef typename ft::reverse_iterator< const_iterator > const_reverse_iterator;
+
+		typedef ft::iterator_traits< iterator > difference_type;
+
 		/* Constructors */
 		explicit RedBlackTree(allocator_type alloc)
 			: _size(0), _allocator(alloc), _begin(NULL), _end(NULL)
 		{
 			_node_allocator = std::allocator< node >();
-			std::allocator< tree > _tree_allocator = std::allocator< tree >();
+			std::allocator< node * > _tree_allocator = std::allocator< node * >();
 
 			_root = _tree_allocator.allocate(1, 0);
-			_tree_allocator.construct(_root, tree());
+			_tree_allocator.construct(_root, NULL);
+		}
+
+		RedBlackTree(const RedBlackTree &x)
+			: _root(x._root), _size(x._size), _node_allocator(x._node_allocator),
+			  _allocator(x._allocator), _begin(x._begin), _end(x._end)
+		{}
+
+		RedBlackTree &operator=(const RedBlackTree &x)
+		{
+			if (this == &x) { return *this; }
+
+			_root = x._root;
+			_size = x._size;
+			_node_allocator = x._node_allocator;
+			_allocator = x._allocator;
+			_begin = x._begin;
+			_end = x._end;
 		}
 
 		~RedBlackTree()
 		{
-			std::allocator< tree > _tree_allocator = std::allocator< tree >();
+			std::allocator< node * > _tree_allocator = std::allocator< node * >();
 
 			clear();
 
@@ -119,7 +220,7 @@ namespace ft
 		template< typename T1 >
 		size_type find_and_delete(T1 f, value_type &v)
 		{
-			node *elem = _root->root;
+			node *elem = *_root;
 
 			if (elem == NULL) return (0);
 
@@ -148,7 +249,7 @@ namespace ft
 			// N is root and only elem in tree
 			if (N->parent == NULL && N->left == NULL && N->right == NULL)
 			{
-				_root->root = NULL;
+				*_root = NULL;
 				_begin = NULL;
 				_end = NULL;
 				return (delete_node(N));
@@ -199,37 +300,84 @@ namespace ft
 			return (delete_node(N));
 		}
 
-
 		template< typename T1 >
-		value_type &insert_no_overwrite(T1 f, value_type &v)
+		ft::pair< iterator, direction_t > find(T1 f, const value_type &v)
 		{
-			node *elem = _root->root;
+			node *elem = *_root;
 
-			if (elem == NULL)
-			{
-				_root->root = create_new_elem(v);
-				_root->root->colour = BLACK;
-				_begin = _root->root->val;
-				_end = _root->root->val;
-				return (*_root->root->val);
-			}
+			if (elem == NULL) return (make_pair(iterator(NULL), NULL_DIR));
 
 			while (true)
 			{
 				if (f(v, *elem->val))
 				{
-					if (elem->left == NULL) return (*insert_elem(elem, v, LEFT)->val);
+					if (elem->left == NULL) return (make_pair(iterator(elem), LEFT));
 					elem = elem->left;
 				}
 				else if (f(*elem->val, v))
 				{
-					if (elem->right == NULL) return (*insert_elem(elem, v, RIGHT)->val);
+					if (elem->right == NULL) return (make_pair(iterator(elem), RIGHT));
 					elem = elem->right;
 				}
 				else
-					return (*elem->val);
+					return (make_pair(iterator(elem), NULL_DIR));
 			}
 		}
+
+		template< typename T1 >
+		ft::pair< const_iterator, direction_t > find(T1 f, const value_type &v) const
+		{
+			node *elem = *_root;
+
+			if (elem == NULL) return (make_pair(const_iterator(NULL), NULL_DIR));
+
+			while (true)
+			{
+				if (f(v, *elem->val))
+				{
+					if (elem->left == NULL) return (make_pair(const_iterator(elem), LEFT));
+					elem = elem->left;
+				}
+				else if (f(*elem->val, v))
+				{
+					if (elem->right == NULL) return (make_pair(const_iterator(elem), RIGHT));
+					elem = elem->right;
+				}
+				else
+					return (make_pair(const_iterator(elem), NULL_DIR));
+			}
+		}
+
+		template< typename T1 >
+		ft::pair< iterator, bool > insert(T1 f, const value_type &v)
+		{
+			ft::pair< iterator, direction_t > elem = find(f, v);
+
+			if (elem.first == iterator(NULL))
+			{
+				*_root = create_new_elem(v);
+				(*_root)->colour = BLACK;
+				_begin = *_root;
+				_end = *_root;
+				return (make_pair(iterator(*_root), true));
+			}
+
+			if (elem.second == NULL_DIR) return (make_pair(elem.first, false));
+			return (make_pair(iterator(insert_elem(elem.first._node_it, v, elem.second)), true));
+		}
+
+		template< typename T1 >
+		ft::pair< iterator, bool > insert(T1 f, const value_type &v, iterator hint)
+		{
+			node *elem = *hint;
+
+			if (elem != NULL)
+				if (f(*elem->val, v) && elem->right == NULL)
+					return (make_pair(iterator(insert_elem(elem, v, RIGHT)), true));
+
+			insert(f, v);
+		}
+
 
 		bool empty() const { return (_size == 0); }
 
@@ -239,13 +387,13 @@ namespace ft
 
 		void print() { std::cout << traversePreOrder() << std::endl; }
 
-		void clear() { clear_rec(_root->root); }
+		void clear() { clear_rec(*_root); }
 
 	private:
 		void delete_complex(node *N)
 		{
 			struct node *P = N->parent;
-			bool dir;
+			int dir;
 			struct node *S;
 			struct node *C;
 			struct node *D;
@@ -276,8 +424,8 @@ namespace ft
 				// Case_D1 (P+C+S+D black):
 				S->colour = RED;
 				N = P;// new current node (maybe the root)
-					// iterate 1 black level
-					//   (= 1 tree level) higher
+					  // iterate 1 black level
+					  //   (= 1 tree level) higher
 			} while ((P = N->parent) != NULL);
 			// end of the (do while)-loop
 
@@ -316,14 +464,14 @@ namespace ft
 			D->colour = BLACK;
 		}
 
-		inline node *get_sibling(node *N, bool dir)
+		inline node *get_sibling(node *N, int dir)
 		{
 			if (dir == LEFT) return (N->parent->right);
 			return (N->parent->left);
 		}
 
 
-		inline node *get_child(node *N, bool dir)
+		inline node *get_child(node *N, int dir)
 		{
 			if (dir == LEFT) return (N->left);
 			return (N->right);
@@ -341,27 +489,40 @@ namespace ft
 
 		void delete_node(node *N)
 		{
-			if (N->val == _begin) _begin = N->parent->val;
-			if (N->val == _end) _end = N->parent->val;
+			if (N->parent != NULL)
+			{
+				if (N->parent->left == N) N->parent->left = NULL;
+				if (N->parent->right == N) N->parent->right = NULL;
+				if (N == _begin) _begin = N->parent;
+				if (N == _end) _end = N->parent;
+			}
+
 			_allocator.destroy(N->val);
 			_allocator.deallocate(N->val, 1);
 			_node_allocator.destroy(N);
 			_node_allocator.deallocate(N, 1);
 		}
 
+		std::string ft_itos(size_t i)
+		{
+			std::stringstream s;
+
+			s << i;
+			return (std::string(s.str()));
+		}
 		std::string traversePreOrder()
 		{
 
-			if (_root->root == NULL) { return ""; }
+			if (*_root == NULL) { return ""; }
 
 			std::string sb;
-			sb.append(_root->root->val->first);
+			sb.append(ft_itos((*_root)->val->first));
 
 			std::string pointerRight = "└──";
-			std::string pointerLeft = (_root->root->right != NULL) ? "├──" : "└──";
+			std::string pointerLeft = ((*_root)->right != NULL) ? "├──" : "└──";
 
-			traverseNodes(sb, "", pointerLeft, _root->root->left, _root->root->right != NULL);
-			traverseNodes(sb, "", pointerRight, _root->root->right, false);
+			traverseNodes(sb, "", pointerLeft, (*_root)->left, (*_root)->right != NULL);
+			traverseNodes(sb, "", pointerRight, (*_root)->right, false);
 
 			return sb;
 		}
@@ -380,11 +541,11 @@ namespace ft
 				if (N->colour == RED)
 				{
 					sb.append(R);
-					sb.append(N->val->first);
+					sb.append(ft_itos(N->val->first));
 					sb.append(RESET);
 				}
 				else
-					sb.append(N->val->first);
+					sb.append(ft_itos(N->val->first));
 
 				std::string paddingBuilder = std::string(padding);
 				if (hasRightSibling) { paddingBuilder.append("│  "); }
@@ -399,7 +560,7 @@ namespace ft
 			}
 		}
 
-		node *create_new_elem(value_type &v, node *P = NULL)
+		node *create_new_elem(const value_type &v, node *P = NULL)
 		{
 			value_type *vptr = _allocator.allocate(1, 0);
 			_allocator.construct(vptr, v);
@@ -411,7 +572,7 @@ namespace ft
 			return (new_elem);
 		}
 
-		node *rotate_tree(node *P, bool dir)
+		node *rotate_tree(node *P, int dir)
 		{
 			node *G = P->parent;
 			node *S;
@@ -441,18 +602,18 @@ namespace ft
 
 			if (G != NULL)
 			{
-				dir = P == G->right ? RIGHT : LEFT;
+				dir = (P == G->right) ? RIGHT : LEFT;
 				if (dir == LEFT) { G->left = S; }
 				else { G->right = S; }
 			}
 			else
-				_root->root = S;
+				*_root = S;
 			return S;
 		}
 
-		direction_t get_child_dir(node *n) { return (n == n->parent->left ? LEFT : RIGHT); }
+		static direction_t get_child_dir(node *n) { return (n == n->parent->left ? LEFT : RIGHT); }
 
-		node *insert_elem(node *P, value_type &v, bool dir)
+		node *insert_elem(node *P, const value_type &v, int dir)
 		{
 			node *new_elem = create_new_elem(v, P);
 
@@ -462,12 +623,12 @@ namespace ft
 
 			if (dir == LEFT)
 			{
-				if (P->val == _begin) _begin = new_elem->val;
+				if (P == _begin) _begin = new_elem;
 				P->left = new_elem;
 			}
 			else
 			{
-				if (P->val == _end) _end = new_elem->val;
+				if (P == _end) _end = new_elem;
 				P->right = new_elem;
 			}
 
@@ -513,6 +674,21 @@ namespace ft
 			return (new_elem);
 		}
 	};
+	//
+	//	template< typename T, typename Alloc >
+	//	bool operator==(const typename ft::RedBlackTree< T, Alloc >::iterator &x,
+	//					const typename ft::RedBlackTree< T, Alloc >::iterator &y)
+	//	{
+	//		return x._node_it == y._node_it;
+	//	}
+	//
+	//	template< typename T, typename Alloc >
+	//	bool operator!=(const typename ft::RedBlackTree< T, Alloc >::iterator &x,
+	//					const typename ft::RedBlackTree< T, Alloc >::iterator &y)
+	//	{
+	//		return x._node_it != y._node_it;
+	//	}
+
 }// namespace ft
 
 #endif// FT_CONTAINERS_REDBLACKTREE_HPP

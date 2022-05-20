@@ -18,7 +18,7 @@ namespace ft = std;
 
 #else
 #include <map.hpp>
-//#include <stack.hpp>
+#include <stack.hpp>
 #include <type_traits.hpp>
 #include <vector.hpp>
 
@@ -29,6 +29,7 @@ namespace ft = std;
 #include <iterator>
 #include <map>
 #include <vector>
+#include <stack>
 
 int main()
 {
@@ -91,21 +92,26 @@ int main()
 
 		std::cout << mp["a"] << '\n';
 		std::cout << (mp["b"] = 3) << '\n';
-		mp.print();
+		//		mp.print();
 		std::cout << (mp["c"] = 3) << '\n';
 		std::cout << (mp["ef"] = 3) << '\n';
 		std::cout << (mp["e"] = 3) << '\n';
 		std::cout << (mp["f"] = 3) << '\n';
 		std::cout << (mp["w"] = 3) << '\n';
 		std::cout << (mp["y"] = 3) << '\n';
+		std::cout << (mp["z"] = 3) << '\n';
+		std::cout << (mp["xx"] = 3) << '\n';
+		std::cout << (mp["cc"] = 3) << '\n';
+		std::cout << (mp["ccc"] = 3) << '\n';
 
-		for (ft::map< std::string, int >::iterator it = mp.begin(); it < mp.end(); ++it)
-			std::cout << (*it).first << ' ';
 		mp.print();
+		for (ft::map< std::string, int >::iterator it = mp.begin(); it != mp.end(); ++it)
+			std::cout << (*it).first << ' ';
+		std::cout << '\n';
 		mp.erase("v");
 		mp.erase("a");
 		mp.erase("ef");
-		mp.print();
+		//		mp.print();
 	}
 
 
@@ -144,5 +150,10 @@ int main()
 		b.erase(b.begin() + 1, b.begin() + 3);
 		for (ft::vector< int >::iterator i = b.begin(); i < b.end(); ++i) std::cout << *i << ' ';
 		std::cout << '\n';
+	}
+
+	{
+		std::map<int, int> s;
+		std::make_pair(1, 2);
 	}
 }

@@ -8,12 +8,10 @@ add_compile_options(-Wall -Werror -Wextra)
 
 set(EXEC containers)
 
-include_directories(src)
+include_directories(includes)
 
-file(GLOB SOURCES src/*.cpp)
-file(GLOB HEADERS src/*.hpp)
 
 message(SOURCES="${SOURCES}")
 message(HEADERS="${HEADERS}")
 
-add_executable(${EXEC} ${SOURCES} ${HEADERS})
+add_executable(${EXEC} src/main.cpp)

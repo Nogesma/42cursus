@@ -4,7 +4,7 @@ CXXFLAGS := ${CFLAGS}
 
 CXX ?= g++
 
-INC_FLAGS := -Isrc
+INC_FLAGS := -Iincludes
 LDFLAGS :=
 
 NAME ?= containers
@@ -16,13 +16,13 @@ SRCS := $(shell find $(SRC_DIRS) -name '*.cpp')
 OBJS := $(SRCS:%=$(BUILD_DIR)/%.o)
 
 CXXFLAGS += -Wall -Wextra -Wshadow
-#CXXFLAGS += -Werror
+CXXFLAGS += -Werror
 CXXFLAGS += -std=c++98 -pedantic
 #CXXFLAGS += -march=native
 #CXXFLAGS += -O2
 CXXFLAGS += -g3
 CXXFLAGS += -fdiagnostics-color
-CXXFLAGS += -fsanitize=address
+CXXFLAGS += -fsanitize=address -fno-omit-frame-pointer
 
 
 $(NAME): $(OBJS)

@@ -312,39 +312,5 @@ namespace ft
 	{
 		return (!(lhs < rhs));
 	}
-
-
-	//	template< typename >
-	//	struct is_random_access_iterator_helper : public ft::false_type
-	//	{};
-	//
-	//	template<>
-	//	struct is_random_access_iterator_helper< ft::random_access_iterator< > > : public ft::true_type
-	//	{};
-	//
-	//	template< class T >
-	//	struct is_random_access_iterator : public ft::is_random_access_iterator_helper< T >
-	//	{};
-	//
-	//	template< class InputIterator >
-	//	typename iterator_traits< InputIterator >::difference_type distance(
-	//		InputIterator first, InputIterator last,
-	//		typename ft::enable_if< ft::is_random_access_iterator< InputIterator >::value, int >::type =
-	//			0)
-	//	{
-	//		std::cout << "it's a random iterator\n";
-	//
-	//		return (0);
-	//	}
-	//
-	//	template< class InputIterator >
-	//	typename iterator_traits< InputIterator >::difference_type
-	//	distance(InputIterator first, InputIterator last,
-	//			 typename ft::enable_if< !ft::is_random_access_iterator< InputIterator >::value,
-	//									 int >::type = 0)
-	//	{
-	//		std::cout << "NOT a random iterator\n";
-	//		return (0);
-	//	}
 }// namespace ft
 #endif//FT_CONTAINERS_ITERATOR_HPP

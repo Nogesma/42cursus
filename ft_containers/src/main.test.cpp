@@ -1,7 +1,7 @@
 #include <deque>
 #include <iostream>
 #include <string>
-#if 1//CREATE A REAL STL EXAMPLE
+#if 0//CREATE A REAL STL EXAMPLE
 #include <map>
 #include <stack>
 #include <vector>
@@ -86,7 +86,10 @@ int main(int argc, char **argv)
 		//NORMAL ! :P
 	}
 
-	for (int i = 0; i < COUNT; ++i) { map_int.insert(ft::make_pair(rand(), rand())); }
+	for (int i = 0; i < COUNT; ++i)
+	{
+		map_int.insert(ft::make_pair< const int, int >(rand(), rand()));
+	}
 
 	int sum = 0;
 	for (int i = 0; i < 10000; i++)
