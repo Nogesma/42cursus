@@ -6,6 +6,7 @@
 #define FT_CONTAINERS_MAP_HPP
 
 #include "RedBlackTree.hpp"
+#include "iterator.hpp"
 #include "utility.hpp"
 #include <cstddef>
 #include <functional>
@@ -23,22 +24,44 @@ namespace ft
 		typedef T mapped_type;
 		typedef ft::pair< const key_type, mapped_type > value_type;
 		typedef Compare key_compare;
-		//		typedef value_comp value_compare;
 
+		class value_compare : std::binary_function< value_type, value_type, bool >
+		{
+			friend class map;
+
+		protected:
+			Compare comp;
+			explicit value_compare(Compare c) : comp(c) {}
+
+		public:
+			typedef bool result_type;
+			typedef value_type first_argument_type;
+			typedef value_type second_argument_type;
+			bool operator()(const value_type &x, const value_type &y) const
+			{
+				return comp(x.first, y.first);
+			}
+		};
 		typedef Alloc allocator_type;
 		typedef typename allocator_type::reference reference;
 		typedef typename allocator_type::const_reference const_reference;
 		typedef typename allocator_type::pointer pointer;
 		typedef typename allocator_type::const_pointer const_pointer;
 
-		typedef typename std::iterator< pointer, map > iterator;
-		typedef typename std::iterator< const_pointer, map > const_iterator;
-		typedef typename std::reverse_iterator< iterator > reverse_iterator;
-		typedef typename std::reverse_iterator< const_iterator > const_reverse_iterator;
 
-		typedef std::iterator_traits< iterator > difference_type;
-		typedef std::size_t size_type;
 
+	private:
+		typedef RedBlackTree< value_type, allocator_type > rbtree_type;
+
+	public:
+		typedef typename rbtree_type::iterator		 iterator;
+		typedef typename rbtree_type::const_iterator	 const_iterator;
+		typedef typename rbtree_type::size_type		 size_type;
+		typedef typename rbtree_type::difference_type	 difference_type;
+		typedef typename rbtree_type::reverse_iterator	 reverse_iterator;
+		typedef typename rbtree_type::const_reverse_iterator const_reverse_iterator;
+
+		/* Constructors */
 		explicit map(const key_compare &comp = key_compare(),
 					 const allocator_type &alloc = allocator_type())
 			: _value(alloc), _comparator(value_compare(comp)), _allocator(alloc)
@@ -51,7 +74,16 @@ namespace ft
 		map(const map &x);
 
 		~map(){};
+		/* Iterators */
+		iterator begin() { return _value.begin(); }
 
+		const_iterator begin() const { return _value.begin(); }
+
+		iterator end() { return _value.end(); }
+
+		const_iterator end() const { return _value.end(); }
+
+		// //
 		bool empty() const { return (_value.empty()); }
 		size_type size() const { return (_value.size()); }
 
@@ -74,24 +106,6 @@ namespace ft
 		}
 
 	private:
-		class value_compare : std::binary_function< value_type, value_type, bool >
-		{
-			friend class map;
-
-		protected:
-			Compare comp;
-			explicit value_compare(Compare c) : comp(c) {}
-
-		public:
-			typedef bool result_type;
-			typedef value_type first_argument_type;
-			typedef value_type second_argument_type;
-			bool operator()(const value_type &x, const value_type &y) const
-			{
-				return comp(x.first, y.first);
-			}
-		};
-
 		RedBlackTree< value_type, allocator_type > _value;
 		const value_compare _comparator;
 		allocator_type _allocator;

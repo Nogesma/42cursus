@@ -99,6 +99,8 @@ int main()
 		std::cout << (mp["w"] = 3) << '\n';
 		std::cout << (mp["y"] = 3) << '\n';
 
+		for (ft::map< std::string, int >::iterator it = mp.begin(); it < mp.end(); ++it)
+			std::cout << (*it).first << ' ';
 		mp.print();
 		mp.erase("v");
 		mp.erase("a");

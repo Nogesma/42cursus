@@ -5,6 +5,7 @@
 #ifndef FT_CONTAINERS_REDBLACKTREE_HPP
 #define FT_CONTAINERS_REDBLACKTREE_HPP
 
+#include "iterator.hpp"
 #include <cassert>
 #include <cstddef>
 #include <iostream>
@@ -19,8 +20,20 @@ namespace ft
 	public:
 		typedef T value_type;
 
-		typedef Alloc allocator_type;
 		typedef std::size_t size_type;
+
+		typedef Alloc allocator_type;
+		typedef typename allocator_type::reference reference;
+		typedef typename allocator_type::const_reference const_reference;
+		typedef typename allocator_type::pointer pointer;
+		typedef typename allocator_type::const_pointer const_pointer;
+
+		typedef typename ft::random_access_iterator< pointer, RedBlackTree > iterator;
+		typedef typename ft::random_access_iterator< const_pointer, RedBlackTree > const_iterator;
+		typedef typename ft::reverse_iterator< iterator > reverse_iterator;
+		typedef typename ft::reverse_iterator< const_iterator > const_reverse_iterator;
+
+		typedef ft::iterator_traits< iterator > difference_type;
 
 	private:
 		enum color_t
@@ -62,9 +75,13 @@ namespace ft
 		size_type _size;
 		std::allocator< node > _node_allocator;
 		allocator_type _allocator;
+		value_type *_begin;
+		value_type *_end;
 
 	public:
-		explicit RedBlackTree(allocator_type alloc) : _size(0), _allocator(alloc)
+		/* Constructors */
+		explicit RedBlackTree(allocator_type alloc)
+			: _size(0), _allocator(alloc), _begin(NULL), _end(NULL)
 		{
 			_node_allocator = std::allocator< node >();
 			std::allocator< tree > _tree_allocator = std::allocator< tree >();
@@ -82,6 +99,23 @@ namespace ft
 			_tree_allocator.destroy(_root);
 			_tree_allocator.deallocate(_root, 1);
 		}
+		/* Iterators */
+		iterator begin() { return (iterator(_begin)); }
+
+		const_iterator begin() const { return (const_iterator(_begin)); }
+
+		iterator end() { return (iterator(NULL)); }
+
+		const_iterator end() const { return (const_iterator(NULL)); }
+
+		reverse_iterator rbegin() { return (reverse_iterator(_end)); }
+
+		const_reverse_iterator rbegin() const { return (reverse_iterator(_end)); }
+
+		reverse_iterator rend() { return (reverse_iterator(NULL)); }
+
+		const_reverse_iterator rend() const { return (reverse_iterator(NULL)); }
+
 		template< typename T1 >
 		size_type find_and_delete(T1 f, value_type &v)
 		{
@@ -115,6 +149,8 @@ namespace ft
 			if (N->parent == NULL && N->left == NULL && N->right == NULL)
 			{
 				_root->root = NULL;
+				_begin = NULL;
+				_end = NULL;
 				return (delete_node(N));
 			}
 			// neither child are leafs
@@ -173,6 +209,8 @@ namespace ft
 			{
 				_root->root = create_new_elem(v);
 				_root->root->colour = BLACK;
+				_begin = _root->root->val;
+				_end = _root->root->val;
 				return (*_root->root->val);
 			}
 
@@ -303,6 +341,8 @@ namespace ft
 
 		void delete_node(node *N)
 		{
+			if (N->val == _begin) _begin = N->parent->val;
+			if (N->val == _end) _end = N->parent->val;
 			_allocator.destroy(N->val);
 			_allocator.deallocate(N->val, 1);
 			_node_allocator.destroy(N);
@@ -326,7 +366,7 @@ namespace ft
 			return sb;
 		}
 
-		void traverseNodes(std::string &sb, const std::string &padding, const std::string &pointer,
+		void traverseNodes(std::string &sb, const std::string &padding, const std::string &ptr,
 						   node *N, bool hasRightSibling)
 		{
 
@@ -336,7 +376,7 @@ namespace ft
 			{
 				sb.append("\n");
 				sb.append(padding);
-				sb.append(pointer);
+				sb.append(ptr);
 				if (N->colour == RED)
 				{
 					sb.append(R);
@@ -419,9 +459,17 @@ namespace ft
 			node *N = new_elem;
 			node *G;
 			node *U;
-			if (dir == LEFT) P->left = new_elem;
+
+			if (dir == LEFT)
+			{
+				if (P->val == _begin) _begin = new_elem->val;
+				P->left = new_elem;
+			}
 			else
+			{
+				if (P->val == _end) _end = new_elem->val;
 				P->right = new_elem;
+			}
 
 			do {
 				if (P->colour == BLACK) return (new_elem);

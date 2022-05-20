@@ -5,6 +5,7 @@
 #ifndef FT_CONTAINERS_VECTOR_HPP
 #define FT_CONTAINERS_VECTOR_HPP
 
+#include "algorithm.hpp"
 #include "iterator.hpp"
 #include "type_traits.hpp"
 #include <cstddef>
@@ -224,16 +225,13 @@ namespace ft
 
 		const_reference back() const { return (_value[_size - 1]); }
 
-		// todo: swap overload
 		/* Modifiers */
 
 		template< class InputIterator >
 		void assign(InputIterator first, InputIterator last)
 		{
 
-			const size_type n =
-				last -
-				first;
+			const size_type n = last - first;
 
 			if (n > max_size()) throw std::length_error("vector::assign");
 
@@ -456,9 +454,7 @@ namespace ft
 	{
 		if (lhs.size() != rhs.size()) return (false);
 
-		for (typename vector< T, Alloc >::size_type i = 0; i < lhs.size(); ++i)
-			if (lhs[i] != rhs[i]) return (false);
-		return (true);
+		return (ft::equal(lhs.begin(), lhs.end(), rhs.begin()));
 	}
 
 	template< typename T, typename Alloc >
@@ -470,17 +466,10 @@ namespace ft
 	template< typename T, typename Alloc >
 	bool operator<(const vector< T, Alloc > &lhs, const vector< T, Alloc > &rhs)
 	{
-		typename vector<T, Alloc>::iterator lit = lhs.begin();
-		typename vector<T, Alloc>::iterator rit = rhs.begin();
+		typename vector< T, Alloc >::iterator lit = lhs.begin();
+		typename vector< T, Alloc >::iterator rit = rhs.begin();
 
-		for (; lit < lhs.end() && rit < rhs.end(); ++lit, ++rit)
-		{
-			if (*(lit) < *(rit))
-				return (true);
-			if (*(rit) < *(lit))
-				return (false);
-		}
-		return (false);
+		return (ft::lexicographical_compare(lhs.begin(), lhs.end(), rhs.begin(), rhs.end()));
 	}
 
 	template< typename T, typename Alloc >
@@ -499,6 +488,12 @@ namespace ft
 	bool operator>=(const vector< T, Alloc > &lhs, const vector< T, Alloc > &rhs)
 	{
 		return (!(lhs < rhs));
+	}
+
+	template< class T, class Alloc >
+	void swap(vector< T, Alloc > &x, vector< T, Alloc > &y)
+	{
+		x.swap(y);
 	}
 }// namespace ft
 
