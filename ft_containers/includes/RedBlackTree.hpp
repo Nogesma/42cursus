@@ -16,7 +16,6 @@
 
 namespace ft
 {
-
 	template< typename T, typename Alloc >
 	class RedBlackTree
 	{
@@ -78,6 +77,8 @@ namespace ft
 			rbtree_iterator() : _node_it() {}
 
 			explicit rbtree_iterator(_node_ptr x) : _node_it(x) {}
+
+			_node_ptr base() const { return (_node_it); }
 
 			_node_ptr increment_rbtree(_node_ptr n)
 			{
@@ -142,9 +143,113 @@ namespace ft
 				return tmp;
 			}
 
-			bool operator==(const rbtree_iterator &x) { return _node_it == x._node_it; }
+			friend bool operator==(const rbtree_iterator &lhs, const rbtree_iterator &rhs)
+			{
+				return lhs._node_it == rhs._node_it;
+			}
 
-			bool operator!=(const rbtree_iterator &x) { return _node_it != x._node_it; }
+
+			friend bool operator!=(const rbtree_iterator &lhs, const rbtree_iterator &rhs)
+			{
+				return lhs._node_it != rhs._node_it;
+			}
+
+			_node_ptr _node_it;
+		};
+
+		struct rbtree_const_iterator
+		{
+			typedef T value_type;
+			typedef const T &reference;
+			typedef const T *pointer;
+
+			typedef rbtree_iterator iterator;
+
+			typedef bidirectional_iterator_tag iterator_category;
+			typedef ptrdiff_t difference_type;
+			typedef typename std::allocator< node >::pointer _node_ptr;
+
+
+			rbtree_const_iterator() : _node_it() {}
+
+			explicit rbtree_const_iterator(_node_ptr x) : _node_it(x) {}
+
+			rbtree_const_iterator(const iterator x) : _node_it(x._node_it) {}
+
+			_node_ptr base() const { return (_node_it); }
+
+			_node_ptr increment_rbtree(_node_ptr n)
+			{
+
+				if (n->right != NULL)
+				{
+					node *elem = n->right;
+					while (elem->left) { elem = elem->left; }
+					return elem;
+				}
+				while (get_child_dir(n) == RIGHT)
+				{
+					n = n->parent;
+					if (n->parent == NULL) return NULL;
+				}
+				return (n->parent);
+			}
+
+			_node_ptr decrement_rbtree(_node_ptr n)
+			{
+				if (n->left != NULL)
+				{
+					node *elem = n->left;
+					while (elem->right) { elem = elem->right; }
+					return elem;
+				}
+				while (get_child_dir(n) == LEFT)
+				{
+					n = n->parent;
+					if (n->parent == NULL) return NULL;
+				}
+				return (n->parent);
+			}
+
+			reference operator*() const { return *(_node_it)->val; }
+
+			pointer operator->() const { return (_node_it)->val; }
+
+			rbtree_const_iterator &operator++()
+			{
+				_node_it = increment_rbtree(_node_it);
+				return *this;
+			}
+
+			rbtree_const_iterator operator++(int)
+			{
+				rbtree_const_iterator tmp = *this;
+				_node_it = increment_rbtree(_node_it);
+				return tmp;
+			}
+
+			rbtree_const_iterator &operator--()
+			{
+				_node_it = decrement_rbtree(_node_it);
+				return *this;
+			}
+
+			rbtree_const_iterator operator--(int)
+			{
+				rbtree_const_iterator tmp = *this;
+				_node_it = decrement_rbtree(_node_it);
+				return tmp;
+			}
+
+			friend bool operator==(const rbtree_const_iterator &lhs, const rbtree_const_iterator &rhs)
+			{
+				return lhs._node_it == rhs._node_it;
+			}
+
+			friend bool operator!=(const rbtree_const_iterator &lhs, const rbtree_const_iterator &rhs)
+			{
+				return lhs._node_it != rhs._node_it;
+			}
 
 			_node_ptr _node_it;
 		};
@@ -158,7 +263,7 @@ namespace ft
 
 	public:
 		typedef rbtree_iterator iterator;
-		typedef rbtree_iterator const_iterator;
+		typedef const rbtree_const_iterator const_iterator;
 		typedef typename ft::reverse_iterator< iterator > reverse_iterator;
 		typedef typename ft::reverse_iterator< const_iterator > const_reverse_iterator;
 
@@ -190,6 +295,8 @@ namespace ft
 			_allocator = x._allocator;
 			_begin = x._begin;
 			_end = x._end;
+
+			return (*this);
 		}
 
 		~RedBlackTree()
@@ -210,13 +317,15 @@ namespace ft
 
 		const_iterator end() const { return (const_iterator(NULL)); }
 
-		reverse_iterator rbegin() { return (reverse_iterator(_end)); }
 
-		const_reverse_iterator rbegin() const { return (reverse_iterator(_end)); }
+		reverse_iterator rbegin() { return (reverse_iterator(end())); }
 
-		reverse_iterator rend() { return (reverse_iterator(NULL)); }
+		const_reverse_iterator rbegin() const { return (const_reverse_iterator(end())); }
 
-		const_reverse_iterator rend() const { return (reverse_iterator(NULL)); }
+		reverse_iterator rend() { return (reverse_iterator(begin())); }
+
+		const_reverse_iterator rend() const { return (const_reverse_iterator(begin())); }
+
 
 		template< typename T1 >
 		size_type find_and_delete(T1 f, value_type &v)
@@ -616,6 +725,48 @@ namespace ft
 			return (new_elem);
 		}
 	};
+
+	//	template< typename T, typename Alloc >
+	//	bool operator==(const typename RedBlackTree< T, Alloc >::iterator &lhs,
+	//					const typename RedBlackTree< T, Alloc >::iterator &rhs)
+	//	{
+	//		return (lhs.base() == rhs.base());
+	//	}
+	//
+	//	template< typename T, typename Alloc >
+	//	bool operator==(const typename RedBlackTree< T, Alloc >::const_iterator &lhs,
+	//					const typename RedBlackTree< T, Alloc >::const_iterator &rhs)
+	//	{
+	//		return (lhs.base() == rhs.base());
+	//	}
+	//	template< typename IteratorL, typename IteratorR >
+	//	inline bool operator==(const random_access_iterator< IteratorL > &lhs,
+	//						   const random_access_iterator< IteratorR > &rhs)
+	//	{
+	//		return lhs.base() == rhs.base();
+	//	}
+
+	//	template< typename T, typename Alloc >
+	//	bool operator!=(const typename RedBlackTree< T, Alloc >::iterator &lhs,
+	//					const typename RedBlackTree< T, Alloc >::iterator &rhs)
+	//	{
+	//		return (!(lhs == rhs));
+	//	}
+	//
+	//	template< typename T, typename Alloc >
+	//	bool operator!=(const typename RedBlackTree< T, Alloc >::const_iterator &lhs,
+	//					const typename RedBlackTree< T, Alloc >::const_iterator &rhs)
+	//	{
+	//		return (!(lhs == rhs));
+	//	}
+
+	//	template< typename IteratorL, typename IteratorR >
+	//	bool operator!=(const random_access_iterator< IteratorL > &lhs,
+	//					const random_access_iterator< IteratorR > &rhs)
+	//	{
+	//		return (!(lhs == rhs));
+	//	}
+
 }// namespace ft
 
 #endif// FT_CONTAINERS_REDBLACKTREE_HPP

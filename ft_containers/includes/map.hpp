@@ -6,6 +6,7 @@
 #define FT_CONTAINERS_MAP_HPP
 
 #include <RedBlackTree.hpp>
+#include <algorithm.hpp>
 #include <iterator.hpp>
 #include <utility.hpp>
 
@@ -56,10 +57,13 @@ namespace ft
 	public:
 		typedef typename rbtree_type::iterator iterator;
 		typedef typename rbtree_type::const_iterator const_iterator;
-		typedef typename rbtree_type::size_type size_type;
-		typedef typename rbtree_type::difference_type difference_type;
+
 		typedef typename rbtree_type::reverse_iterator reverse_iterator;
 		typedef typename rbtree_type::const_reverse_iterator const_reverse_iterator;
+
+		typedef typename rbtree_type::difference_type difference_type;
+		typedef typename rbtree_type::size_type size_type;
+
 
 		/* Constructors */
 		explicit map(const key_compare &comp = key_compare(),
@@ -88,6 +92,7 @@ namespace ft
 			_value = x._value;
 			_comparator = x._comparator;
 			_allocator = x._allocator;
+			return (*this);
 		}
 		/* Iterators */
 		iterator begin() { return _value.begin(); }
@@ -131,7 +136,7 @@ namespace ft
 
 		iterator insert(iterator position, const value_type &val)
 		{
-			return (_value.insert(_comparator, val).first);// todo: maybe fix hint
+			return (_value.insert(_comparator, val, position).first);// todo: maybe fix hint
 		}
 
 
@@ -214,5 +219,56 @@ namespace ft
 		value_compare _comparator;
 		allocator_type _allocator;
 	};
+
+
+	template< class Key, class T, class Compare, class Alloc >
+	bool operator==(const map< Key, T, Compare, Alloc > &lhs,
+					const map< Key, T, Compare, Alloc > &rhs)
+	{
+		if (lhs.size() != rhs.size()) return (false);
+
+		return (ft::equal(lhs.begin(), lhs.end(), rhs.begin()));
+	}
+
+
+	template< class Key, class T, class Compare, class Alloc >
+	bool operator!=(const map< Key, T, Compare, Alloc > &lhs,
+					const map< Key, T, Compare, Alloc > &rhs)
+	{
+		return (!(lhs == rhs));
+	}
+
+
+	template< class Key, class T, class Compare, class Alloc >
+	bool operator<(const map< Key, T, Compare, Alloc > &lhs,
+				   const map< Key, T, Compare, Alloc > &rhs)
+	{
+		return (ft::lexicographical_compare(lhs.begin(), lhs.end(), rhs.begin(), rhs.end()));
+	}
+
+
+	template< class Key, class T, class Compare, class Alloc >
+	bool operator<=(const map< Key, T, Compare, Alloc > &lhs,
+					const map< Key, T, Compare, Alloc > &rhs)
+	{
+		return (!(rhs < lhs));
+	}
+
+
+	template< class Key, class T, class Compare, class Alloc >
+	bool operator>(const map< Key, T, Compare, Alloc > &lhs,
+				   const map< Key, T, Compare, Alloc > &rhs)
+	{
+		return (rhs < lhs);
+	}
+
+
+	template< class Key, class T, class Compare, class Alloc >
+	bool operator>=(const map< Key, T, Compare, Alloc > &lhs,
+					const map< Key, T, Compare, Alloc > &rhs)
+	{
+		return (!(lhs < rhs));
+	}
+
 }// namespace ft
 #endif// FT_CONTAINERS_MAP_HPP

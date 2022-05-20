@@ -11,16 +11,16 @@ STD_NAME ?= std_containers
 
 SRC_DIRS ?= ./src
 
-SRC := src/main.test.cpp
+SRC := src/main.cpp
 
 CXXFLAGS += -Wall -Wextra -Wshadow
 CXXFLAGS += -Werror
-CXXFLAGS += -march=native
-CXXFLAGS += -O2
-CXXFLAGS += -flto
+#CXXFLAGS += -march=native
+#CXXFLAGS += -O2
+#CXXFLAGS += -flto
 #CXXFLAGS += -g3
-#CXXFLAGS += -fdiagnostics-color
-#CXXFLAGS += -fsanitize=address -fno-omit-frame-pointer
+CXXFLAGS += -fdiagnostics-color
+CXXFLAGS += -fsanitize=address -fno-omit-frame-pointer
 
 CVERSION = -std=c++98 -pedantic
 

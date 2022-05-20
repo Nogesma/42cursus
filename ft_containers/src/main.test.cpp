@@ -4,7 +4,7 @@
 
 
 #ifndef USE_STD_NAMESPACE
-#define USE_STD_NAMESPACE 0
+#define USE_STD_NAMESPACE 1
 #endif
 #if USE_STD_NAMESPACE//CREATE A REAL STL EXAMPLE
 #include <map>
@@ -93,7 +93,7 @@ int main(int argc, char **argv)
 
 	for (int i = 0; i < COUNT; ++i)
 	{
-		map_int.insert(ft::make_pair< const int, int >(rand(), rand()));
+		map_int.insert(ft::make_pair(rand(), rand()));
 	}
 
 	int sum = 0;

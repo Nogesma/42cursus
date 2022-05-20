@@ -3,7 +3,7 @@
 //
 
 #ifndef USE_STD_NAMESPACE
-#define USE_STD_NAMESPACE 1
+#define USE_STD_NAMESPACE 0
 #endif
 
 #if USE_STD_NAMESPACE
@@ -146,5 +146,10 @@ int main()
 		b.erase(b.begin() + 1, b.begin() + 3);
 		for (ft::vector< int >::iterator i = b.begin(); i < b.end(); ++i) std::cout << *i << ' ';
 		std::cout << '\n';
+	}
+	{
+		ft::vector< int > a;
+
+		ft::vector< int > b(a);
 	}
 }

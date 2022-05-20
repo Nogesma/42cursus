@@ -72,13 +72,6 @@ namespace ft
 	{
 		return (pair< T1, T2 >(x, y));
 	}
-
-//
-//	template< class T1, class T2 >
-//	inline pair< const T1, T2 > make_pair(const T1 x, T2 y)
-//	{
-//		return (pair< const T1, T2 >(x, y));
-//	}
 }// namespace ft
 
 #endif// FT_CONTAINERS_UTILITY_HPP
