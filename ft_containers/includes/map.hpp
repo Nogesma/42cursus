@@ -163,17 +163,9 @@ namespace ft
 
 		void swap(map &x)
 		{
-			rbtree_type value = x._value;
-			value_compare comp = x._comparator;
-			allocator_type alloc = x._allocator;
-
-			x._value = _value;
-			x._comparator = _comparator;
-			x._allocator = alloc;
-
-			_value = value;
-			_comparator = comp;
-			_allocator = alloc;
+			std::swap(_comparator, x._comparator);
+			std::swap(_allocator, x._allocator);
+			ft::swap(_value, x._value);
 		}
 
 		void clear() { _value.clear(); }
@@ -210,9 +202,20 @@ namespace ft
 		}
 
 		//todo: lower/upper bound, equal range
+		iterator lower_bound(const key_type &k)
+		{
+			value_type obj = value_type(k, mapped_type());
+			_value.lower_bound(_comparator, obj);
+		}
+		const_iterator lower_bound(const key_type &k) const
+		{
+			value_type obj = value_type(k, mapped_type());
+			_value.lower_bound(_comparator, obj);
+		}
 
 		/* Allocator */
 		allocator_type get_allocator() const { return _allocator; }
+
 
 	private:
 		rbtree_type _value;
@@ -268,6 +271,12 @@ namespace ft
 					const map< Key, T, Compare, Alloc > &rhs)
 	{
 		return (!(lhs < rhs));
+	}
+
+	template< class Key, class T, class Compare, class Alloc >
+	void swap(map< Key, T, Compare, Alloc > &x, map< Key, T, Compare, Alloc > &y)
+	{
+		x.swap(y);
 	}
 
 }// namespace ft

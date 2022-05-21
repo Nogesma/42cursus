@@ -167,18 +167,17 @@ namespace ft
 
 			typedef bidirectional_iterator_tag iterator_category;
 			typedef ptrdiff_t difference_type;
-			typedef typename std::allocator< node >::pointer _node_ptr;
 
 
 			rbtree_const_iterator() : _node_it() {}
 
-			explicit rbtree_const_iterator(_node_ptr x) : _node_it(x) {}
+			explicit rbtree_const_iterator(node *x) : _node_it(x) {}
 
 			rbtree_const_iterator(const iterator x) : _node_it(x._node_it) {}
 
-			_node_ptr base() const { return (_node_it); }
+			node *base() const { return (_node_it); }
 
-			_node_ptr increment_rbtree(_node_ptr n)
+			const node *increment_rbtree(const node *n)
 			{
 
 				if (n->right != NULL)
@@ -195,7 +194,7 @@ namespace ft
 				return (n->parent);
 			}
 
-			_node_ptr decrement_rbtree(_node_ptr n)
+			const node *decrement_rbtree(const node *n)
 			{
 				if (n->left != NULL)
 				{
@@ -211,9 +210,9 @@ namespace ft
 				return (n->parent);
 			}
 
-			reference operator*() const { return *(_node_it)->val; }
+			reference operator*() const { return *static_cast< const node * >(_node_it)->val; }
 
-			pointer operator->() const { return (_node_it)->val; }
+			pointer operator->() const { return static_cast< const node * >(_node_it)->val; }
 
 			rbtree_const_iterator &operator++()
 			{
@@ -241,17 +240,19 @@ namespace ft
 				return tmp;
 			}
 
-			friend bool operator==(const rbtree_const_iterator &lhs, const rbtree_const_iterator &rhs)
+			friend bool operator==(const rbtree_const_iterator &lhs,
+								   const rbtree_const_iterator &rhs)
 			{
 				return lhs._node_it == rhs._node_it;
 			}
 
-			friend bool operator!=(const rbtree_const_iterator &lhs, const rbtree_const_iterator &rhs)
+			friend bool operator!=(const rbtree_const_iterator &lhs,
+								   const rbtree_const_iterator &rhs)
 			{
 				return lhs._node_it != rhs._node_it;
 			}
 
-			_node_ptr _node_it;
+			const node *_node_it;
 		};
 
 		node **_root;
@@ -308,6 +309,8 @@ namespace ft
 			_tree_allocator.destroy(_root);
 			_tree_allocator.deallocate(_root, 1);
 		}
+
+
 		/* Iterators */
 		iterator begin() { return (iterator(_begin)); }
 
@@ -326,6 +329,15 @@ namespace ft
 
 		const_reverse_iterator rend() const { return (const_reverse_iterator(begin())); }
 
+		void swap(RedBlackTree &x)
+		{
+			std::swap(_root, x._root);
+			std::swap(_size, x._size);
+			std::swap(_node_allocator, x._node_allocator);
+			std::swap(_allocator, x._allocator);
+			std::swap(_begin, x._begin);
+			std::swap(_end, x._end);
+		}
 
 		template< typename T1 >
 		size_type find_and_delete(T1 f, value_type &v)
@@ -497,6 +509,28 @@ namespace ft
 
 		void clear() { clear_rec(*_root); }
 
+		template< typename T1 >
+		iterator lower_bound(T1 f, const value_type &v)
+		{
+			node *elem = *_root;
+
+			if (elem == NULL) return (end());
+
+			while (true)
+			{
+				if (f(*elem->val, v))
+				{
+					if (elem->right == NULL) return (end());
+					elem = elem->right;
+				}
+				else
+				{
+					if (elem->left == NULL) return (iterator(elem));
+					elem = elem->left;
+				}
+			}
+		}
+
 	private:
 		void delete_complex(node *N)
 		{
@@ -532,8 +566,8 @@ namespace ft
 				// Case_D1 (P+C+S+D black):
 				S->colour = RED;
 				N = P;// new current node (maybe the root)
-					// iterate 1 black level
-					//   (= 1 tree level) higher
+					  // iterate 1 black level
+					  //   (= 1 tree level) higher
 			} while ((P = N->parent) != NULL);
 			// end of the (do while)-loop
 
@@ -662,7 +696,10 @@ namespace ft
 			return S;
 		}
 
-		static direction_t get_child_dir(node *n) { return (n == n->parent->left ? LEFT : RIGHT); }
+		static direction_t get_child_dir(const node *n)
+		{
+			return (n == n->parent->left ? LEFT : RIGHT);
+		}
 
 		node *insert_elem(node *P, const value_type &v, int dir)
 		{
@@ -726,46 +763,12 @@ namespace ft
 		}
 	};
 
-	//	template< typename T, typename Alloc >
-	//	bool operator==(const typename RedBlackTree< T, Alloc >::iterator &lhs,
-	//					const typename RedBlackTree< T, Alloc >::iterator &rhs)
-	//	{
-	//		return (lhs.base() == rhs.base());
-	//	}
-	//
-	//	template< typename T, typename Alloc >
-	//	bool operator==(const typename RedBlackTree< T, Alloc >::const_iterator &lhs,
-	//					const typename RedBlackTree< T, Alloc >::const_iterator &rhs)
-	//	{
-	//		return (lhs.base() == rhs.base());
-	//	}
-	//	template< typename IteratorL, typename IteratorR >
-	//	inline bool operator==(const random_access_iterator< IteratorL > &lhs,
-	//						   const random_access_iterator< IteratorR > &rhs)
-	//	{
-	//		return lhs.base() == rhs.base();
-	//	}
 
-	//	template< typename T, typename Alloc >
-	//	bool operator!=(const typename RedBlackTree< T, Alloc >::iterator &lhs,
-	//					const typename RedBlackTree< T, Alloc >::iterator &rhs)
-	//	{
-	//		return (!(lhs == rhs));
-	//	}
-	//
-	//	template< typename T, typename Alloc >
-	//	bool operator!=(const typename RedBlackTree< T, Alloc >::const_iterator &lhs,
-	//					const typename RedBlackTree< T, Alloc >::const_iterator &rhs)
-	//	{
-	//		return (!(lhs == rhs));
-	//	}
-
-	//	template< typename IteratorL, typename IteratorR >
-	//	bool operator!=(const random_access_iterator< IteratorL > &lhs,
-	//					const random_access_iterator< IteratorR > &rhs)
-	//	{
-	//		return (!(lhs == rhs));
-	//	}
+	template< class T, class Alloc >
+	void swap(RedBlackTree< T, Alloc > &x, RedBlackTree< T, Alloc > &y)
+	{
+		x.swap(y);
+	}
 
 }// namespace ft
 

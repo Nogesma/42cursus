@@ -375,21 +375,9 @@ namespace ft
 
 		void swap(vector &x)
 		{
-			size_type tmp_capacity;
-			size_type tmp_size;
-			value_type *tmp_value;
-
-			tmp_capacity = _capacity;
-			tmp_size = _size;
-			tmp_value = _value;
-
-			_capacity = x._capacity;
-			_size = x._size;
-			_value = x._value;
-
-			x._capacity = tmp_capacity;
-			x._size = tmp_size;
-			x._value = tmp_value;
+			std::swap(_capacity, x._capacity);
+			std::swap(_size, x._size);
+			std::swap(_value, x._value);
 		}
 
 		void clear()
