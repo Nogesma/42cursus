@@ -17,19 +17,21 @@ namespace ft
 		T1 first;
 		T2 second;
 
-		pair(): first(), second() {}
-
-		pair(const pair< T1, T2 > &pr) : first(pr.first), second(pr.second) {}
+		pair() : first(), second() {}
 
 		pair(const first_type &a, const second_type &b) : first(a), second(b) {}
 
-		pair &operator=(const pair &pr)
-		{
-			first = pr.first;
-			second = pr.second;
+		template< typename U1, typename U2 >
+		explicit pair(const pair< U1, U2 > &p) : first(p.first), second(p.second)
+		{}
 
-			return (*this);
-		}
+		//		pair &operator=(const pair &pr)
+		//		{
+		//			first = pr.first;
+		//			second = pr.second;
+		//
+		//			return (*this);
+		//		}
 	};
 
 	template< class T1, class T2 >
@@ -70,7 +72,7 @@ namespace ft
 
 	/* make-pair */
 	template< class T1, class T2 >
-	inline pair< T1, T2 > make_pair(T1 x, T2 y)
+	pair< T1, T2 > make_pair(T1 x, T2 y)
 	{
 		return (pair< T1, T2 >(x, y));
 	}

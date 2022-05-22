@@ -136,7 +136,7 @@ namespace ft
 
 		iterator insert(iterator position, const value_type &val)
 		{
-			return (_value.insert(_comparator, val, position).first);// todo: maybe fix hint
+			return (_value.insert(_comparator, position, val).first);// todo: maybe fix hint
 		}
 
 
@@ -148,7 +148,7 @@ namespace ft
 			for (; first != last; ++first) _value.insert(_comparator, *first);
 		}
 
-		void erase(iterator position) { _value.del_elem(*position); }
+		void erase(iterator position) { _value.del_elem(position.base()); }
 
 		size_type erase(const key_type &k)
 		{
@@ -158,7 +158,15 @@ namespace ft
 
 		void erase(iterator first, iterator last)
 		{
-			for (; first != last; ++first) _value.del_elem(*first);
+			iterator tmp;
+			while (first != last)
+			{
+				tmp = first;
+				std::cout << "HERE:: "<< (tmp == first);
+				++first;
+				std::cout << (tmp == first) << std::endl;
+				_value.del_elem(tmp.base());
+			}
 		}
 
 		void swap(map &x)
@@ -180,24 +188,23 @@ namespace ft
 		{
 			value_type obj = value_type(k, mapped_type());
 			ft::pair< iterator, int > f = _value.find(_comparator, obj);
-			if (f.second != 0) return (end());
+			if (f.second != -1) return (end());
 			return (f.first);
 		}
-
 
 		const_iterator find(const key_type &k) const
 		{
 			value_type obj = value_type(k, mapped_type());
 			ft::pair< const_iterator, int > f = _value.find(_comparator, obj);
-			if (f.second != 0) return (end());
+			if (f.second != -1) return (end());
 			return (f.first);
 		}
 
 		size_type count(const key_type &k) const
 		{
 			value_type obj = value_type(k, mapped_type());
-			ft::pair< iterator, int > f = _value.find(_comparator, obj);
-			if (f.second != 0) return (0);
+			ft::pair< const_iterator, int > f = _value.find(_comparator, obj);
+			if (f.second != -1) return (0);
 			return (1);
 		}
 

@@ -89,6 +89,8 @@ namespace ft
 
 			explicit rbtree_iterator(_node_ptr x) : _node_it(x) {}
 
+			rbtree_iterator(const rbtree_iterator &x) : _node_it(x._node_it) {}
+
 			_node_ptr base() const { return (_node_it); }
 
 			_node_ptr increment_rbtree(_node_ptr n)
@@ -185,7 +187,8 @@ namespace ft
 
 			explicit rbtree_const_iterator(node *x) : _node_it(x) {}
 
-			rbtree_const_iterator(const iterator x) : _node_it(x._node_it) {}
+			rbtree_const_iterator(const iterator &x) : _node_it(x._node_it) {}
+			rbtree_const_iterator(const rbtree_const_iterator &x) : _node_it(x._node_it) {}
 
 			node *base() const { return (_node_it); }
 
@@ -390,6 +393,8 @@ namespace ft
 
 		void del_elem(node *N)
 		{
+			// avoid deleting sentinel node if  user passes end() to erase
+			if (N == _sentinel_node) return;
 			// N is root and only elem in tree
 			if (N->parent == _sentinel_node && N->left == _sentinel_node &&
 				N->right == _sentinel_node)
@@ -446,61 +451,64 @@ namespace ft
 		}
 
 		template< typename T1 >
-		ft::pair< iterator, direction_t > find(T1 f, const value_type &v)
+		ft::pair< iterator, int > find(T1 f, const value_type &v)
 		{
 			node *elem = *_root;
 
-			if (elem == _sentinel_node) return (make_pair(iterator(_sentinel_node), NULL_DIR));
+			if (elem == _sentinel_node)
+				return (ft::make_pair(iterator(_sentinel_node), (int) NULL_DIR));
 
 			while (true)
 			{
 				assert(elem != _sentinel_node && elem != NULL);
 				if (f(v, *elem->val))
 				{
-					if (elem->left == _sentinel_node) return (make_pair(iterator(elem), LEFT));
+					if (elem->left == _sentinel_node)
+						return (ft::make_pair(iterator(elem), (int) LEFT));
 					elem = elem->left;
 				}
 				else if (f(*elem->val, v))
 				{
-					if (elem->right == _sentinel_node) return (make_pair(iterator(elem), RIGHT));
+					if (elem->right == _sentinel_node)
+						return (ft::make_pair(iterator(elem), (int) RIGHT));
 					elem = elem->right;
 				}
 				else
-					return (make_pair(iterator(elem), NULL_DIR));
+					return (ft::make_pair(iterator(elem), (int) NULL_DIR));
 			}
 		}
 
 		template< typename T1 >
-		ft::pair< const_iterator, direction_t > find(T1 f, const value_type &v) const
+		ft::pair< const_iterator, int > find(T1 f, const value_type &v) const
 		{
 			node *elem = *_root;
 
 			if (elem == _sentinel_node)
-				return (make_pair(const_iterator(_sentinel_node), NULL_DIR));
+				return (ft::make_pair(const_iterator(_sentinel_node), (int) NULL_DIR));
 
 			while (true)
 			{
 				if (f(v, *elem->val))
 				{
 					if (elem->left == _sentinel_node)
-						return (make_pair(const_iterator(elem), LEFT));
+						return (ft::make_pair(const_iterator(elem), (int) LEFT));
 					elem = elem->left;
 				}
 				else if (f(*elem->val, v))
 				{
 					if (elem->right == _sentinel_node)
-						return (make_pair(const_iterator(elem), RIGHT));
+						return (ft::make_pair(const_iterator(elem), (int) RIGHT));
 					elem = elem->right;
 				}
 				else
-					return (make_pair(const_iterator(elem), NULL_DIR));
+					return (ft::make_pair(const_iterator(elem), (int) NULL_DIR));
 			}
 		}
 
 		template< typename T1 >
 		ft::pair< iterator, bool > insert(T1 f, const value_type &v)
 		{
-			ft::pair< iterator, direction_t > elem = find(f, v);
+			ft::pair< iterator, int > elem = find(f, v);
 
 			if (elem.first == iterator(_sentinel_node))
 			{
@@ -510,21 +518,23 @@ namespace ft
 				_sentinel_node->left = _begin;
 				_end = *_root;
 				_sentinel_node->right = _end;
-				return (make_pair(iterator(*_root), true));
+				return (ft::make_pair(iterator(*_root), true));
 			}
 
-			if (elem.second == NULL_DIR) return (make_pair(elem.first, false));
-			return (make_pair(iterator(insert_elem(elem.first._node_it, v, elem.second)), true));
+			if (elem.second == (int) NULL_DIR) return (ft::make_pair(elem.first, false));
+			return (
+				ft::make_pair(iterator(insert_elem(elem.first._node_it, v, elem.second)), true));
 		}
 
 		template< typename T1 >
-		ft::pair< iterator, bool > insert(T1 f, const value_type &v, iterator hint)
+		ft::pair< iterator, bool > insert(T1 f, iterator hint, const value_type &v)
 		{
-			node *elem = *hint;
-
-			if (elem != _sentinel_node)
-				if (f(*elem->val, v) && elem->right == _sentinel_node)
-					return (make_pair(iterator(insert_elem(elem, v, RIGHT)), true));
+			(void) hint;// todo: fix
+			//			node *elem = *hint;
+			//
+			//			if (elem != _sentinel_node)
+			//				if (f(*elem->val, v) && elem->right == _sentinel_node)
+			//					return (make_pair(iterator(insert_elem(elem, v, RIGHT)), true));
 
 			return insert(f, v);
 		}
@@ -570,7 +580,9 @@ namespace ft
 			struct node *D;
 
 			assert(P != _sentinel_node);
-
+			// we deleted N parent, so use after free
+			std::cout << "HR:: " << P << ' ' << _sentinel_node << '\n';
+			std::cout << "NSDODINC: " << (P->left == N) << std::endl;
 			dir = get_child_dir(N);
 			if (dir == LEFT) N->parent->left = _sentinel_node;
 			else
