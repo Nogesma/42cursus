@@ -555,27 +555,6 @@ namespace ft
 				ft::make_pair(iterator(insert_elem(elem.first._node_it, v, elem.second)), true));
 		}
 
-		//		template< typename T1 >
-		//		ft::pair< const_iterator, bool > insert(T1 f, const value_type &v)
-		//		{
-		//			ft::pair< const_iterator, int > elem = find(f, v);
-		//
-		//			if (elem.first == const_iterator(_sentinel_node))
-		//			{
-		//				*_root = create_new_elem(v);
-		//				(*_root)->colour = BLACK;
-		//				_begin = *_root;
-		//				_sentinel_node->left = _begin;
-		//				_end = *_root;
-		//				_sentinel_node->right = _end;
-		//				return (ft::make_pair(const_iterator(*_root), true));
-		//			}
-		//
-		//			if (elem.second == (int) NULL_DIR) return (ft::make_pair(elem.first, false));
-		//			return (ft::make_pair(const_iterator(insert_elem(elem.first._node_it, v, elem.second)),
-		//								  true));
-		//		}
-
 		template< typename T1 >
 		ft::pair< iterator, bool > insert(T1 f, iterator hint, const value_type &v)
 		{
@@ -714,8 +693,8 @@ namespace ft
 				// Case_D1 (P+C+S+D black):
 				S->colour = RED;
 				N = P;// new current node (maybe the root)
-					// iterate 1 black level
-					//   (= 1 tree level) higher
+					  // iterate 1 black level
+					  //   (= 1 tree level) higher
 			} while ((P = N->parent) != _sentinel_node);
 			// end of the (do while)-loop
 

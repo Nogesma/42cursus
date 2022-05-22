@@ -133,7 +133,6 @@ namespace ft
 			return (_value.insert(_comparator, val));
 		}
 
-
 		iterator insert(iterator position, const value_type &val)
 		{
 			return (_value.insert(_comparator, position, val).first);// todo: maybe fix hint

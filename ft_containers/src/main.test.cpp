@@ -2,10 +2,10 @@
 #include <iostream>
 #include <string>
 
-
 #ifndef USE_STD_NAMESPACE
 #define USE_STD_NAMESPACE 1
 #endif
+
 #if USE_STD_NAMESPACE//CREATE A REAL STL EXAMPLE
 #include <map>
 #include <stack>
@@ -91,10 +91,7 @@ int main(int argc, char **argv)
 		//NORMAL ! :P
 	}
 
-	for (int i = 0; i < COUNT; ++i)
-	{
-		map_int.insert(ft::make_pair(rand(), rand()));
-	}
+	for (int i = 0; i < COUNT; ++i) { map_int.insert(ft::make_pair(rand(), rand())); }
 
 	int sum = 0;
 	for (int i = 0; i < 10000; i++)

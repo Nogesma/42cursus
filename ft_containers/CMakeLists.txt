@@ -14,4 +14,4 @@ include_directories(includes)
 message(SOURCES="${SOURCES}")
 message(HEADERS="${HEADERS}")
 
-add_executable(${EXEC} src/main.cpp)
+add_executable(${EXEC} src/main.test.cpp)

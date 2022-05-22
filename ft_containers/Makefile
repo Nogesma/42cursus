@@ -11,7 +11,7 @@ STD_NAME ?= std_containers
 
 SRC_DIRS ?= ./src
 
-SRC := src/main.cpp
+SRC := src/main.test.cpp
 
 CXXFLAGS += -Wall -Wextra -Wshadow
 CXXFLAGS += -Werror
