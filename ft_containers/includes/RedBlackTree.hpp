@@ -35,7 +35,8 @@ namespace ft
 		enum color_t
 		{
 			RED,
-			BLACK
+			BLACK,
+			SENTINEL
 		};
 
 		enum direction_t
@@ -53,12 +54,22 @@ namespace ft
 			node *right;
 			int colour;
 
-			node(value_type *v, node *P)
+			node(value_type *v, node *P, node *s)
 			{
 				val = v;
+				left = s;
+				right = s;
+				parent = P;
+				colour = RED;
+			}
+
+
+			node()
+			{
+				val = NULL;
 				left = NULL;
 				right = NULL;
-				parent = P;
+				parent = NULL;
 				colour = RED;
 			}
 		};
@@ -82,33 +93,34 @@ namespace ft
 
 			_node_ptr increment_rbtree(_node_ptr n)
 			{
-
-				if (n->right != NULL)
+				if (n->colour == SENTINEL) return n->left;
+				if (n->right->colour != SENTINEL)
 				{
 					node *elem = n->right;
-					while (elem->left) { elem = elem->left; }
+					while (elem->left->colour != SENTINEL) { elem = elem->left; }
 					return elem;
 				}
 				while (get_child_dir(n) == RIGHT)
 				{
 					n = n->parent;
-					if (n->parent == NULL) return NULL;
+					if (n->colour == SENTINEL) return n;
 				}
 				return (n->parent);
 			}
 
 			_node_ptr decrement_rbtree(_node_ptr n)
 			{
-				if (n->left != NULL)
+				if (n->colour == SENTINEL) return n->right;
+				if (n->left->colour != SENTINEL)
 				{
 					node *elem = n->left;
-					while (elem->right) { elem = elem->right; }
+					while (elem->right->colour != SENTINEL) { elem = elem->right; }
 					return elem;
 				}
 				while (get_child_dir(n) == LEFT)
 				{
 					n = n->parent;
-					if (n->parent == NULL) return NULL;
+					if (n->colour == SENTINEL) return n;
 				}
 				return (n->parent);
 			}
@@ -179,33 +191,34 @@ namespace ft
 
 			const node *increment_rbtree(const node *n)
 			{
-
-				if (n->right != NULL)
+				if (n->colour == SENTINEL) return (n->left);
+				if (n->right->colour != SENTINEL)
 				{
 					node *elem = n->right;
-					while (elem->left) { elem = elem->left; }
+					while (elem->left->colour != SENTINEL) { elem = elem->left; }
 					return elem;
 				}
 				while (get_child_dir(n) == RIGHT)
 				{
 					n = n->parent;
-					if (n->parent == NULL) return NULL;
+					if (n->colour == SENTINEL) return n;
 				}
 				return (n->parent);
 			}
 
 			const node *decrement_rbtree(const node *n)
 			{
-				if (n->left != NULL)
+				if (n->colour == SENTINEL) return n->right;
+				if (n->left->colour != SENTINEL)
 				{
 					node *elem = n->left;
-					while (elem->right) { elem = elem->right; }
+					while (elem->right->colour != SENTINEL) { elem = elem->right; }
 					return elem;
 				}
 				while (get_child_dir(n) == LEFT)
 				{
 					n = n->parent;
-					if (n->parent == NULL) return NULL;
+					if (n->colour == SENTINEL) return n;
 				}
 				return (n->parent);
 			}
@@ -261,29 +274,37 @@ namespace ft
 		allocator_type _allocator;
 		node *_begin;
 		node *_end;
+		node *_sentinel_node;
 
 	public:
 		typedef rbtree_iterator iterator;
-		typedef const rbtree_const_iterator const_iterator;
+		typedef rbtree_const_iterator const_iterator;
 		typedef typename ft::reverse_iterator< iterator > reverse_iterator;
 		typedef typename ft::reverse_iterator< const_iterator > const_reverse_iterator;
 
 		typedef ft::iterator_traits< iterator > difference_type;
 
 		/* Constructors */
-		explicit RedBlackTree(allocator_type alloc)
-			: _size(0), _allocator(alloc), _begin(NULL), _end(NULL)
+		explicit RedBlackTree(allocator_type alloc) : _size(0), _allocator(alloc)
 		{
 			_node_allocator = std::allocator< node >();
 			std::allocator< node * > _tree_allocator = std::allocator< node * >();
 
+			_sentinel_node = _node_allocator.allocate(1, 0);
+			_node_allocator.construct(_sentinel_node, node());
+			_sentinel_node->colour = SENTINEL;
+			_begin = _sentinel_node;
+			_end = _sentinel_node;
+			_sentinel_node->left = _begin;
+			_sentinel_node->right = _end;
 			_root = _tree_allocator.allocate(1, 0);
-			_tree_allocator.construct(_root, NULL);
+			_tree_allocator.construct(_root, _sentinel_node);
 		}
 
 		RedBlackTree(const RedBlackTree &x)
 			: _root(x._root), _size(x._size), _node_allocator(x._node_allocator),
-			  _allocator(x._allocator), _begin(x._begin), _end(x._end)
+			  _allocator(x._allocator), _begin(x._begin), _end(x._end),
+			  _sentinel_node(x._sentinel_node)
 		{}
 
 		RedBlackTree &operator=(const RedBlackTree &x)
@@ -292,10 +313,9 @@ namespace ft
 
 			_root = x._root;
 			_size = x._size;
-			_node_allocator = x._node_allocator;
-			_allocator = x._allocator;
 			_begin = x._begin;
 			_end = x._end;
+			_sentinel_node = x._sentinel_node;
 
 			return (*this);
 		}
@@ -306,6 +326,8 @@ namespace ft
 
 			clear();
 
+			_node_allocator.destroy(_sentinel_node);
+			_node_allocator.deallocate(_sentinel_node, 1);
 			_tree_allocator.destroy(_root);
 			_tree_allocator.deallocate(_root, 1);
 		}
@@ -316,10 +338,9 @@ namespace ft
 
 		const_iterator begin() const { return (const_iterator(_begin)); }
 
-		iterator end() { return (iterator(NULL)); }
+		iterator end() { return (iterator(_sentinel_node)); }
 
-		const_iterator end() const { return (const_iterator(NULL)); }
-
+		const_iterator end() const { return (const_iterator(_sentinel_node)); }
 
 		reverse_iterator rbegin() { return (reverse_iterator(end())); }
 
@@ -337,6 +358,7 @@ namespace ft
 			std::swap(_allocator, x._allocator);
 			std::swap(_begin, x._begin);
 			std::swap(_end, x._end);
+			std::swap(_sentinel_node, x._sentinel_node);
 		}
 
 		template< typename T1 >
@@ -344,18 +366,18 @@ namespace ft
 		{
 			node *elem = *_root;
 
-			if (elem == NULL) return (0);
+			if (elem == _sentinel_node) return (0);
 
 			while (true)
 			{
 				if (f(v, *elem->val))
 				{
-					if (elem->left == NULL) return (0);
+					if (elem->left == _sentinel_node) return (0);
 					elem = elem->left;
 				}
 				else if (f(*elem->val, v))
 				{
-					if (elem->right == NULL) return (0);
+					if (elem->right == _sentinel_node) return (0);
 					elem = elem->right;
 				}
 				else
@@ -369,19 +391,20 @@ namespace ft
 		void del_elem(node *N)
 		{
 			// N is root and only elem in tree
-			if (N->parent == NULL && N->left == NULL && N->right == NULL)
+			if (N->parent == _sentinel_node && N->left == _sentinel_node &&
+				N->right == _sentinel_node)
 			{
-				*_root = NULL;
-				_begin = NULL;
-				_end = NULL;
+				*_root = _sentinel_node;
+				_begin = _sentinel_node;
+				_end = _sentinel_node;
 				return (delete_node(N));
 			}
 			// neither child are leafs
-			if (N->left != NULL && N->right != NULL)
+			if (N->left != _sentinel_node && N->right != _sentinel_node)
 			{
 				node *elem;
 				elem = N->left;
-				while (elem->right != NULL) elem = elem->right;
+				while (elem->right != _sentinel_node) elem = elem->right;
 
 				value_type *tmp;
 
@@ -392,13 +415,13 @@ namespace ft
 				N = elem;
 			}
 			// two childs are leaf
-			if (N->left == NULL && N->right == NULL)
+			if (N->left == _sentinel_node && N->right == _sentinel_node)
 			{
 				if (N->colour == RED)
 				{
-					if (get_child_dir(N) == LEFT) N->parent->left = NULL;
+					if (get_child_dir(N) == LEFT) N->parent->left = _sentinel_node;
 					else
-						N->parent->right = NULL;
+						N->parent->right = _sentinel_node;
 					return (delete_node(N));
 				}
 				delete_complex(N);
@@ -407,9 +430,9 @@ namespace ft
 
 			// one child is a leaf
 			node *C;
-			if (N->left == NULL) C = N->left;
-			else if (N->right == NULL)
-				C = N->right;
+			if (N->left == _sentinel_node) C = N->right;
+			else if (N->right == _sentinel_node)
+				C = N->left;
 			else
 				assert(1 == 0);// should never happen
 
@@ -427,18 +450,19 @@ namespace ft
 		{
 			node *elem = *_root;
 
-			if (elem == NULL) return (make_pair(iterator(NULL), NULL_DIR));
+			if (elem == _sentinel_node) return (make_pair(iterator(_sentinel_node), NULL_DIR));
 
 			while (true)
 			{
+				assert(elem != _sentinel_node && elem != NULL);
 				if (f(v, *elem->val))
 				{
-					if (elem->left == NULL) return (make_pair(iterator(elem), LEFT));
+					if (elem->left == _sentinel_node) return (make_pair(iterator(elem), LEFT));
 					elem = elem->left;
 				}
 				else if (f(*elem->val, v))
 				{
-					if (elem->right == NULL) return (make_pair(iterator(elem), RIGHT));
+					if (elem->right == _sentinel_node) return (make_pair(iterator(elem), RIGHT));
 					elem = elem->right;
 				}
 				else
@@ -451,18 +475,21 @@ namespace ft
 		{
 			node *elem = *_root;
 
-			if (elem == NULL) return (make_pair(const_iterator(NULL), NULL_DIR));
+			if (elem == _sentinel_node)
+				return (make_pair(const_iterator(_sentinel_node), NULL_DIR));
 
 			while (true)
 			{
 				if (f(v, *elem->val))
 				{
-					if (elem->left == NULL) return (make_pair(const_iterator(elem), LEFT));
+					if (elem->left == _sentinel_node)
+						return (make_pair(const_iterator(elem), LEFT));
 					elem = elem->left;
 				}
 				else if (f(*elem->val, v))
 				{
-					if (elem->right == NULL) return (make_pair(const_iterator(elem), RIGHT));
+					if (elem->right == _sentinel_node)
+						return (make_pair(const_iterator(elem), RIGHT));
 					elem = elem->right;
 				}
 				else
@@ -475,12 +502,14 @@ namespace ft
 		{
 			ft::pair< iterator, direction_t > elem = find(f, v);
 
-			if (elem.first == iterator(NULL))
+			if (elem.first == iterator(_sentinel_node))
 			{
 				*_root = create_new_elem(v);
 				(*_root)->colour = BLACK;
 				_begin = *_root;
+				_sentinel_node->left = _begin;
 				_end = *_root;
+				_sentinel_node->right = _end;
 				return (make_pair(iterator(*_root), true));
 			}
 
@@ -493,11 +522,11 @@ namespace ft
 		{
 			node *elem = *hint;
 
-			if (elem != NULL)
-				if (f(*elem->val, v) && elem->right == NULL)
+			if (elem != _sentinel_node)
+				if (f(*elem->val, v) && elem->right == _sentinel_node)
 					return (make_pair(iterator(insert_elem(elem, v, RIGHT)), true));
 
-			insert(f, v);
+			return insert(f, v);
 		}
 
 
@@ -514,18 +543,18 @@ namespace ft
 		{
 			node *elem = *_root;
 
-			if (elem == NULL) return (end());
+			if (elem == _sentinel_node) return (end());
 
 			while (true)
 			{
 				if (f(*elem->val, v))
 				{
-					if (elem->right == NULL) return (end());
+					if (elem->right == _sentinel_node) return (end());
 					elem = elem->right;
 				}
 				else
 				{
-					if (elem->left == NULL) return (iterator(elem));
+					if (elem->left == _sentinel_node) return (iterator(elem));
 					elem = elem->left;
 				}
 			}
@@ -540,12 +569,12 @@ namespace ft
 			struct node *C;
 			struct node *D;
 
-			assert(P != NULL);
+			assert(P != _sentinel_node);
 
 			dir = get_child_dir(N);
-			if (dir == LEFT) N->parent->left = NULL;
+			if (dir == LEFT) N->parent->left = _sentinel_node;
 			else
-				N->parent->right = NULL;
+				N->parent->right = _sentinel_node;
 
 			goto Start_D;
 
@@ -557,10 +586,10 @@ namespace ft
 				C = get_child(S, dir);
 				if (S->colour == RED) goto Case_D3;// S red ===> P+C+D black
 				// S is black:
-				if (D != NULL && D->colour == RED)// not considered black
-					goto Case_D6;                 // D red && S black
-				if (C != NULL && C->colour == RED)// not considered black
-					goto Case_D5;                 // C red && S+D black
+				if (D != _sentinel_node && D->colour == RED)// not considered black
+					goto Case_D6;                           // D red && S black
+				if (C != _sentinel_node && C->colour == RED)// not considered black
+					goto Case_D5;                           // C red && S+D black
 				// Here both nephews are == NIL (first iteration) or black (later).
 				if (P->colour == RED) goto Case_D4;
 				// Case_D1 (P+C+S+D black):
@@ -568,7 +597,7 @@ namespace ft
 				N = P;// new current node (maybe the root)
 					  // iterate 1 black level
 					  //   (= 1 tree level) higher
-			} while ((P = N->parent) != NULL);
+			} while ((P = N->parent) != _sentinel_node);
 			// end of the (do while)-loop
 
 			// Case_D2 (P == NULL):
@@ -580,9 +609,9 @@ namespace ft
 			S = C;// != NIL
 			// now: P red && S black
 			D = get_child(S, !dir);
-			if (D != NULL && D->colour == RED) goto Case_D6;// D red && S black
+			if (D != _sentinel_node && D->colour == RED) goto Case_D6;// D red && S black
 			C = get_child(S, dir);
-			if (C != NULL && C->colour == RED) goto Case_D5;// C red && S+D black
+			if (C != _sentinel_node && C->colour == RED) goto Case_D5;// C red && S+D black
 		// Otherwise C+D considered black.
 		// fall through to Case_D4
 		Case_D4:// P red && S+C+D black:
@@ -621,7 +650,7 @@ namespace ft
 
 		void clear_rec(node *N)
 		{
-			if (N == NULL) return;
+			if (N == _sentinel_node) return;
 
 			clear_rec(N->left);
 			clear_rec(N->right);
@@ -631,14 +660,19 @@ namespace ft
 
 		void delete_node(node *N)
 		{
-			if (N->parent != NULL)
+			if (N->parent != _sentinel_node)
 			{
-				if (N->parent->left == N) N->parent->left = NULL;
-				if (N->parent->right == N) N->parent->right = NULL;
-				if (N == _begin) _begin = N->parent;
-				if (N == _end) _end = N->parent;
+				if (N->parent->left == N) N->parent->left = _sentinel_node;
+				if (N->parent->right == N) N->parent->right = _sentinel_node;
 			}
+			else
+				*_root = _sentinel_node;
+			if (N == _begin) _begin = N->parent;
+			_sentinel_node->left = _begin;
+			if (N == _end) _end = N->parent;
+			_sentinel_node->right = _end;
 
+			--_size;
 			_allocator.destroy(N->val);
 			_allocator.deallocate(N->val, 1);
 			_node_allocator.destroy(N);
@@ -650,8 +684,12 @@ namespace ft
 			value_type *vptr = _allocator.allocate(1, 0);
 			_allocator.construct(vptr, v);
 
+
 			node *new_elem = _node_allocator.allocate(1, 0);
-			_node_allocator.construct(new_elem, node(vptr, P));
+			if (P == NULL)
+				_node_allocator.construct(new_elem, node(vptr, _sentinel_node, _sentinel_node));
+			else
+				_node_allocator.construct(new_elem, node(vptr, P, _sentinel_node));
 
 			++_size;
 			return (new_elem);
@@ -667,7 +705,7 @@ namespace ft
 				S = P->left;
 			node *C;
 
-			assert(S != NULL);// pointer to true node required
+			assert(S != _sentinel_node);// pointer to true node required
 			if (dir == LEFT)
 			{
 				C = S->left;
@@ -679,13 +717,13 @@ namespace ft
 				P->left = C;
 			}
 
-			if (C != NULL) C->parent = P;
+			if (C != _sentinel_node) C->parent = P;
 			if (dir == LEFT) { S->left = P; }
 			else { S->right = P; }
 			P->parent = S;
 			S->parent = G;
 
-			if (G != NULL)
+			if (G != _sentinel_node)
 			{
 				dir = (P == G->right) ? RIGHT : LEFT;
 				if (dir == LEFT) { G->left = S; }
@@ -711,12 +749,20 @@ namespace ft
 
 			if (dir == LEFT)
 			{
-				if (P == _begin) _begin = new_elem;
+				if (P == _begin)
+				{
+					_begin = new_elem;
+					_sentinel_node->left = _begin;
+				}
 				P->left = new_elem;
 			}
 			else
 			{
-				if (P == _end) _end = new_elem;
+				if (P == _end)
+				{
+					_end = new_elem;
+					_sentinel_node->right = _end;
+				}
 				P->right = new_elem;
 			}
 
@@ -725,20 +771,20 @@ namespace ft
 
 				G = P->parent;
 
-				if (G == NULL) goto case0;
+				if (G == _sentinel_node) goto case0;
 
 				dir = get_child_dir(P);
 
 				if (dir == LEFT) U = G->right;
 				else
 					U = G->left;
-				if (U == NULL || U->colour == BLACK) goto case1;
+				if (U == _sentinel_node || U->colour == BLACK) goto case1;
 
 				P->colour = BLACK;
 				U->colour = BLACK;
 				G->colour = RED;
 				N = G;
-			} while ((P = N->parent) != NULL);
+			} while ((P = N->parent) != _sentinel_node);
 
 			return (new_elem);
 

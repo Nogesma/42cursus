@@ -89,9 +89,9 @@ namespace ft
 
 		map &operator=(const map &x)
 		{
-			_value = x._value;
+			clear();
 			_comparator = x._comparator;
-			_allocator = x._allocator;
+			insert(x.begin(), x.end());
 			return (*this);
 		}
 		/* Iterators */
