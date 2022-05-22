@@ -149,7 +149,18 @@ int main()
 	}
 	{
 		ft::vector< int > a;
-
 		ft::vector< int > b(a);
+	}
+	{
+		ft::map< int, std::string > a;
+		a[0] = "a";
+		a[1] = "b";
+		a[2] = "c";
+
+		std::cout << a.begin()->second << std::endl;
+
+		++a.begin();
+
+		std::cout << a.begin()->second << std::endl;
 	}
 }

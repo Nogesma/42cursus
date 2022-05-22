@@ -162,9 +162,7 @@ namespace ft
 			while (first != last)
 			{
 				tmp = first;
-				std::cout << "HERE:: "<< (tmp == first);
 				++first;
-				std::cout << (tmp == first) << std::endl;
 				_value.del_elem(tmp.base());
 			}
 		}
@@ -208,18 +206,41 @@ namespace ft
 			return (1);
 		}
 
-		//todo: lower/upper bound, equal range
+		iterator upper_bound(const key_type &k)
+		{
+			value_type obj = value_type(k, mapped_type());
+			return _value.upper_bound(_comparator, obj);
+		}
+
+		const_iterator upper_bound(const key_type &k) const
+		{
+			value_type obj = value_type(k, mapped_type());
+			return _value.upper_bound(_comparator, obj);
+		}
+
 		iterator lower_bound(const key_type &k)
 		{
 			value_type obj = value_type(k, mapped_type());
-			_value.lower_bound(_comparator, obj);
+			return _value.lower_bound(_comparator, obj);
 		}
+
 		const_iterator lower_bound(const key_type &k) const
 		{
 			value_type obj = value_type(k, mapped_type());
-			_value.lower_bound(_comparator, obj);
+			return _value.lower_bound(_comparator, obj);
 		}
 
+		pair< iterator, iterator > equal_range(const key_type &k)
+		{
+			value_type obj = value_type(k, mapped_type());
+			return _value.equal_range(_comparator, obj);
+		}
+
+		pair< const_iterator, const_iterator > equal_range(const key_type &k) const
+		{
+			value_type obj = value_type(k, mapped_type());
+			return _value.equal_range(_comparator, obj);
+		}
 		/* Allocator */
 		allocator_type get_allocator() const { return _allocator; }
 

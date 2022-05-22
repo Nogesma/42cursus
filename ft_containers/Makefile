@@ -18,7 +18,7 @@ CXXFLAGS += -Werror
 #CXXFLAGS += -march=native
 #CXXFLAGS += -O2
 #CXXFLAGS += -flto
-#CXXFLAGS += -g3
+CXXFLAGS += -g3
 CXXFLAGS += -fdiagnostics-color
 CXXFLAGS += -fsanitize=address -fno-omit-frame-pointer
 

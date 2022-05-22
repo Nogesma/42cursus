@@ -5,10 +5,10 @@
 #ifndef FT_CONTAINERS_SET_HPP
 #define FT_CONTAINERS_SET_HPP
 
+#include <RedBlackTree.hpp>
+#include <algorithm.hpp>
 #include <functional>
 #include <memory>
-
-#include <RedBlackTree.hpp>
 
 namespace ft
 {
@@ -33,10 +33,10 @@ namespace ft
 		typedef RedBlackTree< value_type, allocator_type > rbtree_type;
 
 	public:
-		typedef typename rbtree_type::iterator iterator;
+		typedef typename rbtree_type::const_iterator iterator;
 		typedef typename rbtree_type::const_iterator const_iterator;
 
-		typedef typename rbtree_type::reverse_iterator reverse_iterator;
+		typedef typename rbtree_type::const_reverse_iterator reverse_iterator;
 		typedef typename rbtree_type::const_reverse_iterator const_reverse_iterator;
 
 		typedef typename rbtree_type::difference_type difference_type;
@@ -72,25 +72,18 @@ namespace ft
 
 		set &operator=(const set &x)
 		{
-			_value = x._value;
+			clear();
 			_comparator = x._comparator;
-			_allocator = x._allocator;
+			insert(x.begin(), x.end());
+			return (*this);
 		}
 
 		/* Iterators */
-		iterator begin() { return _value.begin(); }
-
 		const_iterator begin() const { return _value.begin(); }
-
-		iterator end() { return _value.end(); }
 
 		const_iterator end() const { return _value.end(); }
 
-		reverse_iterator rbegin() { return (_value.rbegin()); }
-
 		const_reverse_iterator rbegin() const { return (_value.rbegin()); }
-
-		reverse_iterator rend() { return _value.rend(); }
 
 		const_reverse_iterator rend() const { return (_value.rend()); }
 
@@ -104,15 +97,17 @@ namespace ft
 		/* Modifiers */
 		ft::pair< iterator, bool > insert(const value_type &val)
 		{
-			return (_value.insert(_comparator, val));
+			ft::pair< typename rbtree_type::iterator, bool > p = _value.insert(_comparator, val);
+			return pair< iterator, bool >(p.first, p.second);
 		}
-
 
 		iterator insert(iterator position, const value_type &val)
 		{
-			return (_value.insert(_comparator, val, position).first);// todo: maybe fix hint
-		}
+			ft::pair< typename rbtree_type::iterator, bool > p =
+				_value.insert(_comparator, position, val);
 
+			return p.first;
+		}
 
 		template< class InputIterator >
 		void
@@ -121,6 +116,122 @@ namespace ft
 		{
 			for (; first != last; ++first) _value.insert(_comparator, *first);
 		}
+
+		void erase(iterator position) { _value.del_elem(position.it_const_cast().base()); }
+
+		size_type erase(const value_type &val)
+		{
+			return (_value.find_and_delete(_comparator, val));
+		}
+
+		void erase(iterator first, iterator last)
+		{
+			iterator tmp;
+			while (first != last)
+			{
+				tmp = first;
+				++first;
+				_value.del_elem(tmp.it_const_cast().base());
+			}
+		}
+
+		void swap(set &x)
+		{
+			std::swap(_comparator, x._comparator);
+			std::swap(_allocator, x._allocator);
+			ft::swap(_value, x._value);
+		}
+
+		void clear() { _value.clear(); }
+
+		/* Observers */
+		key_compare key_comp() const { return _comparator; }
+
+		value_compare value_comp() const { return (_comparator); }
+
+		/* Operations */
+		iterator find(const value_type &val) const
+		{
+			ft::pair< const_iterator, int > f = _value.find(_comparator, val);
+			if (f.second != -1) return (end());
+			return (f.first);
+		}
+
+		size_type count(const value_type &val) const
+		{
+			ft::pair< const_iterator, int > f = _value.find(_comparator, val);
+			if (f.second != -1) return (0);
+			return (1);
+		}
+
+		iterator upper_bound(const value_type &val) const
+		{
+			return _value.upper_bound(_comparator, val);
+		}
+
+		iterator lower_bound(const value_type &val) const
+		{
+			return _value.lower_bound(_comparator, val);
+		}
+
+		pair< iterator, iterator > equal_range(const value_type &val) const
+		{
+			return _value.equal_range(_comparator, val);
+		}
+
+
+		/* Allocator */
+		allocator_type get_allocator() const { return _allocator; }
 	};
+
+
+	template< class T, class Compare, class Alloc >
+	bool operator==(const set< T, Compare, Alloc > &lhs, const set< T, Compare, Alloc > &rhs)
+	{
+		if (lhs.size() != rhs.size()) return (false);
+
+		return (ft::equal(lhs.begin(), lhs.end(), rhs.begin()));
+	}
+
+
+	template< class T, class Compare, class Alloc >
+	bool operator!=(const set< T, Compare, Alloc > &lhs, const set< T, Compare, Alloc > &rhs)
+	{
+		return (!(lhs == rhs));
+	}
+
+
+	template< class T, class Compare, class Alloc >
+	bool operator<(const set< T, Compare, Alloc > &lhs, const set< T, Compare, Alloc > &rhs)
+	{
+		return (ft::lexicographical_compare(lhs.begin(), lhs.end(), rhs.begin(), rhs.end()));
+	}
+
+
+	template< class T, class Compare, class Alloc >
+	bool operator<=(const set< T, Compare, Alloc > &lhs, const set< T, Compare, Alloc > &rhs)
+	{
+		return (!(rhs < lhs));
+	}
+
+
+	template< class T, class Compare, class Alloc >
+	bool operator>(const set< T, Compare, Alloc > &lhs, const set< T, Compare, Alloc > &rhs)
+	{
+		return (rhs < lhs);
+	}
+
+
+	template< class T, class Compare, class Alloc >
+	bool operator>=(const set< T, Compare, Alloc > &lhs, const set< T, Compare, Alloc > &rhs)
+	{
+		return (!(lhs < rhs));
+	}
+
+	template< class T, class Compare, class Alloc >
+	void swap(set< T, Compare, Alloc > &x, set< T, Compare, Alloc > &y)
+	{
+		x.swap(y);
+	}
 }// namespace ft
 #endif//FT_CONTAINERS_SET_HPP

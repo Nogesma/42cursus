@@ -83,17 +83,13 @@ namespace ft
 			typedef ft::bidirectional_iterator_tag iterator_category;
 			typedef ptrdiff_t difference_type;
 
-			typedef typename std::allocator< node >::pointer _node_ptr;
-
 			rbtree_iterator() : _node_it() {}
 
-			explicit rbtree_iterator(_node_ptr x) : _node_it(x) {}
+			explicit rbtree_iterator(node *x) : _node_it(x) {}
 
-			rbtree_iterator(const rbtree_iterator &x) : _node_it(x._node_it) {}
+			node *base() const { return (_node_it); }
 
-			_node_ptr base() const { return (_node_it); }
-
-			_node_ptr increment_rbtree(_node_ptr n)
+			node *increment_rbtree(node *n)
 			{
 				if (n->colour == SENTINEL) return n->left;
 				if (n->right->colour != SENTINEL)
@@ -110,7 +106,7 @@ namespace ft
 				return (n->parent);
 			}
 
-			_node_ptr decrement_rbtree(_node_ptr n)
+			node *decrement_rbtree(node *n)
 			{
 				if (n->colour == SENTINEL) return n->right;
 				if (n->left->colour != SENTINEL)
@@ -168,7 +164,7 @@ namespace ft
 				return lhs._node_it != rhs._node_it;
 			}
 
-			_node_ptr _node_it;
+			node *_node_it;
 		};
 
 		struct rbtree_const_iterator
@@ -188,9 +184,9 @@ namespace ft
 			explicit rbtree_const_iterator(node *x) : _node_it(x) {}
 
 			rbtree_const_iterator(const iterator &x) : _node_it(x._node_it) {}
-			rbtree_const_iterator(const rbtree_const_iterator &x) : _node_it(x._node_it) {}
 
-			node *base() const { return (_node_it); }
+			node *base() const { return _node_it; }
+			iterator it_const_cast() { return iterator(const_cast< node * >(_node_it)); }
 
 			const node *increment_rbtree(const node *n)
 			{
@@ -365,7 +361,7 @@ namespace ft
 		}
 
 		template< typename T1 >
-		size_type find_and_delete(T1 f, value_type &v)
+		size_type find_and_delete(T1 f, const value_type &v)
 		{
 			node *elem = *_root;
 
@@ -391,17 +387,23 @@ namespace ft
 			}
 		}
 
+		void del_const_elem(const node *N) { (void) (const_cast< node * >(N)); }
+
 		void del_elem(node *N)
 		{
 			// avoid deleting sentinel node if  user passes end() to erase
 			if (N == _sentinel_node) return;
+
+
 			// N is root and only elem in tree
 			if (N->parent == _sentinel_node && N->left == _sentinel_node &&
 				N->right == _sentinel_node)
 			{
 				*_root = _sentinel_node;
 				_begin = _sentinel_node;
+				_sentinel_node->left = _begin;
 				_end = _sentinel_node;
+				_sentinel_node->right = _end;
 				return (delete_node(N));
 			}
 			// neither child are leafs
@@ -411,14 +413,40 @@ namespace ft
 				elem = N->left;
 				while (elem->right != _sentinel_node) elem = elem->right;
 
-				value_type *tmp;
-
-				tmp = N->val;
-				N->val = elem->val;
-				elem->val = tmp;
+				std::swap(N->val, elem->val);
 
 				N = elem;
 			}
+
+
+			if (N == _begin)
+			{
+				node *elem;
+				elem = N->right;
+				if (elem != _sentinel_node)
+				{
+					while (elem->left != _sentinel_node) elem = elem->left;
+					_begin = elem;
+				}
+				else
+					_begin = N->parent;
+				_sentinel_node->left = _begin;
+			}
+			if (N == _end)
+			{
+				node *elem;
+				elem = N->left;
+				if (elem != _sentinel_node)
+				{
+					while (elem->right != _sentinel_node) elem = elem->right;
+					_end = elem;
+				}
+				else
+					_end = N->parent;
+				_sentinel_node->right = _end;
+			}
+
+
 			// two childs are leaf
 			if (N->left == _sentinel_node && N->right == _sentinel_node)
 			{
@@ -447,6 +475,7 @@ namespace ft
 			if (get_child_dir(N) == LEFT) N->parent->left = C;
 			else
 				N->parent->right = C;
+			C->parent = N->parent;
 			return (delete_node(N));
 		}
 
@@ -526,6 +555,27 @@ namespace ft
 				ft::make_pair(iterator(insert_elem(elem.first._node_it, v, elem.second)), true));
 		}
 
+		//		template< typename T1 >
+		//		ft::pair< const_iterator, bool > insert(T1 f, const value_type &v)
+		//		{
+		//			ft::pair< const_iterator, int > elem = find(f, v);
+		//
+		//			if (elem.first == const_iterator(_sentinel_node))
+		//			{
+		//				*_root = create_new_elem(v);
+		//				(*_root)->colour = BLACK;
+		//				_begin = *_root;
+		//				_sentinel_node->left = _begin;
+		//				_end = *_root;
+		//				_sentinel_node->right = _end;
+		//				return (ft::make_pair(const_iterator(*_root), true));
+		//			}
+		//
+		//			if (elem.second == (int) NULL_DIR) return (ft::make_pair(elem.first, false));
+		//			return (ft::make_pair(const_iterator(insert_elem(elem.first._node_it, v, elem.second)),
+		//								  true));
+		//		}
+
 		template< typename T1 >
 		ft::pair< iterator, bool > insert(T1 f, iterator hint, const value_type &v)
 		{
@@ -540,34 +590,94 @@ namespace ft
 		}
 
 
+		template< typename T1 >
+		ft::pair< iterator, bool > insert(T1 f, const_iterator hint, const value_type &v)
+		{
+			(void) hint;// todo: fix
+			//			node *elem = *hint;
+			//
+			//			if (elem != _sentinel_node)
+			//				if (f(*elem->val, v) && elem->right == _sentinel_node)
+			//					return (make_pair(iterator(insert_elem(elem, v, RIGHT)), true));
+
+			return insert(f, v);
+		}
+
 		bool empty() const { return (_size == 0); }
 
 		size_type size() const { return (_size); }
 
 		size_type max_size() const { return (_node_allocator.max_size()); }
 
-		void clear() { clear_rec(*_root); }
+		void clear()
+		{
+			_begin = _sentinel_node;
+			_end = _sentinel_node;
+			_sentinel_node->left = _begin;
+			_sentinel_node->right = _end;
+			clear_rec(*_root);
+			*_root = _sentinel_node;
+		}
+
+		template< typename T1 >
+		iterator upper_bound(T1 f, const value_type &v)
+		{
+			iterator it = begin();
+
+			while (it != end())
+				if (f(v, *it)) return (it);
+				else
+					it++;
+			return it;
+		}
+
+		template< typename T1 >
+		const_iterator upper_bound(T1 f, const value_type &v) const
+		{
+
+			const_iterator it = begin();
+
+			while (it != end())
+				if (f(v, *it)) return (it);
+				else
+					it++;
+			return it;
+		}
 
 		template< typename T1 >
 		iterator lower_bound(T1 f, const value_type &v)
 		{
-			node *elem = *_root;
+			iterator it = begin();
 
-			if (elem == _sentinel_node) return (end());
-
-			while (true)
-			{
-				if (f(*elem->val, v))
-				{
-					if (elem->right == _sentinel_node) return (end());
-					elem = elem->right;
-				}
+			while (it != end())
+				if (f(*it, v)) it++;
 				else
-				{
-					if (elem->left == _sentinel_node) return (iterator(elem));
-					elem = elem->left;
-				}
-			}
+					return (it);
+			return it;
+		}
+
+		template< typename T1 >
+		const_iterator lower_bound(T1 f, const value_type &v) const
+		{
+			const_iterator it = begin();
+
+			while (it != end())
+				if (f(*it, v)) it++;
+				else
+					return (it);
+			return it;
+		}
+
+		template< typename T1 >
+		pair< iterator, iterator > equal_range(T1 f, const value_type &v)
+		{
+			return (make_pair(lower_bound(f, v), upper_bound(f, v)));
+		}
+
+		template< typename T1 >
+		pair< const_iterator, const_iterator > equal_range(T1 f, const value_type &v) const
+		{
+			return (make_pair(lower_bound(f, v), upper_bound(f, v)));
 		}
 
 	private:
@@ -580,9 +690,6 @@ namespace ft
 			struct node *D;
 
 			assert(P != _sentinel_node);
-			// we deleted N parent, so use after free
-			std::cout << "HR:: " << P << ' ' << _sentinel_node << '\n';
-			std::cout << "NSDODINC: " << (P->left == N) << std::endl;
 			dir = get_child_dir(N);
 			if (dir == LEFT) N->parent->left = _sentinel_node;
 			else
@@ -607,8 +714,8 @@ namespace ft
 				// Case_D1 (P+C+S+D black):
 				S->colour = RED;
 				N = P;// new current node (maybe the root)
-					  // iterate 1 black level
-					  //   (= 1 tree level) higher
+					// iterate 1 black level
+					//   (= 1 tree level) higher
 			} while ((P = N->parent) != _sentinel_node);
 			// end of the (do while)-loop
 
@@ -667,22 +774,24 @@ namespace ft
 			clear_rec(N->left);
 			clear_rec(N->right);
 
-			delete_node(N);
+			// todo: use delete_node
+			--_size;
+			_allocator.destroy(N->val);
+			_allocator.deallocate(N->val, 1);
+			_node_allocator.destroy(N);
+			_node_allocator.deallocate(N, 1);
 		}
 
 		void delete_node(node *N)
 		{
-			if (N->parent != _sentinel_node)
-			{
-				if (N->parent->left == N) N->parent->left = _sentinel_node;
-				if (N->parent->right == N) N->parent->right = _sentinel_node;
-			}
-			else
-				*_root = _sentinel_node;
-			if (N == _begin) _begin = N->parent;
-			_sentinel_node->left = _begin;
-			if (N == _end) _end = N->parent;
-			_sentinel_node->right = _end;
+			// all theses condition should be managed before calling this function
+			assert(N->left->parent != N);
+			assert(N->right->parent != N);
+			assert(_sentinel_node == *_root || N == *_root || N->parent != _sentinel_node);
+			assert(N != _begin);
+			assert(N != _end);
+			assert(_sentinel_node->left == _begin);
+			assert(_sentinel_node->right == _end);
 
 			--_size;
 			_allocator.destroy(N->val);

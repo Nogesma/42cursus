@@ -70,7 +70,7 @@ namespace ft
 			for (size_type i = 0; i < _size; ++i, ++first) _allocator.construct(_value + i, *first);
 		}
 
-		vector(const vector &x) : _capacity(), _size(), _allocator(x._allocator)
+		vector(const vector &x) : _capacity(), _size(), _value(), _allocator(x._allocator)
 		{
 			insert(begin(), x.begin(), x.end());
 		}
