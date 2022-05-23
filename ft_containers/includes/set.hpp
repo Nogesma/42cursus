@@ -7,6 +7,7 @@
 
 #include <RedBlackTree.hpp>
 #include <algorithm.hpp>
+
 #include <functional>
 #include <memory>
 

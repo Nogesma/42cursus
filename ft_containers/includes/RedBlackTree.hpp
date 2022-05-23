@@ -8,7 +8,6 @@
 #include <iterator.hpp>
 #include <utility.hpp>
 
-#include <cassert>
 #include <cstddef>
 #include <iostream>
 #include <memory>
@@ -387,8 +386,6 @@ namespace ft
 			}
 		}
 
-		void del_const_elem(const node *N) { (void) (const_cast< node * >(N)); }
-
 		void del_elem(node *N)
 		{
 			// avoid deleting sentinel node if  user passes end() to erase
@@ -464,13 +461,9 @@ namespace ft
 			// one child is a leaf
 			node *C;
 			if (N->left == _sentinel_node) C = N->right;
-			else if (N->right == _sentinel_node)
-				C = N->left;
 			else
-				assert(1 == 0);// should never happen
+				C = N->left;
 
-			// one child is a leaf
-			assert(C->colour == RED);
 			C->colour = BLACK;
 			if (get_child_dir(N) == LEFT) N->parent->left = C;
 			else
@@ -489,7 +482,6 @@ namespace ft
 
 			while (true)
 			{
-				assert(elem != _sentinel_node && elem != NULL);
 				if (f(v, *elem->val))
 				{
 					if (elem->left == _sentinel_node)
@@ -558,13 +550,7 @@ namespace ft
 		template< typename T1 >
 		ft::pair< iterator, bool > insert(T1 f, iterator hint, const value_type &v)
 		{
-			(void) hint;// todo: fix
-			//			node *elem = *hint;
-			//
-			//			if (elem != _sentinel_node)
-			//				if (f(*elem->val, v) && elem->right == _sentinel_node)
-			//					return (make_pair(iterator(insert_elem(elem, v, RIGHT)), true));
-
+			(void) hint;
 			return insert(f, v);
 		}
 
@@ -572,13 +558,7 @@ namespace ft
 		template< typename T1 >
 		ft::pair< iterator, bool > insert(T1 f, const_iterator hint, const value_type &v)
 		{
-			(void) hint;// todo: fix
-			//			node *elem = *hint;
-			//
-			//			if (elem != _sentinel_node)
-			//				if (f(*elem->val, v) && elem->right == _sentinel_node)
-			//					return (make_pair(iterator(insert_elem(elem, v, RIGHT)), true));
-
+			(void) hint;
 			return insert(f, v);
 		}
 
@@ -668,7 +648,6 @@ namespace ft
 			struct node *C;
 			struct node *D;
 
-			assert(P != _sentinel_node);
 			dir = get_child_dir(N);
 			if (dir == LEFT) N->parent->left = _sentinel_node;
 			else
@@ -677,57 +656,44 @@ namespace ft
 			goto Start_D;
 
 			do {
-				dir = get_child_dir(N);// side of parent P on which node N is located
+				dir = get_child_dir(N);
 			Start_D:
-				S = get_sibling(N, dir);// sibling of N (has black height >= 1)
+				S = get_sibling(N, dir);
 				D = get_child(S, !dir);
 				C = get_child(S, dir);
 				if (S->colour == RED) goto Case_D3;// S red ===> P+C+D black
-				// S is black:
-				if (D != _sentinel_node && D->colour == RED)// not considered black
-					goto Case_D6;                           // D red && S black
-				if (C != _sentinel_node && C->colour == RED)// not considered black
-					goto Case_D5;                           // C red && S+D black
-				// Here both nephews are == NIL (first iteration) or black (later).
+				if (D != _sentinel_node && D->colour == RED) goto Case_D6;
+				if (C != _sentinel_node && C->colour == RED) goto Case_D5;
 				if (P->colour == RED) goto Case_D4;
-				// Case_D1 (P+C+S+D black):
 				S->colour = RED;
-				N = P;// new current node (maybe the root)
-					  // iterate 1 black level
-					  //   (= 1 tree level) higher
+				N = P;
 			} while ((P = N->parent) != _sentinel_node);
-			// end of the (do while)-loop
 
-			// Case_D2 (P == NULL):
-			return;             // deletion complete
-		Case_D3:                // S red && P+C+D black:
-			rotate_tree(P, dir);// P may be the root
+			return;
+		Case_D3:
+			rotate_tree(P, dir);
 			P->colour = RED;
 			S->colour = BLACK;
-			S = C;// != NIL
-			// now: P red && S black
+			S = C;
 			D = get_child(S, !dir);
-			if (D != _sentinel_node && D->colour == RED) goto Case_D6;// D red && S black
+			if (D != _sentinel_node && D->colour == RED) goto Case_D6;
 			C = get_child(S, dir);
-			if (C != _sentinel_node && C->colour == RED) goto Case_D5;// C red && S+D black
-		// Otherwise C+D considered black.
-		// fall through to Case_D4
-		Case_D4:// P red && S+C+D black:
+			if (C != _sentinel_node && C->colour == RED) goto Case_D5;
+
+		Case_D4:
 			S->colour = RED;
 			P->colour = BLACK;
-			return;// deletion complete
+			return;
 
-		Case_D5:                 // C red && S+D black:
-			rotate_tree(S, !dir);// S is never the root
+		Case_D5:
+			rotate_tree(S, !dir);
 			S->colour = RED;
 			C->colour = BLACK;
 			D = S;
 			S = C;
-			// now: D red && S black
-			// fall through to Case_D6
 
-		Case_D6:                // D red && S black:
-			rotate_tree(P, dir);// P may be the root
+		Case_D6:
+			rotate_tree(P, dir);
 			S->colour = P->colour;
 			P->colour = BLACK;
 			D->colour = BLACK;
@@ -753,25 +719,11 @@ namespace ft
 			clear_rec(N->left);
 			clear_rec(N->right);
 
-			// todo: use delete_node
-			--_size;
-			_allocator.destroy(N->val);
-			_allocator.deallocate(N->val, 1);
-			_node_allocator.destroy(N);
-			_node_allocator.deallocate(N, 1);
+			delete_node(N);
 		}
 
 		void delete_node(node *N)
 		{
-			// all theses condition should be managed before calling this function
-			assert(N->left->parent != N);
-			assert(N->right->parent != N);
-			assert(_sentinel_node == *_root || N == *_root || N->parent != _sentinel_node);
-			assert(N != _begin);
-			assert(N != _end);
-			assert(_sentinel_node->left == _begin);
-			assert(_sentinel_node->right == _end);
-
 			--_size;
 			_allocator.destroy(N->val);
 			_allocator.deallocate(N->val, 1);
@@ -805,7 +757,6 @@ namespace ft
 				S = P->left;
 			node *C;
 
-			assert(S != _sentinel_node);// pointer to true node required
 			if (dir == LEFT)
 			{
 				C = S->left;
@@ -819,7 +770,10 @@ namespace ft
 
 			if (C != _sentinel_node) C->parent = P;
 			if (dir == LEFT) { S->left = P; }
-			else { S->right = P; }
+			else
+			{
+				S->right = P;
+			}
 			P->parent = S;
 			S->parent = G;
 
@@ -827,7 +781,10 @@ namespace ft
 			{
 				dir = (P == G->right) ? RIGHT : LEFT;
 				if (dir == LEFT) { G->left = S; }
-				else { G->right = S; }
+				else
+				{
+					G->right = S;
+				}
 			}
 			else
 				*_root = S;

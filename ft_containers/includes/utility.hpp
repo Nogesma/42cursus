@@ -22,7 +22,7 @@ namespace ft
 		pair(const first_type &a, const second_type &b) : first(a), second(b) {}
 
 		template< typename U1, typename U2 >
-		explicit pair(const pair< U1, U2 > &p) : first(p.first), second(p.second)
+		pair(const pair< U1, U2 > &p) : first(p.first), second(p.second)
 		{}
 	};
 

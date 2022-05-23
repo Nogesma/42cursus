@@ -3,7 +3,7 @@
 #include <string>
 
 #ifndef USE_STD_NAMESPACE
-#define USE_STD_NAMESPACE 1
+#define USE_STD_NAMESPACE 0
 #endif
 
 #if USE_STD_NAMESPACE//CREATE A REAL STL EXAMPLE
