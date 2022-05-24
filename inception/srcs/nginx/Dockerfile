@@ -1,4 +1,4 @@
-FROM alpine:3.15
+FROM alpine:3
 
 RUN apk update
 RUN apk add nginx
@@ -14,8 +14,5 @@ RUN ln -sf /dev/stdout /var/log/nginx/access.log \
 
 COPY nginx.conf /etc/nginx/nginx.conf
 COPY index.html /www/index.html
-
-COPY localhost.crt /etc/ssl/certs/localhost.crt
-COPY localhost.key /etc/ssl/certs/localhost.key
 
 CMD ["/usr/sbin/nginx", "-g",  "daemon off;error_log /dev/stdout debug;"]
