@@ -2,32 +2,48 @@ version: '3.9'
 
 services:
   nginx:
+    depends_on:
+      - wordpress
     container_name: nginx
     restart: always
     build: nginx
     tty: true
+    networks:
+      front:
     ports:
       - "443:443"
-      - "80:80"
-#  mongod:
-#    container_name: mongod
-#    restart: always
-#    image: mongo:5.0
-#    volumes:
-#      - mongodb:/data/db
-#    ports:
-#      - 27017:27017
-#  scrambler:
-#    container_name: scrambler
-#    restart: always
-#    image: ghcr.io/nogesma/scrambler:latest
-#  web:
-#    container_name: web
-#    restart: always
-#    image: ghcr.io/nogesma/cube-bot-web:latest
-#    volumes:
-#      - caddy_data:/data
-#      - caddy_config:/config
-#    ports:
-#      - 80:80
-#      - 443:443
+    volumes:
+      - www:/var/www/html/wordpress
+  mariadb:
+    env_file:
+      - .env
+    container_name: mariadb
+    restart: always
+    build: mariadb
+    networks:
+      back:
+    volumes:
+      - db:/var/lib/mysql
+  wordpress:
+    depends_on:
+      - mariadb
+    env_file:
+      - .env
+    container_name: wordpress
+    restart: always
+    build: wordpress
+    networks:
+      front:
+      back:
+    volumes:
+      - www:/var/www/html/wordpress
+
+volumes:
+  db:
+    name: db
+  www:
+    name: www
+
+networks:
+  front:
+  back:
