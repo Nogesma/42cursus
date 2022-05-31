@@ -13,7 +13,8 @@ services:
     ports:
       - "443:443"
     volumes:
-      - www:/var/www/html/wordpress
+      - www:/var/www/html
+
   mariadb:
     env_file:
       - .env
@@ -24,6 +25,7 @@ services:
       back:
     volumes:
       - db:/var/lib/mysql
+
   wordpress:
     depends_on:
       - mariadb
@@ -36,12 +38,21 @@ services:
       front:
       back:
     volumes:
-      - www:/var/www/html/wordpress
+      - www:/var/www/html
 
 volumes:
   db:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /home/msegrans
     name: db
   www:
+    driver_opts:
+      type: none
+      o: bind
+      device: /home/msegrans
     name: www
 
 networks:

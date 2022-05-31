@@ -15,6 +15,6 @@ COPY nginx.conf /etc/nginx/nginx.conf
 COPY localhost.crt /etc/ssl/certs/localhost.crt
 COPY localhost.key /etc/ssl/private/localhost.key
 
-VOLUME /var/www/html/wordpress
+VOLUME /var/www/html
 
 CMD ["/usr/sbin/nginx", "-g",  "daemon off;error_log /dev/stdout debug;"]

@@ -74,8 +74,8 @@ for i in /scripts/pre-exec.d/*sh
 do
 	if [ -e "${i}" ]; then
 		echo "[i] pre-exec.d - processing $i"
-		. ${i}
+		. "${i}"
 	fi
 done
 
-exec /usr/bin/mysqld --user=mysql --console --skip-name-resolve --skip-networking=0 $@
+exec /usr/bin/mysqld --user=mysql --console --skip-name-resolve --skip-networking=0 "$@"
